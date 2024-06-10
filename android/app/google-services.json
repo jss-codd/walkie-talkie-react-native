@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "490706555606",
+    "project_id": "react-native-push-notifi-65394",
+    "storage_bucket": "react-native-push-notifi-65394.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:490706555606:android:33166546cb0f56019c2f77",
+        "android_client_info": {
+          "package_name": "com.awesomeproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYgFe4WpffRYOz9UTRtQkBnfzrjFGkffs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:490706555606:android:cde7f996c5bfb4269c2f77",
+        "android_client_info": {
+          "package_name": "react.native.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYgFe4WpffRYOz9UTRtQkBnfzrjFGkffs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
