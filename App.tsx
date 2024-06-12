@@ -161,8 +161,8 @@ function App(): React.JSX.Element {
   const getLocation = async () => {
     Geolocation.getCurrentPosition(
       (position) => {
-        // console.log(appStateVisible, 'appState.current------')
-        setLocation(position);
+        // console.log(appState.current, 'appState.current------')
+        // setLocation(position);
         // return;
         // if (appState.current == 'background') {
         if (1 == 1) {
@@ -198,28 +198,28 @@ function App(): React.JSX.Element {
   };
 
   // update App state
-  useEffect(() => {
-    // const subscription = AppState.addEventListener('change', nextAppState => {
-    //   if (
-    //     appState.current.match(/inactive|background/) &&
-    //     nextAppState === 'active'
-    //   ) {
-    //     console.log('App has come to the foreground!');
-    //   }
+  // useEffect(() => {
+  //   const subscription = AppState.addEventListener('change', nextAppState => {
+  //     if (
+  //       appState.current.match(/inactive|background/) &&
+  //       nextAppState === 'active'
+  //     ) {
+  //       console.log('App has come to the foreground!');
+  //     }
 
-    //   appState.current = nextAppState;
-    //   setAppStateVisible(appState.current);
+  //     appState.current = nextAppState;
+  //     setAppStateVisible(appState.current);
 
-    //   if (appState.current == 'active') {
-    //     stopTask();
-    //   }
-    //   console.log('AppState', appState.current);
-    // });
+  //     if (appState.current == 'active') {
+  //       stopTask();
+  //     }
+  //     console.log('AppState', appState.current);
+  //   });
 
-    // return () => {
-    //   subscription.remove();
-    // };
-  }, []);
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, []);
 
   // check internet
   useEffect(() => {
@@ -313,7 +313,7 @@ function App(): React.JSX.Element {
   // add background task
   useEffect(() => {
     ReactNativeForegroundService.add_task(() => getLocation(), {
-      delay: 5000,
+      delay: 60000,
       onLoop: true,
       taskId: 'taskid',
       onError: e => console.log(`Error logging:`, e),
@@ -361,7 +361,7 @@ function App(): React.JSX.Element {
       </View>
     );
   }
-
+  // console.log(location, 'location')
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -387,20 +387,21 @@ function App(): React.JSX.Element {
         <MapView
           style={styles.mapStyle}
           // initialRegion={{
-          //   latitude: (location?.coords?.latitude || -37.020100),
-          //   longitude: (location?.coords?.longitude || 144.964600),
-          //   latitudeDelta: 0.0122,
-          //   longitudeDelta: 0.0121,
-          //   latitudeDelta: 0.0922,
-          //   longitudeDelta: 0.0421
+          //   latitude: (location?.coords?.latitude || 22.6870138),
+          //   longitude: (location?.coords?.longitude || 75.8712195),
+          //   latitudeDelta: 0.0100,
+          //   longitudeDelta: 0.0011,
+          //   // latitudeDelta: 0.0922,
+          //   // longitudeDelta: 0.0421
           // }}
           region={{
             latitude: (location?.coords?.latitude || -37.020100),
             longitude: (location?.coords?.longitude || 144.964600),
-            latitudeDelta: 0.0122,
-            longitudeDelta: 0.0121
+            latitudeDelta: 0.0100,
+            longitudeDelta: 0.0011
           }}
           showsUserLocation={true}
+          onUserLocationChange={(e: any) => setLocation({ coords: { latitude: e.nativeEvent.coordinate.latitude, longitude: e.nativeEvent.coordinate.longitude } })}
           // showsTraffic={true}
           loadingEnabled={true}
           // minZoomLevel={15}
