@@ -49,6 +49,10 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>App needs AlwaysAndWhenIn BG locations permission</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>App needs Always BG locations permission</string>
 	<false/>
 </dict>
 </plist>

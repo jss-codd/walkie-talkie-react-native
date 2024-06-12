@@ -18,12 +18,27 @@ const VoiceRecorder = () => {
     const [audioPath, setAudioPath] = useState('');
     const [loader, setLoader] = useState(false);
     const [isEnabled, setIsEnabled] = useState(false);
+    const [timerState, setTimerState] = useState<any>(null);
 
     const dirs = RNFetchBlob.fs.dirs;
     const path = Platform.select({
         ios: 'sound.m4a',
         android: `${dirs.CacheDir}/sound.mp3`,
     });
+
+    const getMimeType = (fileExtension: string) => {
+        // Define a map of file extensions to MIME types
+        const mimeTypes = {
+            m4a: 'audio/m4a',
+            mp3: 'audio/mp3',
+        };
+
+        // Get the MIME type from the map based on the file extension
+        const mimeType = mimeTypes[fileExtension.toLowerCase()];
+
+        // Return the MIME type or a default value if not found
+        return mimeType || 'application/octet-stream'; // Default MIME type for unknown file types
+    };
 
     const requestPermissions = async () => {
         if (Platform.OS === 'android') {
@@ -60,45 +75,82 @@ const VoiceRecorder = () => {
             return;
         });
         setAudioPath(result);
+
+        const timer = setTimeout(() => {
+            onStopRecord();
+        }, 10000)
+
+        setTimerState(timer);
     };
 
+    const onCancelRecord = async (timer: string | number | NodeJS.Timeout | undefined) => {
+        await audioRecorderPlayer.stopRecorder();
+        audioRecorderPlayer.removeRecordBackListener();
+
+        clearTimeout(timer);
+        setRecording(false);
+        setRecordTime('0');
+        setAudioPath('');
+    }
+
     const onStopRecord = async () => {
-        setLoader(true)
+        setLoader(true);
         setRecording(false);
         const result = await audioRecorderPlayer.stopRecorder();
+        const fileExtension = result.split('.').pop();
+        if (!fileExtension) return;
+        const mimeType = getMimeType(fileExtension);
+        const fileNameWithExtension = 'sound.' + fileExtension;
         audioRecorderPlayer.removeRecordBackListener();
         setRecordTime('0');
         setAudioPath(result);
-
         const token: any = await loadStorage();
 
         //call curl here
-        RNFetchBlob.fetch('POST', UPLOAD_URL + '/upload', {
-            // this is required, otherwise it won't be process as a multipart/form-data request
-            'Content-Type': 'multipart/form-data',
-        }, [
+        RNFetchBlob.fetch(
+            'POST',
+            UPLOAD_URL + '/upload',
             {
-                name: 'file',
-                filename: 'sound.mp3',
-                // upload a file from asset is also possible in version >= 0.6.2
-                data: RNFetchBlob.wrap((result))
+                // this is required, otherwise it won't be process as a multipart/form-data request
+                'Content-Type': 'multipart/form-data',
             },
-            {
-                name: "token",
-                data: token?.token || ""
-            }
-        ]).then((resp) => {
-            const res = JSON.parse(resp.data) || { success: false };
-            setLoader(false);
-            if (res?.success)
-                Alert.alert('Recording Success');
-            else
-                Alert.alert('Recording Failed');
-        }).catch((err) => {
-            setLoader(false)
-            Alert.alert('Recording Failed', err.message);
-            console.log(err, 'err')
-        })
+            [
+                {
+                    name: 'file',
+                    filename: fileNameWithExtension,
+                    // upload a file from asset is also possible in version >= 0.6.2
+                    data: RNFetchBlob.wrap(
+                        Platform.OS === 'ios'
+                            ? result.replace('file://', '')
+                            : result,
+                    ),
+                    // type: mimeType,
+                },
+                {
+                    name: 'token',
+                    data: token?.token || '',
+                },
+            ],
+        )
+            // listen to upload progress event
+            .uploadProgress((written, total) => {
+                console.log('uploaded', written / total);
+            })
+            // listen to download progress event
+            .progress((received, total) => {
+                console.log('progress', received / total);
+            })
+            .then(resp => {
+                const res = JSON.parse(resp.data) || { success: false };
+                setLoader(false);
+                if (res?.success) Alert.alert('Recording Success');
+                else Alert.alert('Recording Failed');
+            })
+            .catch(err => {
+                setLoader(false);
+                Alert.alert('Recording Failed', err.message);
+                console.log(err, 'err');
+            });
     };
 
     const toggleNotification = async (e: boolean) => {
@@ -125,7 +177,7 @@ const VoiceRecorder = () => {
             });
     }
 
-    const fetchNotificationStatus = async() => {
+    const fetchNotificationStatus = async () => {
         setLoader(true);
         const token: any = await loadStorage();
 
@@ -156,7 +208,15 @@ const VoiceRecorder = () => {
             <Image style={styles.logo} source={require('../icons/logo.png')} width={100} height={100} alt='logo' />
             <Text style={{ marginBottom: 20, marginTop: 50, fontSize: 20, color: "#666" }}>Recording Time: {recordTime}</Text>
 
-            <Button title={recording ? "Stop Recording" : "Start Recording"} onPress={recording ? onStopRecord : onStartRecord} />
+            <View style={styles.thread}>
+                <View>
+                    <Button title={recording ? "Recording Running" : "Start Recording"} onPress={recording ? void (0) : onStartRecord} />
+                </View>
+                <View>
+                    {recording && (<Button color="#dc3545" title={"Cancel Recording"} onPress={() => onCancelRecord(timerState)} />)}
+                </View>
+            </View>
+
 
             <View style={{ marginBottom: 20, marginTop: 20 }}>
                 <Text style={{ fontSize: 20, color: "#666" }}>Receive Notification: <Switch
@@ -182,6 +242,11 @@ const styles = StyleSheet.create({
     },
     textDark: {
         color: "#666"
+    },
+    thread: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 10,
     }
 });
 

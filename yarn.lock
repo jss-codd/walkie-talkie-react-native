@@ -1571,6 +1571,11 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
+"@supersami/rn-foreground-service@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.npmjs.org/@supersami/rn-foreground-service/-/rn-foreground-service-2.1.1.tgz"
+  integrity sha512-CyeArkV2OUvgSjhYbmm//h/s5zKHOCyG97g4lODxEpmkxHF5WwMOFdFuMWEHhG7KUAfJg5gOYxr1erq2EhlvLQ==
+
 "@types/axios@^0.14.0":
   version "0.14.0"
   resolved "https://registry.npmjs.org/@types/axios/-/axios-0.14.0.tgz"
@@ -1602,6 +1607,11 @@
   version "7.20.6"
   dependencies:
     "@babel/types" "^7.20.7"
+
+"@types/geojson@^7946.0.13":
+  version "7946.0.14"
+  resolved "https://registry.npmjs.org/@types/geojson/-/geojson-7946.0.14.tgz"
+  integrity sha512-WCfD5Ht3ZesJUsONdhvm84dmzWOiOzOAqOncN0++w0lBw1o8OuDNJF2McvvCef/yBqb/HYRahp1BYtODFQ8bRg==
 
 "@types/graceful-fs@^4.1.3":
   version "4.1.9"
@@ -4889,6 +4899,18 @@ react-native-fs@^2.20.0:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
 
+react-native-geolocation-service@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.npmjs.org/react-native-geolocation-service/-/react-native-geolocation-service-5.3.1.tgz"
+  integrity sha512-LTXPtPNmrdhx+yeWG47sAaCgQc3nG1z+HLLHlhK/5YfOgfLcAb9HAkhREPjQKPZOUx8pKZMIpdGFUGfJYtimXQ==
+
+react-native-maps@^1.15.6:
+  version "1.15.6"
+  resolved "https://registry.npmjs.org/react-native-maps/-/react-native-maps-1.15.6.tgz"
+  integrity sha512-RRyjMvpMoV3249kJ9PA1JjZE/8FmYYHrHuloI/Vzkg/DjxFtJAbFnCnhg5AyS/LI5/n2riulbVl4qpiKpuO22Q==
+  dependencies:
+    "@types/geojson" "^7946.0.13"
+
 react-native-permissions@^4.1.5:
   version "4.1.5"
   resolved "https://registry.npmjs.org/react-native-permissions/-/react-native-permissions-4.1.5.tgz"
@@ -4912,7 +4934,7 @@ react-native-storage@^1.0.1:
     opencollective "^1.0.3"
     opencollective-postinstall "^2.0.2"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@>=0.33, react-native@>=0.58.4, react-native@>=0.59, react-native@>=0.70.0, react-native@>=0.8.0, react-native@0.74.1:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@>= 0.64.3", react-native@>=0.33, react-native@>=0.58.4, react-native@>=0.59, react-native@>=0.59.0, react-native@>=0.70.0, react-native@>=0.8.0, react-native@0.74.1:
   version "0.74.1"
   dependencies:
     "@jest/create-cache-key-function" "^29.6.3"
@@ -4969,7 +4991,7 @@ react-test-renderer@18.2.0:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.23.0"
 
-react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", react@^18.2.0, react@>=16.6.3, react@>=16.8, react@>=18.1.0, react@18.2.0:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", react@^18.2.0, "react@>= 17.0.1", react@>=16.6.3, react@>=16.8, react@>=18.1.0, react@18.2.0:
   version "18.2.0"
   dependencies:
     loose-envify "^1.1.0"

@@ -127,6 +127,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:28.2.1')
     // Add the dependencies for the desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
