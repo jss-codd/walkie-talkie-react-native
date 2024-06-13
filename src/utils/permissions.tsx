@@ -1,10 +1,12 @@
 import {PermissionsAndroid, Platform} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import axios from 'axios';
-import {BACKEND_URL} from './constants';
-import {saveStorage} from './storage';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import {BACKEND_URL} from './constants';
+import {saveStorage} from './storage';
+import { showAlert } from './alert';
 
 const hasLocationPermission = async () => {
     let locationPermission: any;
@@ -116,4 +118,28 @@ const askInitialPermission = async () => {
     return grantedLocation && grantedNotification;
 };
 
-export {hasLocationPermission, askInitialPermission};
+const requestAudioPermissions = async () => {
+    if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.requestMultiple([
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        ]);
+
+        if (
+            ((granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED) || (granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN)) &&
+            ((granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED) || (granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN)) &&
+            ((granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED) || (granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN))
+        ) {
+            return true;
+        } else {
+            showAlert('Permissions not granted!', "");
+            return false;
+        }
+    } else {
+        const result = await request(PERMISSIONS.IOS.MICROPHONE);
+        return result === 'granted';
+    }
+};
+
+export {hasLocationPermission, askInitialPermission, requestAudioPermissions};
