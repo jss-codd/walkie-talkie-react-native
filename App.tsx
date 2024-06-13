@@ -139,7 +139,7 @@ function App(): React.JSX.Element {
     // add background task
     useEffect(() => {
         ReactNativeForegroundService.add_task(() => getLocation(), {
-            delay: 60000,
+            delay: 10000,
             onLoop: true,
             taskId: 'taskid',
             onError: e => console.log(`Error logging:`, e),
@@ -236,7 +236,6 @@ function App(): React.JSX.Element {
                                         e.nativeEvent.coordinate.longitude,
                                 },
                             });
-                            console.log('e.nativeEvent', e.nativeEvent);
                         }}
                         // showsTraffic={true}
                         loadingEnabled={true}
