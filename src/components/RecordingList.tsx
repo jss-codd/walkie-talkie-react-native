@@ -5,6 +5,9 @@ import VoiceRecorder from "./VoiceRecorder";
 import { TimeAgo } from "../utils/timeAgo";
 import Sound from 'react-native-sound';
 import { showAlert } from "../utils/alert";
+import Play from '../assets/svgs/play.svg';
+import Delete from '../assets/svgs/delete.svg';
+import Pause from '../assets/svgs/pause.svg';
 
 Sound.setCategory('Playback'); // true = mixWithOthers
 
@@ -50,25 +53,27 @@ const RecordingList = (props: any) => {
 
     const ThreadItem = ({ item, index }: { item: any, index: number }) => (
         <View style={styles.thread}>
-            <Image source={require('../assets/audio-1.jpg')} style={styles.avatar} />
+            <Image source={require('../assets/images/images.jpeg')} style={styles.avatar} />
             <View style={styles.threadContent}>
                 <Text style={styles.username}>Audio Message sent by <Text style={styles.sentBy}>Michel</Text></Text>
                 {/* <Text style={styles.content}>This is the content of the first thread</Text> */}
                 <Text style={styles.timestamp}>{TimeAgo.inWords(item.sentTime)}</Text>
             </View>
             <View>
-                <Button
+                {/* <Button
                     title="Play"
                     disabled={item.playStatus}
                     onPress={() => playSound(item, index)}
-                />
+                /> */}
+                {!item.playStatus ? (<Play onPress={() => playSound(item, index)} height={35} width={35} />) : (<Pause height={35} width={35} />)}
             </View>
             <View>
-                <Button
+                {/* <Button
                     title="Delete"
                     color="#dc3545"
                     onPress={() => deleteNotification(item, index)}
-                />
+                /> */}
+                <Delete onPress={() => deleteNotification(item, index)} height={32} width={32} />
             </View>
         </View>
     );
@@ -119,7 +124,8 @@ const styles = StyleSheet.create({
     },
     username: {
         marginBottom: 4,
-        color: '#666'
+        color: '#666',
+        fontWeight: 'bold'
     },
     content: {
         marginBottom: 4,

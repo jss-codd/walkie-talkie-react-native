@@ -3,69 +3,47 @@ import { View, Button, Text, PermissionsAndroid, Platform, Alert, Image, StyleSh
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import { request, PERMISSIONS } from 'react-native-permissions';
 import RNFetchBlob from 'rn-fetch-blob'
+import axios from 'axios';
+
 import { BACKEND_URL } from '../utils/constants'
 import Loader from './Loader';
 import { loadStorage } from '../utils/storage';
-import axios from 'axios';
+import Clock from '../assets/svgs/clock.svg';
+import { requestAudioPermissions } from '../utils/permissions';
+import { showAlert } from '../utils/alert';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
-const UPLOAD_URL = BACKEND_URL;
+const dirs = RNFetchBlob.fs.dirs;
+const path = Platform.select({
+    ios: 'sound.m4a',
+    android: `${dirs.CacheDir}/sound.mp3`,
+});
+
+const getMimeType = (fileExtension: string) => {
+    // Define a map of file extensions to MIME types
+    const mimeTypes: any = {
+        m4a: 'audio/m4a',
+        mp3: 'audio/mp3',
+    };
+
+    // Get the MIME type from the map based on the file extension
+    const mimeType = mimeTypes[fileExtension.toLowerCase()];
+
+    // Return the MIME type or a default value if not found
+    return mimeType || 'application/octet-stream'; // Default MIME type for unknown file types
+};
 
 const VoiceRecorder = () => {
     const [recording, setRecording] = useState(false);
-    const [recordTime, setRecordTime] = useState('0');
+    const [recordTime, setRecordTime] = useState('00:00:00');
     const [audioPath, setAudioPath] = useState('');
     const [loader, setLoader] = useState(false);
     const [isEnabled, setIsEnabled] = useState(false);
     const [timerState, setTimerState] = useState<any>(null);
 
-    const dirs = RNFetchBlob.fs.dirs;
-    const path = Platform.select({
-        ios: 'sound.m4a',
-        android: `${dirs.CacheDir}/sound.mp3`,
-    });
-
-    const getMimeType = (fileExtension: string) => {
-        // Define a map of file extensions to MIME types
-        const mimeTypes = {
-            m4a: 'audio/m4a',
-            mp3: 'audio/mp3',
-        };
-
-        // Get the MIME type from the map based on the file extension
-        const mimeType = mimeTypes[fileExtension.toLowerCase()];
-
-        // Return the MIME type or a default value if not found
-        return mimeType || 'application/octet-stream'; // Default MIME type for unknown file types
-    };
-
-    const requestPermissions = async () => {
-        if (Platform.OS === 'android') {
-            const granted = await PermissionsAndroid.requestMultiple([
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-            ]);
-
-            if (
-                ((granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED) || (granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN)) &&
-                ((granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED) || (granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN)) &&
-                ((granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED) || (granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN))
-            ) {
-                return true;
-            } else {
-                Alert.alert('Permissions not granted');
-                return false;
-            }
-        } else {
-            const result = await request(PERMISSIONS.IOS.MICROPHONE);
-            return result === 'granted';
-        }
-    };
-
     const onStartRecord = async () => {
-        const hasPermissions = await requestPermissions();
+        const hasPermissions = await requestAudioPermissions();
         if (!hasPermissions) return;
 
         setRecording(true);
@@ -89,7 +67,7 @@ const VoiceRecorder = () => {
 
         clearTimeout(timer);
         setRecording(false);
-        setRecordTime('0');
+        setRecordTime('00:00:00');
         setAudioPath('');
     }
 
@@ -102,14 +80,14 @@ const VoiceRecorder = () => {
         const mimeType = getMimeType(fileExtension);
         const fileNameWithExtension = 'sound.' + fileExtension;
         audioRecorderPlayer.removeRecordBackListener();
-        setRecordTime('0');
+        setRecordTime('00:00:00');
         setAudioPath(result);
         const token: any = await loadStorage();
 
         //call curl here
         RNFetchBlob.fetch(
             'POST',
-            UPLOAD_URL + '/upload',
+            BACKEND_URL + '/upload',
             {
                 // this is required, otherwise it won't be process as a multipart/form-data request
                 'Content-Type': 'multipart/form-data',
@@ -144,11 +122,11 @@ const VoiceRecorder = () => {
                 const res = JSON.parse(resp.data) || { success: false };
                 setLoader(false);
                 if (res?.success) Alert.alert('Recording Success');
-                else Alert.alert('Recording Failed');
+                else showAlert('Recording Failed', "");
             })
             .catch(err => {
                 setLoader(false);
-                Alert.alert('Recording Failed', err.message);
+                showAlert('Recording Failed', err.message);
                 console.log(err, 'err');
             });
     };
@@ -170,8 +148,8 @@ const VoiceRecorder = () => {
                 setLoader(false)
             })
             .catch(error => {
-                setLoader(false)
-                Alert.alert('Error to change');
+                setLoader(false);
+                showAlert('Error to change', "");
                 setIsEnabled(previousState => !previousState)
                 console.error("Error sending data: ", error);
             });
@@ -192,8 +170,8 @@ const VoiceRecorder = () => {
                 setLoader(false)
             })
             .catch(error => {
-                setLoader(false)
-                Alert.alert('Error to fetch');
+                setLoader(false);
+                showAlert('Error to fetch', "");
                 console.error("Error fetch data: ", error);
             });
     }
@@ -205,8 +183,18 @@ const VoiceRecorder = () => {
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginBottom: '10%' }}>
             <Loader loading={loader} />
-            <Image style={styles.logo} source={require('../icons/logo.png')} width={100} height={100} alt='logo' />
-            <Text style={{ marginBottom: 20, marginTop: 50, fontSize: 20, color: "#666" }}>Recording Time: {recordTime}</Text>
+            <Image style={styles.logo} source={require('../icons/logo.png')} alt='logo' />
+
+            <View style={{ flexDirection: 'row', marginBottom: 20, marginTop: 20, gap: 10 }}>
+                <View>
+                    <Clock height={35} width={35} />
+                </View>
+                <View>
+                    <Text style={{ fontSize: 20, color: "#666" }}>
+                        {recordTime}
+                    </Text>
+                </View>
+            </View>
 
             <View style={styles.thread}>
                 <View>
@@ -217,16 +205,19 @@ const VoiceRecorder = () => {
                 </View>
             </View>
 
-
-            <View style={{ marginBottom: 20, marginTop: 20 }}>
-                <Text style={{ fontSize: 20, color: "#666" }}>Receive Notification: <Switch
-                    trackColor={{ false: '#767577', true: '#81b0ff' }}
-                    thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                    ios_backgroundColor="#3e3e3e"
-                    style={{}}
-                    value={isEnabled}
-                    onValueChange={toggleNotification}
-                /></Text>
+            <View style={{ marginTop: 20, flexDirection: 'row' }}>
+                <View>
+                    <Text style={{ fontSize: 18, color: "#666" }}>Receive Notification:</Text>
+                </View>
+                <View>
+                    <Switch
+                        trackColor={{ false: '#767577', true: '#81b0ff' }}
+                        thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+                        ios_backgroundColor="#3e3e3e"
+                        value={isEnabled}
+                        onValueChange={toggleNotification}
+                    />
+                </View>
             </View>
         </View>
     );
