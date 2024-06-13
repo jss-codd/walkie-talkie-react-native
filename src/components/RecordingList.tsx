@@ -4,6 +4,7 @@ import { loadStorage, saveStorage } from "../utils/storage";
 import VoiceRecorder from "./VoiceRecorder";
 import { TimeAgo } from "../utils/timeAgo";
 import Sound from 'react-native-sound';
+import { showAlert } from "../utils/alert";
 
 Sound.setCategory('Playback'); // true = mixWithOthers
 
@@ -17,7 +18,7 @@ const RecordingList = (props: any) => {
 
         const callback = (error: any, sound: any) => {
             if (error) {
-                Alert.alert('error', error.message);
+                showAlert('Error on playing sound!', error.message);
                 return;
             }
 
@@ -51,7 +52,7 @@ const RecordingList = (props: any) => {
         <View style={styles.thread}>
             <Image source={require('../assets/audio-1.jpg')} style={styles.avatar} />
             <View style={styles.threadContent}>
-                <Text style={styles.username}>@Recording {index + 1}</Text>
+                <Text style={styles.username}>Audio Message sent by <Text style={styles.sentBy}>Michel</Text></Text>
                 {/* <Text style={styles.content}>This is the content of the first thread</Text> */}
                 <Text style={styles.timestamp}>{TimeAgo.inWords(item.sentTime)}</Text>
             </View>
@@ -92,34 +93,6 @@ const RecordingList = (props: any) => {
                 contentContainerStyle={styles.container}
                 ListHeaderComponent={VoiceRecorder}
             />
-            {/* <GestureHandlerRootView style={backgroundStyle}>
-                <SwipeableFlatList
-                    ListHeaderComponent={VoiceRecorder}
-                    data={recordingList}
-                    renderItem={({ item, index }) => <ThreadItem item={item} index={index} />}
-                    renderLeftActions={({ item }) => (
-                        <SwipeableQuickActions>
-                            <SwipeableQuickActionButton
-                                onPress={() => {
-                                    LayoutAnimation.configureNext(
-                                        LayoutAnimation.Presets.easeInEaseOut,
-                                    );
-                                    // setData(data.filter(value => value !== item.album));
-                                }}
-                                text="delete"
-                                textStyle={{ fontWeight: 'bold', color: 'white' }}
-                            />
-                        </SwipeableQuickActions>
-                    )}
-                    renderRightActions={({ item }) => (
-                        <SwipeableQuickActions>
-                            <SwipeableQuickActionButton onPress={() => { }} text="Other" />
-                            <SwipeableQuickActionButton onPress={() => { }} text="Flag" />
-                            <SwipeableQuickActionButton onPress={() => { }} text="Archive" />
-                        </SwipeableQuickActions>
-                    )}
-                />
-            </GestureHandlerRootView> */}
         </>
     );
 }
@@ -145,7 +118,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     username: {
-        fontWeight: 'bold',
         marginBottom: 4,
         color: '#666'
     },
@@ -156,6 +128,10 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     scrollContainer: {},
+    sentBy: {
+        color: "#7e59c5",
+        fontWeight: 'bold'
+    }
 });
 
 export default RecordingList;

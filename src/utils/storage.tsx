@@ -14,19 +14,29 @@ const storage = new Storage({
   defaultExpires: 1000 * 3600 * 24
 });
 
-export const saveStorage = (data, key = 'fcm') => {
-    storage.save({
-        key, // Note: Do not use underscore("_") in key!
-        data
-    });
+export const saveStorage = (data: any, key = 'fcm') => {
+  storage.save({
+    key, // Note: Do not use underscore("_") in key!
+    data
+  });
 }
 
 export const loadStorage = async (key = 'fcm') => {
-    try {
-        const token = await storage.load({ key })
-        return token;
-    } catch(err){
-        console.log(err.message, 'err.message.load.token');
-        return {};
-    }
+  try {
+    const token = await storage.load({ key })
+    return token;
+  } catch (err: any) {
+    console.log(err.message, 'err.message.load.token');
+    return {};
+  }
+}
+
+export const recordingStorage = async (message: any) => {
+  const list: any = await loadStorage('recordingList');
+
+  if (Array.isArray(list)) {
+    saveStorage([message, ...list], 'recordingList');
+  } else {
+    saveStorage([message], 'recordingList');
+  }
 }

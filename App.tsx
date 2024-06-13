@@ -5,24 +5,16 @@
  * @format
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import type { PropsWithChildren } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
   View,
-  TextInput,
-  Button,
-  FlatList,
-  NativeModules,
-  AppState,
-  Platform,
-  PermissionsAndroid
+  Button
 } from 'react-native';
 
 import {
@@ -33,156 +25,44 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import NetInfo from '@react-native-community/netinfo';
-import axios from 'axios';
 import messaging from '@react-native-firebase/messaging';
 import Geolocation from 'react-native-geolocation-service';
 import ReactNativeForegroundService from "@supersami/rn-foreground-service";
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import HeadlessTask from './HeadlessTask';
-import VoiceRecorder from './src/components/VoiceRecorder';
-import { BACKEND_URL } from './src/utils/constants';
-import { loadStorage, saveStorage } from './src/utils/storage';
+import { AlertMessages } from './src/utils/constants';
+import { loadStorage, recordingStorage } from './src/utils/storage';
 import RecordingList from './src/components/RecordingList';
-
-const saveLocation = async (dataPayload: any) => {
-  // return;
-  axios.post(BACKEND_URL + '/save-location', dataPayload)
-    .then(response => {
-      // console.log("response.data: ", response.data);
-    })
-    .catch(error => {
-      console.error("Error sending data: ", error);
-    });
-}
-
-const showAlert = () => {
-  Alert.alert(
-    "No Internet! ❌",
-    "Sorry, we need an Internet connection for App to run correctly.",
-    [{ text: "Okay" }]
-  );
-};
-
-const recordingStorage = async (message: any) => {
-  const list: any = await loadStorage('recordingList');
-
-  // message.uuid = uuid.v4();
-
-  if (Array.isArray(list)) {
-    saveStorage([message, ...list], 'recordingList');
-  } else {
-    saveStorage([message], 'recordingList');
-  }
-}
-
-const hasLocationPermission = async () => {
-  if (Platform.OS === 'ios') {
-    return true;
-  }
-
-  const granted1 = await PermissionsAndroid.request(
-    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    {
-      title: 'Location Access Required',
-      message: 'This app needs to access your location',
-      buttonPositive: 'OK',
-    },
-  );
-
-  const granted2 = await PermissionsAndroid.request(
-    PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-    {
-      title: 'Background Location Permission',
-      message:
-        'We need access to your location ' +
-        'so you can get live quality updates.',
-      buttonNeutral: 'Ask Me Later',
-      buttonNegative: 'Cancel',
-      buttonPositive: 'OK',
-    },
-  );
-
-  return granted1 === PermissionsAndroid.RESULTS.GRANTED && granted2 === PermissionsAndroid.RESULTS.GRANTED;
-};
-
-// fetch token
-const requestUserPermission = async () => {
-  try {
-    await messaging().requestPermission();
-    const token = await messaging().getToken();
-
-    const dataPayload = {
-      "token": token
-    };
-
-    axios.post(BACKEND_URL + '/device-token', dataPayload)
-      .then(response => {
-        // console.log("response.data token: ", response.data);
-        saveStorage({ "token": token });
-      })
-      .catch(error => {
-        console.error("Error sending data: ", error);
-      });
-  } catch (error: any) {
-    console.log('Permission or Token retrieval error:', error.message);
-  }
-};
-
-const askInitialPermission = async () => {
-  const grantedLocation = await hasLocationPermission();
-
-  if (Platform.OS === "android") {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-    );
-
-    if (granted == PermissionsAndroid.RESULTS.GRANTED || granted == PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-      const grantedNotification = true;
-      requestUserPermission();
-      return grantedLocation && grantedNotification;
-    }
-  } else if (Platform.OS === "ios") {
-    // iOS - Requesting permissions
-    const grantedNotification = true;
-    requestUserPermission();
-    return grantedLocation && grantedNotification;
-  }
-}
+import { saveLocation } from './src/utils/apiCall';
+import { showAlert } from './src/utils/alert';
+import { hasLocationPermission, askInitialPermission } from './src/utils/permissions';
 
 function App(): React.JSX.Element {
-  const appState = useRef(AppState.currentState);
   const isDarkMode = useColorScheme() === 'dark';
   const [isConnected, setConnected] = useState(false);
   const [messageReceiveCount, setMessageReceiveCount] = useState(0);
   const [location, setLocation] = useState<any>(null);
-  const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   const getLocation = async () => {
     Geolocation.getCurrentPosition(
       (position) => {
-        // console.log(appState.current, 'appState.current------')
-        // setLocation(position);
-        // return;
-        // if (appState.current == 'background') {
-        if (1 == 1) {
-          const latitude = position?.coords?.latitude;
-          const longitude = position?.coords?.longitude;
+        const latitude = position?.coords?.latitude;
+        const longitude = position?.coords?.longitude;
 
-          loadStorage().then((token) => {
-            const dataPayload = {
-              "latitude": latitude,
-              "longitude": longitude,
-              "token": token?.token || ""
-            };
+        loadStorage().then((token) => {
+          const dataPayload = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "token": token?.token || ""
+          };
 
-            console.log(dataPayload, 'dataPayload1')
+          console.log(dataPayload, 'dataPayload1')
 
-            saveLocation(dataPayload);
-          }, (err) => {
-            console.error(err, 'token error'); // Error!
-          });
-        }
+          saveLocation(dataPayload);
+        }, (err) => {
+          console.error(err, 'token error'); // Error!
+        });
       },
       (error) => {
         console.log(`Code ${error.code}`, error.message)
@@ -197,36 +77,12 @@ function App(): React.JSX.Element {
     flex: 1
   };
 
-  // update App state
-  // useEffect(() => {
-  //   const subscription = AppState.addEventListener('change', nextAppState => {
-  //     if (
-  //       appState.current.match(/inactive|background/) &&
-  //       nextAppState === 'active'
-  //     ) {
-  //       console.log('App has come to the foreground!');
-  //     }
-
-  //     appState.current = nextAppState;
-  //     setAppStateVisible(appState.current);
-
-  //     if (appState.current == 'active') {
-  //       stopTask();
-  //     }
-  //     console.log('AppState', appState.current);
-  //   });
-
-  //   return () => {
-  //     subscription.remove();
-  //   };
-  // }, []);
-
   // check internet
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state: any) => {
       setConnected(state.isConnected);
       if (!state.isConnected) {
-        showAlert();
+        showAlert(AlertMessages.no_internet.title, AlertMessages.no_internet.message);
       }
     });
 
@@ -272,7 +128,7 @@ function App(): React.JSX.Element {
       const granted = await askInitialPermission();
 
       if (!granted) {
-        Alert.alert(`We can not access your location. Position will not work properly`);
+        showAlert(AlertMessages.location_access_error.title, AlertMessages.location_access_error.message);
       }
 
       getLocation();
@@ -342,7 +198,7 @@ function App(): React.JSX.Element {
           },
         });
       } else {
-        Alert.alert(`We can not access your location. Position will not work properly`);
+        showAlert(AlertMessages.location_access_error.title, AlertMessages.location_access_error.message);
       }
     });
   };
@@ -373,12 +229,12 @@ function App(): React.JSX.Element {
         <RecordingList messageReceiveCount={messageReceiveCount} />
       </View>
       <View>
-        <Text>
+        {/* <Text>
           {location?.coords?.latitude}
         </Text>
         <Text>
           {location?.coords?.longitude}
-        </Text>
+        </Text> */}
         <Button onPress={startTask} title="Start Live Tracking" />
         <Button onPress={stopTask} color="#dc3545" title="Stop Live Tracking" />
       </View>
@@ -386,17 +242,9 @@ function App(): React.JSX.Element {
       <View style={styles.container}>
         <MapView
           style={styles.mapStyle}
-          // initialRegion={{
-          //   latitude: (location?.coords?.latitude || 22.6870138),
-          //   longitude: (location?.coords?.longitude || 75.8712195),
-          //   latitudeDelta: 0.0100,
-          //   longitudeDelta: 0.0011,
-          //   // latitudeDelta: 0.0922,
-          //   // longitudeDelta: 0.0421
-          // }}
           region={{
-            latitude: (location?.coords?.latitude || -37.020100),
-            longitude: (location?.coords?.longitude || 144.964600),
+            latitude: (location?.coords?.latitude || 22.6870138),
+            longitude: (location?.coords?.longitude || 75.8712195),
             latitudeDelta: 0.0100,
             longitudeDelta: 0.0011
           }}
@@ -413,11 +261,6 @@ function App(): React.JSX.Element {
               latitude: location?.coords?.latitude || 0,
               longitude: location?.coords?.longitude || 0,
             }}
-          // onDragEnd={
-          //   (e) => alert(JSON.stringify(e.nativeEvent.coordinate))
-          // }
-          // title={'Test Marker'}
-          // description={'This is a description of the marker'}
           />
         </MapView>
       </View>
@@ -600,8 +443,8 @@ const styles = StyleSheet.create({
   },
   container: {
     position: 'absolute',
-    // top: 375,
-    top: 415,
+    top: 375,
+    // top: 415,
     left: 0,
     right: 0,
     bottom: 0,
