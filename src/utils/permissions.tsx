@@ -1,81 +1,119 @@
-import { PermissionsAndroid, Platform } from "react-native";
+import {PermissionsAndroid, Platform} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
-import axios from "axios";
-import { BACKEND_URL } from "./constants";
-import { saveStorage } from "./storage";
+import axios from 'axios';
+import {BACKEND_URL} from './constants';
+import {saveStorage} from './storage';
+import {request, PERMISSIONS} from 'react-native-permissions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const hasLocationPermission = async () => {
-    if (Platform.OS === 'ios') {
-        return true;
+    let locationPermission: any;
+    let bgPermission: any;
+
+    if (Platform.OS === 'android') {
+        const grantedPermission = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+                title: 'Location Access Required',
+                message: 'This app needs to access your location',
+                buttonPositive: 'OK',
+            },
+        );
+        locationPermission =
+            grantedPermission === PermissionsAndroid.RESULTS.GRANTED;
+    } else {
+        const grantedPermission = await request(
+            PERMISSIONS.IOS.LOCATION_ALWAYS,
+        );
+        locationPermission = grantedPermission === 'granted';
     }
 
-    const granted1 = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-            title: 'Location Access Required',
-            message: 'This app needs to access your location',
-            buttonPositive: 'OK',
-        },
-    );
+    if (Platform.OS === 'android') {
+        const granted2 = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+            {
+                title: 'Background Location Permission',
+                message:
+                    'We need access to your location ' +
+                    'so you can get live quality updates.',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+            },
+        );
+        bgPermission = granted2 === PermissionsAndroid.RESULTS.GRANTED;
+    } else {
+        bgPermission = true;
+    }
 
-    const granted2 = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-        {
-            title: 'Background Location Permission',
-            message:
-                'We need access to your location ' +
-                'so you can get live quality updates.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-        },
-    );
-
-    return granted1 === PermissionsAndroid.RESULTS.GRANTED && granted2 === PermissionsAndroid.RESULTS.GRANTED;
+    return locationPermission && bgPermission;
 };
 
-// fetch token
-const requestUserPermission = async () => {
-    try {
-        await messaging().requestPermission();
-        const token = await messaging().getToken();
+const getFcmToken = async () => {
+    let fcmToken = await AsyncStorage.getItem('fcmToken');
+    if (fcmToken === null) {
+        try {
+            const getToken = await messaging().getToken();
+            if (getToken) {
+                await AsyncStorage.setItem('fcmToken', getToken);
+                saveToken(getToken);
+                saveStorage({token: getToken});
+            }
+        } catch (err) {
+            console.log('Error while getting FCM Token', err);
+        }
+    }
+};
 
+// save token
+const saveToken = async (token: string) => {
+    try {
         const dataPayload = {
-            "token": token
+            token: token,
         };
 
-        axios.post(BACKEND_URL + '/device-token', dataPayload)
+        axios
+            .post(BACKEND_URL + '/device-token', dataPayload)
             .then(response => {
-                // console.log("response.data token: ", response.data);
-                saveStorage({ "token": token });
+                console.log('saveToken ', response);
             })
             .catch(error => {
-                console.error("Error sending data: ", error);
+                console.error('Error sending data: ', error);
             });
     } catch (error: any) {
         console.log('Permission or Token retrieval error:', error.message);
     }
 };
 
+const notificationPermission = async () => {
+    try {
+        if (Platform.OS === 'android') {
+            const permission = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+            );
+            return (
+                permission === PermissionsAndroid.RESULTS.GRANTED ||
+                permission === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+            );
+        } else {
+            const permission = await messaging().requestPermission();
+            return (
+                permission === messaging.AuthorizationStatus.AUTHORIZED ||
+                permission === messaging.AuthorizationStatus.PROVISIONAL
+            );
+        }
+    } catch (err) {
+        return false;
+    }
+};
+
 const askInitialPermission = async () => {
     const grantedLocation = await hasLocationPermission();
-  
-    if (Platform.OS === "android") {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-      );
-  
-      if (granted == PermissionsAndroid.RESULTS.GRANTED || granted == PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-        const grantedNotification = true;
-        requestUserPermission();
-        return grantedLocation && grantedNotification;
-      }
-    } else if (Platform.OS === "ios") {
-      // iOS - Requesting permissions
-      const grantedNotification = true;
-      requestUserPermission();
-      return grantedLocation && grantedNotification;
+    const grantedNotification = await notificationPermission();
+    if (grantedNotification) {
+        getFcmToken();
     }
-  }
+    return grantedLocation && grantedNotification;
+};
 
-export { hasLocationPermission, requestUserPermission, askInitialPermission };
+export {hasLocationPermission, askInitialPermission};
