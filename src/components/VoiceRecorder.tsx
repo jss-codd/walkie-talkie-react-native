@@ -1,9 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Button, Text, PermissionsAndroid, Platform, Alert, Image, StyleSheet, Switch } from 'react-native';
+import React, { useState } from 'react';
+import { View, Button, Text, Platform, Alert, StyleSheet } from 'react-native';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
-import { request, PERMISSIONS } from 'react-native-permissions';
 import RNFetchBlob from 'rn-fetch-blob'
-import axios from 'axios';
 
 import { BACKEND_URL } from '../utils/constants'
 import Loader from './Loader';
@@ -34,12 +32,11 @@ const getMimeType = (fileExtension: string) => {
     return mimeType || 'application/octet-stream'; // Default MIME type for unknown file types
 };
 
-const VoiceRecorder = () => {
+const VoiceRecorder = ({ children }) => {
     const [recording, setRecording] = useState(false);
     const [recordTime, setRecordTime] = useState('00:00:00');
     const [audioPath, setAudioPath] = useState('');
     const [loader, setLoader] = useState(false);
-    const [isEnabled, setIsEnabled] = useState(false);
     const [timerState, setTimerState] = useState<any>(null);
 
     const onStartRecord = async () => {
@@ -131,61 +128,11 @@ const VoiceRecorder = () => {
             });
     };
 
-    const toggleNotification = async (e: boolean) => {
-        setIsEnabled(e);
-        setLoader(true)
-        const token: any = await loadStorage();
-
-        const dataPayload = {
-            "token": token?.token || "",
-            "status": e
-        };
-
-        axios.put(BACKEND_URL + '/notification-status', dataPayload)
-            .then(response => {
-                console.log("response.data: ", response.data);
-                setIsEnabled(e);
-                setLoader(false)
-            })
-            .catch(error => {
-                setLoader(false);
-                showAlert('Error to change', "");
-                setIsEnabled(previousState => !previousState)
-                console.error("Error sending data: ", error);
-            });
-    }
-
-    const fetchNotificationStatus = async () => {
-        setLoader(true);
-        const token: any = await loadStorage();
-
-        const dataPayload = {
-            "token": token?.token || ""
-        };
-
-        axios.post(BACKEND_URL + '/notification-status', dataPayload)
-            .then(response => {
-                // console.log(response.data, 'response.data');
-                setIsEnabled(response.data.status);
-                setLoader(false)
-            })
-            .catch(error => {
-                setLoader(false);
-                showAlert('Error to fetch', "");
-                console.error("Error fetch data: ", error);
-            });
-    }
-
-    useEffect(() => {
-        fetchNotificationStatus();
-    }, [])
-
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginBottom: '10%' }}>
+        <View style={{ marginBottom: '1%', }}>
             <Loader loading={loader} />
-            <Image style={styles.logo} source={require('../icons/logo.png')} alt='logo' />
 
-            <View style={{ flexDirection: 'row', marginBottom: 20, marginTop: 20, gap: 10 }}>
+            <View style={{ flexDirection: 'row', marginBottom: 20, marginTop: 20, gap: 10, justifyContent: "center" }}>
                 <View>
                     <Clock height={35} width={35} />
                 </View>
@@ -196,28 +143,18 @@ const VoiceRecorder = () => {
                 </View>
             </View>
 
-            <View style={styles.thread}>
-                <View>
-                    <Button title={recording ? "Recording Running" : "Start Recording"} onPress={recording ? void (0) : onStartRecord} />
-                </View>
-                <View>
-                    {recording && (<Button color="#dc3545" title={"Cancel Recording"} onPress={() => onCancelRecord(timerState)} />)}
-                </View>
-            </View>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+                {!recording ? (
+                    <View>
+                        <Button title={"Start Recording"} onPress={onStartRecord} />
+                    </View>
+                ) : (
+                    <View>
+                        <Button color="#dc3545" title={"Cancel Recording"} onPress={() => onCancelRecord(timerState)} />
+                    </View>
+                )}
 
-            <View style={{ marginTop: 20, flexDirection: 'row' }}>
-                <View>
-                    <Text style={{ fontSize: 18, color: "#666" }}>Receive Notification:</Text>
-                </View>
-                <View>
-                    <Switch
-                        trackColor={{ false: '#767577', true: '#81b0ff' }}
-                        thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                        ios_backgroundColor="#3e3e3e"
-                        value={isEnabled}
-                        onValueChange={toggleNotification}
-                    />
-                </View>
+                {children}
             </View>
         </View>
     );

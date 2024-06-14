@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, Text, StyleSheet, Image, Button, Alert } from 'react-native';
-import { loadStorage, saveStorage } from "../utils/storage";
-import VoiceRecorder from "./VoiceRecorder";
-import { TimeAgo } from "../utils/timeAgo";
+import { View, FlatList, Text, StyleSheet, Image } from 'react-native';
 import Sound from 'react-native-sound';
+
+import { loadStorage, saveStorage } from "../utils/storage";
+import { TimeAgo } from "../utils/timeAgo";
 import { showAlert } from "../utils/alert";
 import Play from '../assets/svgs/play.svg';
 import Delete from '../assets/svgs/delete.svg';
@@ -11,9 +11,9 @@ import Pause from '../assets/svgs/pause.svg';
 
 Sound.setCategory('Playback'); // true = mixWithOthers
 
-const RecordingList = (props: any) => {
-    const { messageReceiveCount } = props;
+const RecordingList = () => {
     const [recordingList, setRecordingList] = useState([]);
+    const [isRefreshing, setIsRefreshing] = useState(false)
 
     function playSound(item: any, index: number) {
 
@@ -56,23 +56,12 @@ const RecordingList = (props: any) => {
             <Image source={require('../assets/images/images.jpeg')} style={styles.avatar} />
             <View style={styles.threadContent}>
                 <Text style={styles.username}>Audio Message sent by <Text style={styles.sentBy}>Michel</Text></Text>
-                {/* <Text style={styles.content}>This is the content of the first thread</Text> */}
                 <Text style={styles.timestamp}>{TimeAgo.inWords(item.sentTime)}</Text>
             </View>
             <View>
-                {/* <Button
-                    title="Play"
-                    disabled={item.playStatus}
-                    onPress={() => playSound(item, index)}
-                /> */}
                 {!item.playStatus ? (<Play onPress={() => playSound(item, index)} height={35} width={35} />) : (<Pause height={35} width={35} />)}
             </View>
             <View>
-                {/* <Button
-                    title="Delete"
-                    color="#dc3545"
-                    onPress={() => deleteNotification(item, index)}
-                /> */}
                 <Delete onPress={() => deleteNotification(item, index)} height={32} width={32} />
             </View>
         </View>
@@ -84,19 +73,38 @@ const RecordingList = (props: any) => {
         list = Array.isArray(list) ? list.map((d: any) => { return { ...d, playStatus: false } }) : [];
 
         setRecordingList(list);
+
+        setIsRefreshing(false)
     }
+
+    const onRefresh = () => {
+        setIsRefreshing(true)
+
+        loadRecordingFromStorage();
+    };
+
+    const emptyComponent = () => {
+        return (
+            <View style={{ flex: 1, alignItems: "center" }}>
+                <Text style={{ color: "#666", fontSize: 18 }}>oops! There's no data here!</Text>
+            </View>
+        );
+    };
 
     useEffect(() => {
         loadRecordingFromStorage();
-    }, [messageReceiveCount])
+    }, [])
 
     return (
         <>
             <FlatList
                 data={recordingList}
-                renderItem={({ item, index }) => <ThreadItem item={item} index={index} />}
+                renderItem={({ item, index, separators }) => <ThreadItem item={item} index={index} />}
                 contentContainerStyle={styles.container}
-                ListHeaderComponent={VoiceRecorder}
+                onRefresh={onRefresh}
+                refreshing={isRefreshing}
+                ListEmptyComponent={emptyComponent}
+            // ListHeaderComponent={VoiceRecorder}
             />
         </>
     );
