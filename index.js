@@ -8,8 +8,6 @@ import App from './App';
 import {name as appName} from './app.json';
 import { loadStorage, saveStorage } from './src/utils/storage';
 import HeadlessTask from './HeadlessTask';
-// import notifee from '@notifee/react-native';
-import ReactNativeForegroundService from "@supersami/rn-foreground-service";
 
 const recordingStorage = async (message) => {
   const list = await loadStorage('recordingList');
@@ -36,7 +34,6 @@ function HeadlessCheck({ isHeadless }) {
     return <App />;
 }
 
-ReactNativeForegroundService.register();
 AppRegistry.registerComponent(appName, () => HeadlessCheck);
 
 AppRegistry.registerHeadlessTask('HeadlessTask', () => HeadlessTask);

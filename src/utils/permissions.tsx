@@ -1,11 +1,12 @@
-import {PermissionsAndroid, Platform} from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import axios from 'axios';
-import {request, PERMISSIONS} from 'react-native-permissions';
+import { request, PERMISSIONS } from 'react-native-permissions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Permissions from 'react-native-permissions'
 
-import {BACKEND_URL} from './constants';
-import {saveStorage} from './storage';
+import { AlertMessages, BACKEND_URL } from './constants';
+import { saveStorage } from './storage';
 import { showAlert } from './alert';
 
 const hasLocationPermission = async () => {
@@ -59,7 +60,7 @@ const getFcmToken = async () => {
             if (getToken) {
                 await AsyncStorage.setItem('fcmToken', getToken);
                 saveToken(getToken);
-                saveStorage({token: getToken});
+                saveStorage({ token: getToken });
             }
         } catch (err) {
             console.log('Error while getting FCM Token', err);
@@ -77,7 +78,7 @@ const saveToken = async (token: string) => {
         axios
             .post(BACKEND_URL + '/device-token', dataPayload)
             .then(response => {
-                console.log('saveToken ', response);
+                console.log('saveToken ', response.data);
             })
             .catch(error => {
                 console.error('Error sending data: ', error);
@@ -115,6 +116,7 @@ const askInitialPermission = async () => {
     if (grantedNotification) {
         getFcmToken();
     }
+
     return grantedLocation && grantedNotification;
 };
 
@@ -142,4 +144,41 @@ const requestAudioPermissions = async () => {
     }
 };
 
-export {hasLocationPermission, askInitialPermission, requestAudioPermissions};
+const checkPermissions = async () => {
+    if (Platform.OS === 'android') {
+        const notification = await Permissions.check('android.permission.POST_NOTIFICATIONS');
+        console.log(notification, 'notification');
+        if (
+            notification !== PermissionsAndroid.RESULTS.GRANTED &&
+            notification !== PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+        ) {
+            showAlert(AlertMessages.notification_access_error.title, AlertMessages.notification_access_error.message);
+        }
+
+        const location = await Permissions.check('android.permission.ACCESS_FINE_LOCATION');
+        const locationbg = await Permissions.check('android.permission.ACCESS_BACKGROUND_LOCATION');
+
+        if (
+            location !== PermissionsAndroid.RESULTS.GRANTED ||
+            locationbg !== PermissionsAndroid.RESULTS.GRANTED
+        ) {
+            showAlert(AlertMessages.location_access_error.title, AlertMessages.location_access_error.message);
+        }
+    } else {
+        const notification = await messaging().requestPermission();
+        if (
+            notification !== messaging.AuthorizationStatus.AUTHORIZED &&
+            notification !== messaging.AuthorizationStatus.PROVISIONAL
+        ) {
+            showAlert(AlertMessages.notification_access_error.title, AlertMessages.notification_access_error.message);
+        }
+
+        const location = await Permissions.check('ios.permission.LOCATION_ALWAYS');
+
+        if (location !== PermissionsAndroid.RESULTS.GRANTED) {
+            showAlert(AlertMessages.location_access_error.title, AlertMessages.location_access_error.message);
+        }
+    }
+}
+
+export { hasLocationPermission, askInitialPermission, requestAudioPermissions, notificationPermission, checkPermissions };
