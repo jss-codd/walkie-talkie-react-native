@@ -7,6 +7,7 @@ import { saveLocation } from './apiCall';
 const getLocation = async (setLocation: (arg0: GeolocationResponse) => void) => {
     Geolocation.getCurrentPosition(
         (pos) => {
+            // console.log(pos, 'pos')
             setLocation(pos);
 
             const latitude = pos?.coords?.latitude;
@@ -33,7 +34,7 @@ const getLocation = async (setLocation: (arg0: GeolocationResponse) => void) => 
             console.log(JSON.stringify(error), "GetCurrentPosition Error")
             // showAlert('Get Current Position Error', JSON.stringify(error))
         },
-        { enableHighAccuracy: true }
+        { timeout: 10000 }
     );
 };
 
@@ -67,7 +68,7 @@ const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setSubs
                 console.log('WatchPosition Error', JSON.stringify(error));
                 // showAlert('WatchPosition Error', JSON.stringify(error)) 
             },
-            { distanceFilter: 0, interval: 5000 }
+            { distanceFilter: 0, interval: 5000, timeout: 10000 }
         );
 
         setSubscriptionId(watchID);

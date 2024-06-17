@@ -147,7 +147,7 @@ const requestAudioPermissions = async () => {
 const checkPermissions = async () => {
     if (Platform.OS === 'android') {
         const notification = await Permissions.check('android.permission.POST_NOTIFICATIONS');
-        console.log(notification, 'notification');
+        // console.log(notification, 'notification');
         if (
             notification !== PermissionsAndroid.RESULTS.GRANTED &&
             notification !== PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN

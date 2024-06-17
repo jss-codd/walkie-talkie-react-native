@@ -81,6 +81,8 @@ function HomeScreen(): React.JSX.Element {
     clearWatch(subscriptionId, setSubscriptionId);
   };
 
+  // console.log(location, 'location')
+
   return (
     <>
       <View style={{ flex: 1, alignItems: 'center' }}>
@@ -104,15 +106,15 @@ function HomeScreen(): React.JSX.Element {
                 longitudeDelta: 0.0011,
               }}
               showsUserLocation={true}
-              onUserLocationChange={(e: any) => {
-                setLocation({
-                  coords: {
-                    latitude: e.nativeEvent.coordinate.latitude,
-                    longitude:
-                      e.nativeEvent.coordinate.longitude,
-                  },
-                });
-              }}
+              // onUserLocationChange={(e: any) => {
+              //   setLocation({
+              //     coords: {
+              //       latitude: e.nativeEvent.coordinate.latitude,
+              //       longitude:
+              //         e.nativeEvent.coordinate.longitude,
+              //     },
+              //   });
+              // }}
               loadingEnabled={true}
               customMapStyle={mapStyle}>
               <Marker
@@ -303,7 +305,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     borderWidth: 1,
     borderColor: "#666",
-    borderCurve: "circular" 
+    borderCurve: "circular"
   },
   mapStyle: {
     position: 'absolute',
