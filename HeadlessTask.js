@@ -1,5 +1,7 @@
 import Sound from 'react-native-sound';
 
+import { loadStorage } from './src/utils/storage';
+
 Sound.setCategory('Playback');
 
 const playSoundRemote = (remoteMessage) => {
@@ -19,7 +21,9 @@ const playSoundRemote = (remoteMessage) => {
 }
 
 async function HeadlessTask(remoteMessage) {
-  if(remoteMessage?.data?.audio_url) {
+  const settings = await loadStorage("settings");
+  console.log(settings, 'settings')
+  if(settings?.audioPlayStatus && remoteMessage?.data?.audio_url) {
     playSoundRemote(remoteMessage)
   }
 }

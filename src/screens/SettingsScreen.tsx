@@ -1,19 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, FlatList, Text, StyleSheet, Image, Button, Alert, Switch } from 'react-native';
+import axios from 'axios';
+
 import { loadStorage } from '../utils/storage';
 import { BACKEND_URL } from '../utils/constants';
-import axios from 'axios';
 import { showAlert } from '../utils/alert';
 import Loader from '../components/Loader';
+import { SettingContext } from '../context/SettingContext';
 
 function SettingsScreen(): React.JSX.Element {
-    const [isEnabled, setIsEnabled] = useState(false);
-    const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+    const settings = useContext<any>(SettingContext);
+
+    const notificationStatus = settings.notificationStatus;
+    const audioPlayStatus = settings.audioPlayStatus;
+
     const [loader, setLoader] = useState(false);
 
     const toggleNotification = async (e: boolean) => {
-        setIsEnabled(e);
-        setLoader(true)
+        setLoader(true);
+
         const token: any = await loadStorage();
 
         const dataPayload = {
@@ -24,41 +29,17 @@ function SettingsScreen(): React.JSX.Element {
         axios.put(BACKEND_URL + '/notification-status', dataPayload)
             .then(response => {
                 console.log("response.data: ", response.data);
-                setIsEnabled(e);
+                settings.handler('notificationStatus', e)
                 setLoader(false)
             })
             .catch(error => {
                 setLoader(false);
                 showAlert('Error to change', "");
-                setIsEnabled(previousState => !previousState)
-                console.error("Error sending data: ", error);
-            });
-    }
-
-    const fetchSettings = async () => {
-        setLoader(true);
-        const token: any = await loadStorage();
-
-        const dataPayload = {
-            "token": token?.token || ""
-        };
-
-        axios.post(BACKEND_URL + '/fetch-settings', dataPayload)
-            .then(response => {
-                console.log(response.data, 'response.data');
-                setIsEnabled(response.data.status);
-                setIsAudioEnabled(response.data.play_audio);
-                setLoader(false)
-            })
-            .catch(error => {
-                setLoader(false);
-                showAlert('Error to fetch', "");
-                console.error("Error fetch data: ", error);
+                console.warn("Error sending data: ", error);
             });
     }
 
     const togglePlayAudio = async (e: boolean) => {
-        setIsAudioEnabled(e);
         setLoader(true)
         const token: any = await loadStorage();
 
@@ -70,20 +51,15 @@ function SettingsScreen(): React.JSX.Element {
         axios.put(BACKEND_URL + '/audio-play-status', dataPayload)
             .then(response => {
                 console.log("response.data: ", response.data);
-                setIsAudioEnabled(e);
+                settings.handler('audioPlayStatus', e)
                 setLoader(false)
             })
             .catch(error => {
                 setLoader(false);
                 showAlert('Error to change', "");
-                setIsAudioEnabled(previousState => !previousState)
-                console.error("Error sending data: ", error);
+                console.warn("Error sending data: ", error);
             });
     }
-
-    useEffect(() => {
-        fetchSettings();
-    }, [])
 
     return (
         <View style={{ margin: 10 }}>
@@ -95,9 +71,9 @@ function SettingsScreen(): React.JSX.Element {
                 <View style={{ flexBasis: 0, flexGrow: 1 }}>
                     <Switch
                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                        thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+                        thumbColor={notificationStatus ? '#f5dd4b' : '#f4f3f4'}
                         ios_backgroundColor="#3e3e3e"
-                        value={isEnabled}
+                        value={notificationStatus}
                         onValueChange={toggleNotification}
                     />
                 </View>
@@ -109,9 +85,9 @@ function SettingsScreen(): React.JSX.Element {
                 <View style={{ flexBasis: 0, flexGrow: 1 }}>
                     <Switch
                         trackColor={{ false: '#767577', true: '#81b0ff' }}
-                        thumbColor={isAudioEnabled ? '#f5dd4b' : '#f4f3f4'}
+                        thumbColor={audioPlayStatus ? '#f5dd4b' : '#f4f3f4'}
                         ios_backgroundColor="#3e3e3e"
-                        value={isAudioEnabled}
+                        value={audioPlayStatus}
                         onValueChange={togglePlayAudio}
                     />
                 </View>

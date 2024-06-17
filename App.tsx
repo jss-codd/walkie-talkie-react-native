@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import messaging from '@react-native-firebase/messaging';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { Header, getHeaderTitle } from '@react-navigation/elements';
+import axios from 'axios';
 
 import HeadlessTask from './HeadlessTask';
 import { showAlert } from './src/utils/alert';
-import { AlertMessages } from './src/utils/constants';
-import { recordingStorage } from './src/utils/storage';
+import { AlertMessages, BACKEND_URL } from './src/utils/constants';
+import { loadStorage, recordingStorage, saveStorage } from './src/utils/storage';
 import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import RecordingListScreen from './src/screens/RecordingListScreen';
 import Home from './src/assets/svgs/home.svg';
 import Settings from './src/assets/svgs/settings.svg';
 import Clock from './src/assets/svgs/clock-check.svg';
+import { SettingContext } from './src/context/SettingContext';
 
 const Tab = createBottomTabNavigator();
 
@@ -60,8 +62,44 @@ function MyTabs() {
   );
 }
 
+const settingsDefault = {
+  notificationStatus: true,
+  audioPlayStatus: true
+}
+
 function App(): React.JSX.Element {
   const [isConnected, setConnected] = useState(false);
+  const [settings, setSettings] = useState(settingsDefault);
+
+  
+  const settingHandler = (key: any, data: any) => {
+    saveStorage({ ...settings, [key]: data }, "settings");
+    setSettings((pre) => ({ ...pre, [key]: data }));
+  }
+  
+  const contextData = { ...settings, handler: settingHandler };
+
+  const fetchSettings = async () => {
+    // setLoader(true);
+    const token: any = await loadStorage();
+
+    const dataPayload = {
+      "token": token?.token || ""
+    };
+
+    axios.post(BACKEND_URL + '/fetch-settings', dataPayload)
+      .then(response => {
+        console.log(response.data, 'response.data');
+        const res = { audioPlayStatus: response.data.play_audio, notificationStatus: response.data.status };
+        saveStorage(res, "settings");
+        setSettings(res);
+      })
+      .catch(error => {
+        // setLoader(false);
+        showAlert('Error to fetch', "");
+        console.error("Error fetch data: ", error);
+      });
+  }
 
   // check internet
   useEffect(() => {
@@ -110,6 +148,11 @@ function App(): React.JSX.Element {
     return handleBackgroundNotification;
   }, []);
 
+  // fetch settings
+  useEffect(() => {
+    fetchSettings();
+  }, [])
+
   if (isConnected === false) {
     return (
       <View style={styles.centered}>
@@ -121,9 +164,11 @@ function App(): React.JSX.Element {
   }
 
   return (
-    <NavigationContainer>
-      <MyTabs />
-    </NavigationContainer>
+    <SettingContext.Provider value={contextData}>
+      <NavigationContainer>
+        <MyTabs />
+      </NavigationContainer>
+    </SettingContext.Provider>
   );
 }
 
