@@ -8,6 +8,7 @@ import { AlertMessages } from '../utils/constants';;
 import { askInitialPermission, checkPermissions } from '../utils/permissions';
 import { clearWatch, getLocation, watchPosition } from '../utils/location';
 import VoiceRecorder from '../components/VoiceRecorder';
+import LocationAlertModal from '../components/LocationAlertModal';
 
 function HomeScreen(): React.JSX.Element {
   const [location, setLocation] = useState<any>(null);
@@ -15,6 +16,7 @@ function HomeScreen(): React.JSX.Element {
 
   const appState = useRef(AppState.currentState);
   const [backgroundListener, setBackgroundListener] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   // location update on initial load
   useEffect(() => {
@@ -28,7 +30,7 @@ function HomeScreen(): React.JSX.Element {
         );
       }
 
-      getLocation(setLocation);
+      getLocation(setLocation, setModalVisible);
     })();
   }, []);
 
@@ -48,7 +50,7 @@ function HomeScreen(): React.JSX.Element {
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState.match(/inactive|background/)) {
         BackgroundTimer.runBackgroundTimer(() => {
-          getLocation(setLocation);
+          getLocation(setLocation, () => void (0));
         }, 5000);
 
         console.log('App has come to the foreground!');
@@ -85,6 +87,7 @@ function HomeScreen(): React.JSX.Element {
 
   return (
     <>
+      <LocationAlertModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
       <View style={{ flex: 1, alignItems: 'center' }}>
         <View>
           <VoiceRecorder>
@@ -105,7 +108,7 @@ function HomeScreen(): React.JSX.Element {
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.0011,
               }}
-              showsUserLocation={true}
+              // showsUserLocation={true}
               // onUserLocationChange={(e: any) => {
               //   setLocation({
               //     coords: {

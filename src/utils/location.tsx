@@ -3,8 +3,9 @@ import Geolocation, { GeolocationResponse } from '@react-native-community/geoloc
 import { showAlert } from './alert';
 import { loadStorage } from './storage';
 import { saveLocation } from './apiCall';
+import { SetStateAction } from 'react';
 
-const getLocation = async (setLocation: (arg0: GeolocationResponse) => void) => {
+const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, setModalVisible: (arg0: any) => void) => {
     Geolocation.getCurrentPosition(
         (pos) => {
             // console.log(pos, 'pos')
@@ -31,7 +32,10 @@ const getLocation = async (setLocation: (arg0: GeolocationResponse) => void) => 
             );
         },
         (error) => {
-            console.log(JSON.stringify(error), "GetCurrentPosition Error")
+            console.log(JSON.stringify(error), "GetCurrentPosition Error");
+            if (error.code === 2) {
+                setModalVisible(true)
+            }
             // showAlert('Get Current Position Error', JSON.stringify(error))
         },
         { timeout: 10000 }
