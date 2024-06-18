@@ -4,6 +4,23 @@ import { showAlert } from './alert';
 import { loadStorage } from './storage';
 import { saveLocation } from './apiCall';
 
+const returnLocation = () => {
+    return new Promise((resolve, reject) => {
+        Geolocation.getCurrentPosition(
+            async (pos) => {
+                const latitude = pos?.coords?.latitude;
+                const longitude = pos?.coords?.longitude;
+                resolve({ latitude, longitude })
+            },
+            (error) => {
+                console.log(JSON.stringify(error), "returnLocation Error");
+                reject(error.message);
+            },
+            { timeout: 10000 }
+        );
+    })
+};
+
 const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, setModalVisible: (arg0: any) => void) => {
     Geolocation.getCurrentPosition(
         async (pos) => {
@@ -96,7 +113,7 @@ const clearWatch = (subscriptionId: number | null, setSubscriptionId: (arg0: nul
     setSubscriptionId(null);
 };
 
-const compareLocation = async (newLoc: { latitude: number; longitude: number; }, oldLoc: any) => {
+const compareLocation = (newLoc: { latitude: number; longitude: number; }, oldLoc: any) => {
     return new Promise((resolve) => {
         if (oldLoc.hasOwnProperty('latitude') && oldLoc.hasOwnProperty('longitude') && newLoc.hasOwnProperty('latitude') && newLoc.hasOwnProperty('longitude')) {
             const distance = distanceGet(newLoc.latitude, newLoc.longitude, oldLoc.latitude, oldLoc.longitude);
@@ -121,4 +138,4 @@ const distanceGet = (lat1: number, lon1: number, lat2: number, lon2: number) => 
     return d;
 }
 
-export { getLocation, watchPosition, clearWatch };
+export { getLocation, watchPosition, clearWatch, returnLocation };

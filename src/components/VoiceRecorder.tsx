@@ -9,6 +9,7 @@ import { loadStorage } from '../utils/storage';
 import Clock from '../assets/svgs/clock.svg';
 import { requestAudioPermissions } from '../utils/permissions';
 import { showAlert } from '../utils/alert';
+import { returnLocation } from '../utils/location';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
@@ -69,63 +70,89 @@ const VoiceRecorder = ({ children }: { children: any }) => {
     }
 
     const onStopRecord = async () => {
-        setLoader(true);
-        setRecording(false);
-        const result = await audioRecorderPlayer.stopRecorder();
-        const fileExtension = result.split('.').pop();
-        if (!fileExtension) return;
-        const mimeType = getMimeType(fileExtension);
-        const fileNameWithExtension = 'sound.' + fileExtension;
-        audioRecorderPlayer.removeRecordBackListener();
-        setRecordTime('00:00:00');
-        setAudioPath(result);
-        const token: any = await loadStorage();
+        try {
+            setLoader(true);
+            setRecording(false);
 
-        //call curl here
-        RNFetchBlob.fetch(
-            'POST',
-            BACKEND_URL + '/upload',
-            {
-                // this is required, otherwise it won't be process as a multipart/form-data request
-                'Content-Type': 'multipart/form-data',
-            },
-            [
-                {
-                    name: 'file',
-                    filename: fileNameWithExtension,
-                    // upload a file from asset is also possible in version >= 0.6.2
-                    data: RNFetchBlob.wrap(
-                        Platform.OS === 'ios'
-                            ? result.replace('file://', '')
-                            : result,
-                    ),
-                    // type: mimeType,
-                },
-                {
-                    name: 'token',
-                    data: token?.token || '',
-                },
-            ],
-        )
-            // listen to upload progress event
-            .uploadProgress((written, total) => {
-                console.log('uploaded', written / total);
-            })
-            // listen to download progress event
-            .progress((received, total) => {
-                console.log('progress', received / total);
-            })
-            .then(resp => {
-                const res = JSON.parse(resp.data) || { success: false };
+            const result = await audioRecorderPlayer.stopRecorder();
+
+            const fileExtension = result.split('.').pop();
+
+            if (!fileExtension) {
+                setRecordTime('00:00:00');
                 setLoader(false);
-                if (res?.success) Alert.alert('Recording Success');
-                else showAlert('Recording Failed', "");
-            })
-            .catch(err => {
-                setLoader(false);
-                showAlert('Recording Failed', err.message);
-                console.log(err, 'err');
-            });
+                showAlert('Recording Failed', 'Invalid audio extension!');
+                return;
+            }
+
+            const mimeType = getMimeType(fileExtension);
+
+            const fileNameWithExtension = 'sound.' + fileExtension;
+
+            audioRecorderPlayer.removeRecordBackListener();
+
+            setRecordTime('00:00:00');
+
+            setAudioPath(result);
+
+            const token: any = await loadStorage();
+
+            const location = await returnLocation();
+
+            //call curl here
+            RNFetchBlob.fetch(
+                'POST',
+                BACKEND_URL + '/upload',
+                {
+                    // this is required, otherwise it won't be process as a multipart/form-data request
+                    'Content-Type': 'multipart/form-data',
+                },
+                [
+                    {
+                        name: 'file',
+                        filename: fileNameWithExtension,
+                        // upload a file from asset is also possible in version >= 0.6.2
+                        data: RNFetchBlob.wrap(
+                            Platform.OS === 'ios'
+                                ? result.replace('file://', '')
+                                : result,
+                        ),
+                        // type: mimeType,
+                    },
+                    {
+                        name: 'token',
+                        data: token?.token || '',
+                    },
+                    {
+                        name: 'location',
+                        data: JSON.stringify(location)
+                    }
+                ],
+            )
+                // listen to upload progress event
+                .uploadProgress((written, total) => {
+                    console.log('uploaded', written / total);
+                })
+                // listen to download progress event
+                .progress((received, total) => {
+                    console.log('progress', received / total);
+                })
+                .then(resp => {
+                    const res = JSON.parse(resp.data) || { success: false };
+                    setLoader(false);
+                    if (res?.success) showAlert('Recording Success', "");
+                    else showAlert('Recording Failed', "");
+                })
+                .catch(err => {
+                    setLoader(false);
+                    showAlert('Recording Failed', err.message);
+                    console.log(err, 'err');
+                });
+        } catch (err: any) {
+            setLoader(false);
+            showAlert('Recording Failed', err.message);
+            console.error(err, 'err')
+        }
     };
 
     return (

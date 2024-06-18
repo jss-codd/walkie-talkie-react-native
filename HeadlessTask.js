@@ -16,13 +16,13 @@ const playSoundRemote = (remoteMessage) => {
       } else {
         console.log('Playback failed due to audio decoding errors');
       }
+      sound.release();
     });
   });
 }
 
 async function HeadlessTask(remoteMessage) {
   const settings = await loadStorage("settings");
-  console.log(settings, 'settings')
   if(settings?.audioPlayStatus && remoteMessage?.data?.audio_url) {
     playSoundRemote(remoteMessage)
   }
