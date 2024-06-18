@@ -84,8 +84,6 @@ function HomeScreen(): React.JSX.Element {
     clearWatch(subscriptionId, setSubscriptionId);
   };
 
-  // console.log(location, 'location')
-
   return (
     <>
       <LocationAlertModal modalVisible={modalVisible} setModalVisible={setModalVisible} />

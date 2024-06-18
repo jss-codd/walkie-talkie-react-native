@@ -26,7 +26,7 @@ export const loadStorage = async (key = 'fcm') => {
     const token = await storage.load({ key })
     return token;
   } catch (err: any) {
-    console.log(err.message, 'err.message.load.token');
+    console.log(err.message, key + ' load error');
     return {};
   }
 }
