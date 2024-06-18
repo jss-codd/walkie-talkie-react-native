@@ -16,7 +16,6 @@ const RecordingList = () => {
     const [isRefreshing, setIsRefreshing] = useState(false)
 
     function playSound(item: any, index: number) {
-
         setRecordingList((pre: any) => (pre.map((d: any, i: number) => { return (i === index) ? { ...d, playStatus: true } : d })))
 
         const callback = (error: any, sound: any) => {
@@ -38,7 +37,7 @@ const RecordingList = () => {
             });
         };
 
-        const sound: any = new Sound(item.data.audio_url, undefined, error => callback(error, sound));
+        const sound: any = new Sound(item.data.audio_url, null, error => callback(error, sound));
     }
 
     const deleteNotification = async (item: any, index: number) => {

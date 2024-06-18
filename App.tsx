@@ -71,12 +71,11 @@ function App(): React.JSX.Element {
   const [isConnected, setConnected] = useState(false);
   const [settings, setSettings] = useState(settingsDefault);
 
-  
   const settingHandler = (key: any, data: any) => {
     saveStorage({ ...settings, [key]: data }, "settings");
     setSettings((pre) => ({ ...pre, [key]: data }));
   }
-  
+
   const contextData = { ...settings, handler: settingHandler };
 
   const fetchSettings = async () => {
@@ -150,6 +149,7 @@ function App(): React.JSX.Element {
 
   // fetch settings
   useEffect(() => {
+    saveStorage(settings, "settings");
     fetchSettings();
   }, [])
 

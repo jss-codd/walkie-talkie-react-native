@@ -10,12 +10,14 @@ import { loadStorage, saveStorage } from './src/utils/storage';
 import HeadlessTask from './HeadlessTask';
 
 const recordingStorage = async (message) => {
-  const list = await loadStorage('recordingList');
-
-  if (Array.isArray(list)) {
-    saveStorage([message, ...list], 'recordingList');
-  } else {
-    saveStorage([message], 'recordingList');
+  if (message?.data?.audio_url) {
+    const list = await loadStorage('recordingList');
+  
+    if (Array.isArray(list)) {
+      saveStorage([message, ...list], 'recordingList');
+    } else {
+      saveStorage([message], 'recordingList');
+    }
   }
 }
 

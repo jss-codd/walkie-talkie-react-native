@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Alert, Modal, StyleSheet, Text, Pressable, View } from 'react-native';
+import React from 'react';
+import { Alert, Modal, StyleSheet, Text, Pressable, View, Platform, Linking } from 'react-native';
+import { openSettings } from 'react-native-permissions';
 
 const LocationAlertModal = (props: { modalVisible: any; setModalVisible: any; }) => {
     const { modalVisible, setModalVisible } = props;
@@ -19,7 +20,10 @@ const LocationAlertModal = (props: { modalVisible: any; setModalVisible: any; })
                         <Text style={styles.modalText}>Please turn on location from setting panel, We will use location services to acquire your exact location.</Text>
                         <Pressable
                             style={[styles.button, styles.buttonClose]}
-                            onPress={() => setModalVisible(!modalVisible)}>
+                            onPress={() => {
+                                setModalVisible(!modalVisible);
+                                // openSettings();
+                            }}>
                             <Text style={styles.textStyle}>Close</Text>
                         </Pressable>
                     </View>

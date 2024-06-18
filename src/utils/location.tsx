@@ -8,7 +8,6 @@ import { SetStateAction } from 'react';
 const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, setModalVisible: (arg0: any) => void) => {
     Geolocation.getCurrentPosition(
         (pos) => {
-            // console.log(pos, 'pos')
             setLocation(pos);
 
             const latitude = pos?.coords?.latitude;

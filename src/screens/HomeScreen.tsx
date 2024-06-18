@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Button, AppState } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 
 import { showAlert } from '../utils/alert';
 import { AlertMessages } from '../utils/constants';;
@@ -73,6 +73,7 @@ function HomeScreen(): React.JSX.Element {
 
   const startTask = () => {
     console.log('Watcher started');
+    getLocation(setLocation, setModalVisible);
     setBackgroundListener(true);
     watchPosition(setLocation, setSubscriptionId);
   };
@@ -108,7 +109,7 @@ function HomeScreen(): React.JSX.Element {
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.0011,
               }}
-              // showsUserLocation={true}
+              showsUserLocation={true}
               // onUserLocationChange={(e: any) => {
               //   setLocation({
               //     coords: {
@@ -119,7 +120,8 @@ function HomeScreen(): React.JSX.Element {
               //   });
               // }}
               loadingEnabled={true}
-              customMapStyle={mapStyle}>
+              customMapStyle={mapStyle}
+            >
               <Marker
                 draggable
                 // image={require('./assets/images/custom_pin.png')}
@@ -130,6 +132,32 @@ function HomeScreen(): React.JSX.Element {
               />
             </MapView>
           ) : null}
+
+          {/* <MapView
+            style={styles.mapStyle}
+            initialRegion={{
+              latitude: 37.8025259,
+              longitude: -122.4351431,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}>
+            <Polyline
+              coordinates={[
+                { latitude: 37.8025259, longitude: -122.4351431 },
+                { latitude: 37.7896386, longitude: -122.421646 },
+              ]}
+              strokeColor="blue" // fallback for when `strokeColors` is not supported by the map-provider
+              strokeColors={[
+                '#7F0000',
+                '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
+                '#B24112',
+                '#E5845C',
+                '#238C23',
+                '#7F0000',
+              ]}
+              strokeWidth={6}
+            />
+          </MapView> */}
         </View>
       </View>
     </>

@@ -32,11 +32,13 @@ export const loadStorage = async (key = 'fcm') => {
 }
 
 export const recordingStorage = async (message: any) => {
-  const list: any = await loadStorage('recordingList');
+  if (message?.data?.audio_url) {
+    const list: any = await loadStorage('recordingList');
 
-  if (Array.isArray(list)) {
-    saveStorage([message, ...list], 'recordingList');
-  } else {
-    saveStorage([message], 'recordingList');
+    if (Array.isArray(list)) {
+      saveStorage([message, ...list], 'recordingList');
+    } else {
+      saveStorage([message], 'recordingList');
+    }
   }
 }

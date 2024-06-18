@@ -32,7 +32,7 @@ const getMimeType = (fileExtension: string) => {
     return mimeType || 'application/octet-stream'; // Default MIME type for unknown file types
 };
 
-const VoiceRecorder = ({ children }) => {
+const VoiceRecorder = ({ children }: { children: any }) => {
     const [recording, setRecording] = useState(false);
     const [recordTime, setRecordTime] = useState('00:00:00');
     const [audioPath, setAudioPath] = useState('');
