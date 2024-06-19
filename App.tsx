@@ -26,6 +26,7 @@ function LogoTitle(props: any) {
     <Image
       style={{ width: 300, height: 80 }}
       source={require('./src/icons/logo.png')}
+      // source={require('./src/assets/images/logo.png')}
     />
   );
 }
@@ -51,7 +52,7 @@ function MyTabs() {
         tabBarInactiveTintColor: 'gray',
         tabBarLabelStyle: { fontSize: 12, fontWeight: 600 },
         headerStyle: {
-          height: 100,
+          height: 90,
         },
       })}
     >

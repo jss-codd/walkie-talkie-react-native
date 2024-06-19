@@ -15,6 +15,7 @@ function SettingsScreen(): React.JSX.Element {
     const audioPlayStatus = settings.audioPlayStatus;
 
     const [loader, setLoader] = useState(false);
+    const [tokenShow, setTokenShow] = useState("");
 
     const toggleNotification = async (e: boolean) => {
         setLoader(true);
@@ -61,6 +62,17 @@ function SettingsScreen(): React.JSX.Element {
             });
     }
 
+    useEffect(() => {
+        loadStorage().then(
+            token => {
+                setTokenShow(token?.token || '')
+            },
+            err => {
+                console.error(err, 'token error'); // Error!
+            },
+        );
+    }, [])
+
     return (
         <View style={{ margin: 10 }}>
             <Loader loading={loader} />
@@ -92,6 +104,9 @@ function SettingsScreen(): React.JSX.Element {
                     />
                 </View>
             </View>
+            {/* <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+                <Text selectable={true} style={{ color: "#666" }}>Token: {tokenShow}</Text>
+            </View> */}
         </View>
     )
 }

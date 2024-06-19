@@ -122,7 +122,7 @@ function HomeScreen(): React.JSX.Element {
             >
               <Marker
                 draggable
-                // image={require('./assets/images/custom_pin.png')}
+                // image={require('../assets/images/custom_pin.png')}
                 coordinate={{
                   latitude: location?.coords?.latitude || 0,
                   longitude: location?.coords?.longitude || 0,

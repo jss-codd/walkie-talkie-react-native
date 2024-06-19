@@ -129,7 +129,7 @@ const requestAudioPermissions = async () => {
         ]);
 
         if (
-            ((granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED) || (granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN)) &&
+            ((granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED)) &&
             ((granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED) || (granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN)) &&
             ((granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED) || (granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN))
         ) {

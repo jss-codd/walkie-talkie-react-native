@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, FlatList, Text, StyleSheet, Image } from 'react-native';
 import Sound from 'react-native-sound';
+import { useIsFocused } from '@react-navigation/native';
 
 import { loadStorage, saveStorage } from "../utils/storage";
 import { TimeAgo } from "../utils/timeAgo";
@@ -12,6 +13,8 @@ import Pause from '../assets/svgs/pause.svg';
 Sound.setCategory('Playback'); // true = mixWithOthers
 
 const RecordingList = () => {
+    const isFocused = useIsFocused();
+
     const [recordingList, setRecordingList] = useState([]);
     const [isRefreshing, setIsRefreshing] = useState(false)
 
@@ -91,8 +94,10 @@ const RecordingList = () => {
     };
 
     useEffect(() => {
-        loadRecordingFromStorage();
-    }, [])
+        if (isFocused) {
+            loadRecordingFromStorage();
+        }
+    }, [isFocused])
 
     return (
         <>
