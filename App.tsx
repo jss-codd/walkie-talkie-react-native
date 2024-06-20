@@ -11,57 +11,8 @@ import HeadlessTask from './HeadlessTask';
 import { showAlert } from './src/utils/alert';
 import { AlertMessages, BACKEND_URL } from './src/utils/constants';
 import { loadStorage, recordingStorage, saveStorage } from './src/utils/storage';
-import HomeScreen from './src/screens/HomeScreen';
-import SettingsScreen from './src/screens/SettingsScreen';
-import RecordingListScreen from './src/screens/RecordingListScreen';
-import Home from './src/assets/svgs/home.svg';
-import Settings from './src/assets/svgs/settings.svg';
-import Clock from './src/assets/svgs/clock-check.svg';
 import { SettingContext } from './src/context/SettingContext';
-
-const Tab = createBottomTabNavigator();
-
-function LogoTitle(props: any) {
-  return (
-    <Image
-      style={{ width: 300, height: 80 }}
-      source={require('./src/icons/logo.png')}
-      // source={require('./src/assets/images/logo.png')}
-    />
-  );
-}
-
-function MyTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        header: ({ options, route }) => (
-          <Header headerTitle={(props) => <LogoTitle {...props} />} headerTitleAlign="center" {...options} title={getHeaderTitle(options, route.name)} />
-        ),
-        tabBarIcon: ({ focused, color, size }) => {
-          if (route.name === 'Home') {
-            return <Home height={32} width={32} />;
-          } else if (route.name === 'Settings') {
-            return <Settings height={32} width={32} />;
-          } else {
-            return <Clock height={32} width={32} />;
-          }
-
-        },
-        tabBarActiveTintColor: 'orange',
-        tabBarInactiveTintColor: 'gray',
-        tabBarLabelStyle: { fontSize: 12, fontWeight: 600 },
-        headerStyle: {
-          height: 90,
-        },
-      })}
-    >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-      <Tab.Screen name="Last Talks" component={RecordingListScreen} />
-    </Tab.Navigator>
-  );
-}
+import MainStackNavigator from './src/navigations/MainStackNavigator';
 
 const settingsDefault = {
   notificationStatus: true,
@@ -167,7 +118,7 @@ function App(): React.JSX.Element {
   return (
     <SettingContext.Provider value={contextData}>
       <NavigationContainer>
-        <MyTabs />
+        <MainStackNavigator />
       </NavigationContainer>
     </SettingContext.Provider>
   );

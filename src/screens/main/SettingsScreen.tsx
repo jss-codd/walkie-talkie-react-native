@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, FlatList, Text, StyleSheet, Image, Button, Alert, Switch } from 'react-native';
 import axios from 'axios';
 
-import { loadStorage } from '../utils/storage';
-import { BACKEND_URL } from '../utils/constants';
-import { showAlert } from '../utils/alert';
-import Loader from '../components/Loader';
-import { SettingContext } from '../context/SettingContext';
+import { loadStorage } from '../../utils/storage';
+import { BACKEND_URL } from '../../utils/constants';
+import { showAlert } from '../../utils/alert';
+import Loader from '../../components/Loader';
+import { SettingContext } from '../../context/SettingContext';
 
 function SettingsScreen(): React.JSX.Element {
     const settings = useContext<any>(SettingContext);

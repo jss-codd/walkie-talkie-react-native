@@ -3,12 +3,12 @@ import { View, StyleSheet, Button, AppState } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 
-import { showAlert } from '../utils/alert';
-import { AlertMessages } from '../utils/constants';;
-import { askInitialPermission, checkPermissions } from '../utils/permissions';
-import { clearWatch, getLocation, watchPosition } from '../utils/location';
-import VoiceRecorder from '../components/VoiceRecorder';
-import LocationAlertModal from '../components/LocationAlertModal';
+import { showAlert } from '../../utils/alert';
+import { AlertMessages } from '../../utils/constants';;
+import { askInitialPermission, checkPermissions } from '../../utils/permissions';
+import { clearWatch, getLocation, watchPosition } from '../../utils/location';
+import VoiceRecorder from '../../components/VoiceRecorder';
+import LocationAlertModal from '../../components/LocationAlertModal';
 
 function HomeScreen(): React.JSX.Element {
   const [location, setLocation] = useState<any>(null);
@@ -164,163 +164,172 @@ function HomeScreen(): React.JSX.Element {
 
 const mapStyle = [
   {
-    elementType: 'geometry',
-    stylers: [
+    "elementType": "geometry",
+    "stylers": [
       {
-        color: '#f5f5f5',
-      },
-    ],
+        "color": "#f5f5f5"
+      }
+    ]
   },
   {
-    elementType: 'labels.icon',
-    stylers: [
+    "elementType": "labels.icon",
+    "stylers": [
       {
-        visibility: 'off',
-      },
-    ],
+        "visibility": "off"
+      }
+    ]
   },
   {
-    elementType: 'labels.text.fill',
-    stylers: [
+    "elementType": "labels.text.fill",
+    "stylers": [
       {
-        color: '#616161',
-      },
-    ],
+        "color": "#616161"
+      }
+    ]
   },
   {
-    elementType: 'labels.text.stroke',
-    stylers: [
+    "elementType": "labels.text.stroke",
+    "stylers": [
       {
-        color: '#f5f5f5',
-      },
-    ],
+        "color": "#f5f5f5"
+      }
+    ]
   },
   {
-    featureType: 'administrative.land_parcel',
-    elementType: 'labels.text.fill',
-    stylers: [
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
       {
-        color: '#bdbdbd',
-      },
-    ],
+        "color": "#bdbdbd"
+      }
+    ]
   },
   {
-    featureType: 'poi',
-    elementType: 'geometry',
-    stylers: [
+    "featureType": "landscape",
+    "elementType": "geometry.fill",
+    "stylers": [
       {
-        color: '#eeeeee',
-      },
-    ],
+        "color": "#e3cfd4" //
+      }
+    ]
   },
   {
-    featureType: 'poi',
-    elementType: 'labels.text.fill',
-    stylers: [
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
       {
-        color: '#757575',
-      },
-    ],
+        "color": "#eeeeee"
+      }
+    ]
   },
   {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
       {
-        color: '#e5e5e5',
-      },
-    ],
+        "color": "#757575"
+      }
+    ]
   },
   {
-    featureType: 'poi.park',
-    elementType: 'labels.text.fill',
-    stylers: [
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [
       {
-        color: '#9e9e9e',
-      },
-    ],
+        "color": "#e5e5e5"
+      }
+    ]
   },
   {
-    featureType: 'road',
-    elementType: 'geometry',
-    stylers: [
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
       {
-        color: '#ffffff',
-      },
-    ],
+        "color": "#9e9e9e"
+      }
+    ]
   },
   {
-    featureType: 'road.arterial',
-    elementType: 'labels.text.fill',
-    stylers: [
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
       {
-        color: '#757575',
-      },
-    ],
+        "color": "#f8f1f1"//
+      }
+    ]
   },
   {
-    featureType: 'road.highway',
-    elementType: 'geometry',
-    stylers: [
+    "featureType": "road.arterial",
+    "elementType": "labels.text.fill",
+    "stylers": [
       {
-        color: '#dadada',
-      },
-    ],
+        "color": "#757575"
+      }
+    ]
   },
   {
-    featureType: 'road.highway',
-    elementType: 'labels.text.fill',
-    stylers: [
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
       {
-        color: '#616161',
-      },
-    ],
+        "color": "#dadada"
+      }
+    ]
   },
   {
-    featureType: 'road.local',
-    elementType: 'labels.text.fill',
-    stylers: [
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [
       {
-        color: '#9e9e9e',
-      },
-    ],
+        "color": "#616161"
+      }
+    ]
   },
   {
-    featureType: 'transit.line',
-    elementType: 'geometry',
-    stylers: [
+    "featureType": "road.local",
+    "elementType": "labels.text.fill",
+    "stylers": [
       {
-        color: '#e5e5e5',
-      },
-    ],
+        "color": "#9e9e9e"
+      }
+    ]
   },
   {
-    featureType: 'transit.station',
-    elementType: 'geometry',
-    stylers: [
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [
       {
-        color: '#eeeeee',
-      },
-    ],
+        "color": "#e5e5e5"
+      }
+    ]
   },
   {
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [
       {
-        color: '#c9c9c9',
-      },
-    ],
+        "color": "#eeeeee"
+      }
+    ]
   },
   {
-    featureType: 'water',
-    elementType: 'labels.text.fill',
-    stylers: [
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
       {
-        color: '#9e9e9e',
-      },
-    ],
+        "color": "#c9c9c9"
+      }
+    ]
   },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  }
 ];
 
 const styles = StyleSheet.create({

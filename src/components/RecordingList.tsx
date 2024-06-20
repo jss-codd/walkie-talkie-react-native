@@ -9,6 +9,10 @@ import { showAlert } from "../utils/alert";
 import Play from '../assets/svgs/play.svg';
 import Delete from '../assets/svgs/delete.svg';
 import Pause from '../assets/svgs/pause.svg';
+import { COLORS } from "../utils/constants";
+import { TextStyles } from "../utils/TextStyles";
+import { FS } from "../utils/Responsive";
+import { RNText } from "./RNText";
 
 Sound.setCategory('Playback'); // true = mixWithOthers
 
@@ -55,10 +59,14 @@ const RecordingList = () => {
 
     const ThreadItem = ({ item, index }: { item: any, index: number }) => (
         <View style={styles.thread}>
-            <Image source={require('../assets/images/images.jpeg')} style={styles.avatar} />
+            <Image source={require('../assets/images/image.png')} style={styles.avatar} />
             <View style={styles.threadContent}>
-                <Text style={styles.username}>Audio Message sent by <Text style={styles.sentBy}>Michel</Text></Text>
-                <Text style={styles.timestamp}>{TimeAgo.inWords(item.sentTime)}</Text>
+                <RNText textStyle={styles.username}>
+                    Audio Message sent by <RNText textStyle={styles.sentBy}>Michel</RNText>
+                </RNText>
+                <RNText textStyle={styles.timestamp}>
+                    {TimeAgo.inWords(item.sentTime)}
+                </RNText>
             </View>
             <View>
                 {!item.playStatus ? (<Play onPress={() => playSound(item, index)} height={35} width={35} />) : (<Pause height={35} width={35} />)}
@@ -108,7 +116,7 @@ const RecordingList = () => {
                 onRefresh={onRefresh}
                 refreshing={isRefreshing}
                 ListEmptyComponent={emptyComponent}
-            // ListHeaderComponent={VoiceRecorder}
+               // ListHeaderComponent={VoiceRecorder}
             />
         </>
     );
@@ -116,18 +124,18 @@ const RecordingList = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#f0f0f0',
+        backgroundColor: COLORS.WHITE,
         paddingHorizontal: 16,
         paddingVertical: 12,
     },
     thread: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        marginBottom: 16,
+        marginBottom: 16
     },
     avatar: {
-        width: 50,
-        height: 50,
+        width: 47,
+        height: 47,
         borderRadius: 25,
         marginRight: 12,
     },
@@ -135,19 +143,21 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     username: {
+        ...TextStyles.SOFIA_SEMI_BOLD,
+        fontSize: FS(14),
         marginBottom: 4,
-        color: '#666',
-        fontWeight: 'bold'
+        color: '#0F0F0F'
     },
     content: {
         marginBottom: 4,
     },
     timestamp: {
-        color: '#666',
+        ...TextStyles.SOFIA_REGULAR,
+        color: '#232323',
+        fontSize: FS(12),
     },
-    scrollContainer: {},
     sentBy: {
-        color: "#7e59c5",
+        color: "#7609C3",
         fontWeight: 'bold'
     }
 });

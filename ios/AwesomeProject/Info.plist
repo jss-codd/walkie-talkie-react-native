@@ -28,7 +28,6 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-	  <!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
@@ -54,5 +53,17 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SofiaSans-Black.ttf</string>
+		<string>SofiaSans-Bold.ttf</string>
+		<string>SofiaSans-ExtraBold.ttf</string>
+		<string>SofiaSans-ExtraLight.ttf</string>
+		<string>SofiaSans-Light.ttf</string>
+		<string>SofiaSans-Medium.ttf</string>
+		<string>SofiaSans-Regular.ttf</string>
+		<string>SofiaSans-SemiBold.ttf</string>
+		<string>SofiaSans-Thin.ttf</string>
+	</array>
 </dict>
 </plist>
