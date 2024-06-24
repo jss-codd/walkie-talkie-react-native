@@ -23,7 +23,8 @@ export const styles = StyleSheet.create({
     //
     startContainer: {
         // marginLeft: HP(49),
-        marginTop: VP(95),
+        // marginTop: VP(95),
+        marginTop: VP(45),
         alignSelf: 'center',
     },
     //

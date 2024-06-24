@@ -5,7 +5,7 @@ import RegisterScreen from '../screens/auth/Register/RegisterScreen';
 import VerifyCode from '../screens/auth/VerifyCode/VerifyCode';
 
 export type AuthStackParamList = {
-    OnBoardScreen: undefined;
+    REGISTER_SCREEN: undefined;
     VerifyCodeScreen: undefined;
 };
 
@@ -14,7 +14,7 @@ const AuthStackNavigator: React.FunctionComponent = () => {
     return (
         <Stack.Navigator screenOptions={{headerShown: false}}>
             <Stack.Screen
-                name={navigationString.ON_BOARD_SCREEN}
+                name={navigationString.REGISTER_SCREEN}
                 component={RegisterScreen as React.FunctionComponent}
             />
             <Stack.Screen

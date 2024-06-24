@@ -3,30 +3,38 @@ import RecordingList from '../../components/RecordingList';
 import OuterLayout from '../../components/OuterLayout';
 import InnerBlock from '../../components/InnerBlock';
 import { COLORS } from '../../utils/constants';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { RNText } from '../../components/RNText';
 import { TextStyles } from '../../utils/TextStyles';
 import { FS, VP } from '../../utils/Responsive';
 import { Button } from '../../components/Button';
+import { navigationString } from '../../utils/navigationString';
 
-function RecordingListScreen(): React.JSX.Element {
+function RecordingListScreen({ navigation }: { navigation: any }): React.JSX.Element {
     return (
         <OuterLayout containerStyle={{ backgroundColor: COLORS.BACKGROUND }}>
             <InnerBlock>
                 <View style={styles.container}>
+                    <TouchableOpacity
+                        onPress={() =>
+                            navigation.navigate(
+                                navigationString.HOME_SCREEN,
+                            )}
+                        style={{}}
+                    >
+                        <Image source={require('../../assets/icons/arrow-left.png')} style={styles.icon} />
+                    </TouchableOpacity>
+                </View>
+                <View style={{ ...styles.container, marginTop: VP(10), paddingVertical: 0 }}>
                     <RNText textStyle={styles.heading}>
                         last 5 talks
                     </RNText>
                 </View>
                 <RecordingList />
-                <View style={{ margin: "auto" }}>
+                <View style={{ margin: "auto", paddingHorizontal: 16, paddingVertical: 12 }}>
                     <Button
                         text={'Clear Notifications'}
-                        onPress={() => void (0)
-                            // navigation.navigate(
-                            //     navigationString.VERIFY_CODE,
-                            // )
-                        }
+                        onPress={() => void (0)}
                         textStyle={styles.buttonStyle}
                     />
                 </View>
@@ -51,6 +59,10 @@ const styles = StyleSheet.create({
         ...TextStyles.SOFIA_MEDIUM,
         fontSize: FS(16),
         color: COLORS.WHITE,
+    },
+    icon: {
+        width: 20,
+        height: 20,
     },
 });
 

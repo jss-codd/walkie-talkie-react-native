@@ -11,7 +11,7 @@ import Delete from '../assets/svgs/delete.svg';
 import Pause from '../assets/svgs/pause.svg';
 import { COLORS } from "../utils/constants";
 import { TextStyles } from "../utils/TextStyles";
-import { FS } from "../utils/Responsive";
+import { FS, HP, VP } from "../utils/Responsive";
 import { RNText } from "./RNText";
 
 Sound.setCategory('Playback'); // true = mixWithOthers
@@ -116,7 +116,7 @@ const RecordingList = () => {
                 onRefresh={onRefresh}
                 refreshing={isRefreshing}
                 ListEmptyComponent={emptyComponent}
-               // ListHeaderComponent={VoiceRecorder}
+            // ListHeaderComponent={VoiceRecorder}
             />
         </>
     );
@@ -125,8 +125,8 @@ const RecordingList = () => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: COLORS.WHITE,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: HP(16),
+        paddingVertical: VP(19),
     },
     thread: {
         flexDirection: 'row',

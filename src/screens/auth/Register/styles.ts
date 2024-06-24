@@ -15,8 +15,7 @@ export const styles = StyleSheet.create({
     formContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: VP(45),
-        // paddingBottom: VP(60),
+        marginTop: VP(20),
 
     },
     //
@@ -25,8 +24,8 @@ export const styles = StyleSheet.create({
     },
     //
     startContainer: {
-        // marginLeft: HP(49),
-        marginTop: VP(95),
+        // marginTop: VP(95),
+        marginTop: VP(45),
         alignSelf: 'center',
     },
     //
@@ -41,15 +40,15 @@ export const styles = StyleSheet.create({
         ...TextStyles.SOFIA_SEMI_BOLD,
         fontSize: FS(24),
         color: COLORS.BLACK,
-        lineHeight: 28.8,
+        lineHeight: VP(28.8),
     },
     //
     paraStyle: {
         ...TextStyles.SOFIA_SEMI_LIGHT,
         fontSize: FS(16),
         color: COLORS.TEXT,
-        lineHeight: 20,
-        textAlign: "center"
+        lineHeight: VP(20),
+        textAlign: "center",
     },
     //
     paraBold: {
@@ -92,5 +91,9 @@ export const styles = StyleSheet.create({
         color: COLORS.TEXT,
         textAlign: "center",
         width: HP(120)
+    },
+    icon: {
+        width: 16,
+        height: 16,
     }
 });

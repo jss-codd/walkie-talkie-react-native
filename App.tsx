@@ -101,8 +101,15 @@ function App(): React.JSX.Element {
 
   // fetch settings
   useEffect(() => {
-    saveStorage(settings, "settings");
-    fetchSettings();
+    (async () => {
+      const settings = await loadStorage("settings");
+
+      if (!settings || !settings.hasOwnProperty("notificationStatus")) {
+        saveStorage(settings, "settings");
+      }
+
+      // fetchSettings();
+    })()
   }, [])
 
   if (isConnected === false) {

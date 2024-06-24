@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Button, Text, Platform, Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Button, Text, Platform, Alert, StyleSheet } from 'react-native';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import RNFetchBlob from 'rn-fetch-blob'
 
@@ -10,9 +10,6 @@ import Clock from '../assets/svgs/clock.svg';
 import { requestAudioPermissions } from '../utils/permissions';
 import { showAlert } from '../utils/alert';
 import { returnLocation } from '../utils/location';
-import Microphone from '../assets/svgs/microphone.svg';
-import { LinearGradientComp } from '../screens/main/HomeScreen';
-import { RNText } from './RNText';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
@@ -36,7 +33,7 @@ const getMimeType = (fileExtension: string) => {
     return mimeType || 'application/octet-stream'; // Default MIME type for unknown file types
 };
 
-const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconText: any }) => {
+const VoiceRecorderOld = ({ children }: { children: any }) => {
     const [recording, setRecording] = useState(false);
     const [recordTime, setRecordTime] = useState('00:00:00');
     const [audioPath, setAudioPath] = useState('');
@@ -153,63 +150,40 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
                 });
         } catch (err: any) {
             setLoader(false);
-            showAlert('Recording Failed', err);
+            showAlert('Recording Failed', err.message);
             console.error(err, 'err')
         }
     };
 
     return (
-        <>
+        <View style={{ marginBottom: '1%', }}>
             <Loader loading={loader} />
 
-            <View style={{ alignItems: "center" }}>
-                <LinearGradientComp status={recording} style={{ top: -5 }}>
-                    <TouchableOpacity style={{ alignItems: "center" }} onPress={() => !recording ? onStartRecord() : onCancelRecord(timerState)}>
-                        <View style={{
-                            padding: 15,
-                            backgroundColor: '#E5E5E5',
-                            borderRadius: 100,
-                            borderWidth: 1,
-                            borderColor: '#E5E5E5'
-                        }}>
-                            <View style={{ ...iconContainer, backgroundColor: "#E0D0D0", marginBottom: 0 }}>
-                                <Microphone width={32} height={32} />
-                            </View>
-                        </View>
-                    </TouchableOpacity>
-                </LinearGradientComp>
-                <RNText textStyle={iconText}>{recordTime}</RNText>
+            <View style={{ flexDirection: 'row', marginBottom: 20, marginTop: 20, gap: 10, justifyContent: "center" }}>
+                <View>
+                    <Clock height={35} width={35} />
+                </View>
+                <View>
+                    <Text style={{ fontSize: 20, color: "#666" }}>
+                        {recordTime}
+                    </Text>
+                </View>
             </View>
 
-            {/* <View style={{ marginBottom: '1%', }}>
-                <Loader loading={loader} />
-
-                <View style={{ flexDirection: 'row', marginBottom: 20, marginTop: 20, gap: 10, justifyContent: "center" }}>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+                {!recording ? (
                     <View>
-                        <Clock height={35} width={35} />
+                        <Button title={"Start Recording"} onPress={onStartRecord} />
                     </View>
+                ) : (
                     <View>
-                        <Text style={{ fontSize: 20, color: "#666" }}>
-                            {recordTime}
-                        </Text>
+                        <Button color="#dc3545" title={"Cancel Recording"} onPress={() => onCancelRecord(timerState)} />
                     </View>
-                </View>
+                )}
 
-                <View style={{ flexDirection: 'row', gap: 10 }}>
-                    {!recording ? (
-                        <View>
-                            <Button title={"Start Recording"} onPress={onStartRecord} />
-                        </View>
-                    ) : (
-                        <View>
-                            <Button color="#dc3545" title={"Cancel Recording"} onPress={() => onCancelRecord(timerState)} />
-                        </View>
-                    )}
-
-                    {children}
-                </View>
-            </View> */}
-        </>
+                {children}
+            </View>
+        </View>
     );
 };
 
@@ -231,4 +205,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default VoiceRecorder;
+export default VoiceRecorderOld;

@@ -27,6 +27,7 @@
     "react-native-audio-recorder-player": "^3.6.7",
     "react-native-background-timer": "^2.4.1",
     "react-native-cli": "^2.0.1",
+    "react-native-confirmation-code-field": "^7.4.0",
     "react-native-fs": "^2.20.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-maps": "^1.15.6",

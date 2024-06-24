@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import OuterLayout from '../../../components/OuterLayout';
 import { AuthStackParamList } from '../../../navigations/AuthStackNavigator';
 import { styles } from './styles';
@@ -9,24 +9,116 @@ import { RNText } from '../../../components/RNText';
 import ValidationTextInput from '../../../components/ValidationTextInput';
 import { Button } from '../../../components/Button';
 import { navigationString } from '../../../utils/navigationString';
-import { COLORS } from '../../../utils/constants';
+import { BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
 import { HP, VP } from '../../../utils/Responsive';
-import { StackParamList } from '../../../navigations/MainTabNavigator';
+import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
+import { MainStackParamList } from '../../../navigations/MainStackNavigator';
+import { loadStorage, removeStorage, saveStorage } from '../../../utils/storage';
+import OTPInput from '../../../components/OTPInput';
+import axios from 'axios';
+import { showAlert } from '../../../utils/alert';
 
-type NavigationProp = NativeStackScreenProps<StackParamList>;
+type NavigationProp = NativeStackScreenProps<MainStackParamList>;
 
-const VerifyCode: React.FunctionComponent<NavigationProp> = ({
+const otpCheck = /^[0-9]{4}$/;
+
+const VerifyCode: React.FunctionComponent<any> = ({
     navigation,
 }) => {
-    const handleOnPress = () => {
-        navigation.goBack();
+    const [value, setValue] = useState('');
+    const [error, setError] = useState({ status: false, text: "" });
+    const [loading, setLoading] = useState(false);
+    const [mobileNo, setMobileNo] = useState("");
+
+    const handleOnPress = async () => {
+        try {
+            const signupMobile = await loadStorage("signupMobile");
+
+            if (!signupMobile || !signupMobile.hasOwnProperty("mobile")) {
+                navigation.navigate(
+                    navigationString.REGISTER_SCREEN,
+                )
+            }
+
+            const inputValue = value.trim();
+
+            if (otpCheck.test(inputValue) == false) {
+                throw new Error(errorMessage.otp);
+            }
+
+            setLoading(true);
+
+            setError({ status: false, text: "" });
+
+            const dataPayload = {
+                "otp": inputValue,
+                "mobile": signupMobile.mobile
+
+            };
+
+            axios.post(BACKEND_URL + '/otp-verification', dataPayload)
+                .then(response => {
+                    // console.log("response.data: ", response.data);
+                    setLoading(false);
+
+                    if (response.data.success && response.data.mobile && response.data.jwt) {
+                        // saveStorage({ "mobile": response.data.mobile }, "signupMobile");
+
+                        navigation.reset({
+                            index: 0,
+                            routes: [
+                                {
+                                    name: 'MainTabNavigator',
+                                },
+                            ],
+                        });
+                    } else {
+                        showAlert(errorMessage.commonError, "");
+                    }
+                })
+                .catch(error => {
+                    setLoading(false);
+                    showAlert(error.response.data.error || errorMessage.commonError, "");
+                    console.warn("Error sending data: ", error.message);
+
+                    console.warn(error.response.data, 'error.response.data');
+                    console.warn(error.response.status, 'error.response.status');
+                });
+
+        } catch (err: any) {
+            setError((pre) => ({ status: true, text: err.message }))
+        }
     };
+
+    useEffect(() => {
+        (async () => {
+            const signupMobile = await loadStorage("signupMobile");
+
+            if (!signupMobile || !signupMobile.hasOwnProperty("mobile")) {
+                navigation.navigate(
+                    navigationString.REGISTER_SCREEN,
+                )
+            } else {
+                setMobileNo(signupMobile.mobile);
+            }
+        })()
+    }, [])
 
     return (
         <OuterLayout containerStyle={styles.containerStyle}>
             <InnerBlock>
                 <View style={styles.container}>
+                    <View style={{ marginLeft: VP(20), marginTop: VP(20), }}>
+                        <TouchableOpacity
+                            onPress={() =>
+                                navigation.navigate(
+                                    navigationString.REGISTER_SCREEN,
+                                )}
+                        >
+                            <ArrowLeftSquare height={21} width={21} />
+                        </TouchableOpacity>
+                    </View>
                     <ScrollView showsVerticalScrollIndicator={false}>
                         <View style={styles.startContainer}>
                             <Mobile height={VP(160)} />
@@ -38,12 +130,12 @@ const VerifyCode: React.FunctionComponent<NavigationProp> = ({
                         </View>
                         <View style={{ alignSelf: 'center', marginTop: VP(18) }}>
                             <RNText textStyle={styles.paraStyle}>
-                                Enter The OTP Sent to <RNText textStyle={styles.paraBold}>1234-567-898</RNText>
+                                Enter The OTP Sent to <RNText textStyle={styles.paraBold}>{mobileNo}</RNText>
                             </RNText>
                         </View>
                         <View style={styles.formContainer}>
                             <View style={styles.inputContainer}>
-                                <ValidationTextInput placeholder="Enter OTP" stylesPlaceholder={{left: HP(100)}} />
+                                <OTPInput formProps={{ value, setValue, error }} />
                             </View>
 
                             <View style={styles.signInTextContainer}>
@@ -55,12 +147,9 @@ const VerifyCode: React.FunctionComponent<NavigationProp> = ({
                             <View style={{ marginTop: VP(34) }}>
                                 <Button
                                     text={'Verify & Proceed'}
-                                    onPress={() =>
-                                        navigation.navigate(
-                                            navigationString.MAIN_TAB_NAVIGATOR,
-                                        )
-                                    }
+                                    onPress={() => handleOnPress()}
                                     textStyle={styles.buttonStyle}
+                                    isLoading={loading}
                                 />
                             </View>
                         </View>

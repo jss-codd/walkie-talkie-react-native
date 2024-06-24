@@ -3,6 +3,9 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import { navigationString } from '../utils/navigationString';
 import AuthStackNavigator from './AuthStackNavigator';
 import MainTabNavigator from './MainTabNavigator';
+import ProfileScreen from '../screens/main/ProfileScreen';
+import HomeScreen from '../screens/main/HomeScreen';
+import SettingsScreen from '../screens/main/SettingsScreen';
 // import AuthStackNavigator from './AuthStackNavigator';
 // import MainTabNavigator from './MainTabNavigator';
 // import SearchScreen from '../screens/search/SearchScreen';
@@ -15,6 +18,10 @@ import MainTabNavigator from './MainTabNavigator';
 export type MainStackParamList = {
     AuthStackNavigator: undefined;
     MainTabNavigator: undefined;
+    OnBoardScreen: undefined;
+    ProfileScreen: undefined;
+    // HomeScreen: undefined;
+    SettingScreen: undefined;
 };
 
 const MainStackNavigator: React.FunctionComponent = () => {
@@ -29,32 +36,6 @@ const MainStackNavigator: React.FunctionComponent = () => {
                 name={navigationString.MAIN_TAB_NAVIGATOR}
                 component={MainTabNavigator}
             />
-            {/*
-            <Stack.Screen
-                name={navigationString.MAIN_TAB_NAVIGATOR}
-                component={MainTabNavigator}
-            />
-            <Stack.Screen
-                name={navigationString.TRANSACT_LOADING_SCREEN}
-                component={TransactLoadingScreen as React.FunctionComponent}
-            />
-            <Stack.Screen
-                name={navigationString.SEARCH_SCREEN}
-                component={SearchScreen as React.FunctionComponent}
-            />
-            <Stack.Screen
-                name={navigationString.SEARCH_CONFIRM_SCREEN}
-                component={SearchConfirmScreen as React.FunctionComponent}
-            />
-
-            <Stack.Screen
-                name={navigationString.REQUEST_CARD_SCREEN}
-                component={RequestCardScreen as React.FunctionComponent}
-            />
-            <Stack.Screen
-                name={navigationString.CATEGORY_SCREEN}
-                component={CategoryScreen as React.FunctionComponent}
-            /> */}
         </Stack.Navigator>
     );
 };

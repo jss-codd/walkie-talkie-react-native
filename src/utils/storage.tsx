@@ -31,6 +31,12 @@ export const loadStorage = async (key = 'fcm') => {
   }
 }
 
+export const removeStorage = async (key = 'signupMobile') => {
+  storage.remove({
+    key: key
+  });
+}
+
 export const recordingStorage = async (message: any) => {
   if (message?.data?.audio_url) {
     const list: any = await loadStorage('recordingList');

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, Text, StyleSheet, Image } from 'react-native';
+import { View, FlatList, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Sound from 'react-native-sound';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -8,31 +8,91 @@ import { TimeAgo } from "../utils/timeAgo";
 import { showAlert } from "../utils/alert";
 import Play from '../assets/svgs/play.svg';
 import Delete from '../assets/svgs/delete.svg';
-import Pause from '../assets/svgs/pause.svg';
 import { COLORS } from "../utils/constants";
 import { TextStyles } from "../utils/TextStyles";
-import { FS, VP } from "../utils/Responsive";
+import { FS, HP, VP } from "../utils/Responsive";
 import { RNText } from "./RNText";
+import Pencil from '../assets/svgs/pencil.svg';
+import { Button } from "./Button";
+import PencilEdit from '../assets/svgs/pencil-edit.svg';
+import { navigationString } from "../utils/navigationString";
 
-Sound.setCategory('Playback'); // true = mixWithOthers
-
-const Profile = () => {
+const Profile = (props: { handler: () => void, navigation: any }) => {
+    const { handler, navigation } = props;
     return (
         <>
-            <View style={styles.container}>
-                <Image source={require('../assets/images/image.png')} style={styles.avatar} />
+            <View style={{ backgroundColor: "#E6E6E6", paddingHorizontal: 16, paddingVertical: 12, borderBottomLeftRadius: 60, borderBottomRightRadius: 60, paddingBottom: VP(40) }}>
+                <View style={styles.container}>
+                    <Image source={require('../assets/images/image.png')} style={styles.avatar} />
+                    <View style={{ position: "absolute", top: VP(120), right: HP(115) }}>
+                        <Pencil height={40} width={40} />
+                    </View>
+                </View>
+                <View style={{ ...styles.container, marginTop: VP(22) }}>
+                    <RNText textStyle={styles.username}>
+                        Terry Migua
+                    </RNText>
+                </View>
+                <View style={{ ...styles.container, marginTop: VP(47), justifyContent: "flex-start" }}>
+                    <RNText textStyle={styles.inputs}>
+                        <Image source={require('../assets/icons/mail.png')} style={styles.icon} /> terrymigua2@gmail.com
+                    </RNText>
+                </View>
+                <View style={{ ...styles.container, paddingLeft: 14, paddingRight: 14 }}>
+                    <View style={styles.line}></View>
+                </View>
+                <View style={{ ...styles.container, marginTop: VP(20), justifyContent: "flex-start" }}>
+                    <RNText textStyle={styles.inputs}>
+                        <Image source={require('../assets/icons/phone.png')} style={styles.icon} /> 0420 222 585
+                    </RNText>
+                </View>
+                <View style={{ ...styles.container, paddingLeft: 14, paddingRight: 14 }}>
+                    <View style={styles.line}></View>
+                </View>
+                <View style={{ ...styles.container, marginTop: VP(20), justifyContent: "flex-start" }}>
+                    <RNText textStyle={styles.inputs}>
+                        <Image source={require('../assets/icons/location.png')} style={styles.icon} /> melbourne
+                    </RNText>
+                </View>
+                <View style={{ ...styles.container, paddingLeft: 14, paddingRight: 14 }}>
+                    <View style={styles.line}></View>
+                </View>
+                <View style={{ ...styles.container, marginTop: VP(20), justifyContent: "flex-start" }}>
+                    <TouchableOpacity
+                        onPress={() =>
+                            navigation.navigate(
+                                navigationString.SETTING_SCREEN,
+                            )}
+                        style={{}}
+                    >
+                        <RNText textStyle={styles.inputs}>
+                            <Image source={require('../assets/icons/setting.png')} style={styles.icon} /> Settings
+                        </RNText>
+                    </TouchableOpacity>
+                </View>
+            </View>
+            <View style={{ margin: "auto" }}>
+                <Button
+                    text={'Edit Profile'}
+                    onPress={handler}
+                    textStyle={styles.buttonStyle}
+                    Icon={<Image source={require('../assets/icons/edit.png')} style={styles.icon} />}
+                />
             </View>
         </>
     );
 }
 
 const styles = StyleSheet.create({
+    buttonStyle: {
+        ...TextStyles.SOFIA_MEDIUM,
+        fontSize: FS(16),
+        color: COLORS.WHITE,
+    },
     container: {
-        backgroundColor: "#E6E6E6",
         justifyContent: "center",
         flexDirection: "row",
-        // paddingHorizontal: 16,
-        // paddingVertical: 12,
+        ...TextStyles.SOFIA_MEDIUM
     },
     avatar: {
         width: 125,
@@ -43,7 +103,30 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginTop: VP(40),
         borderColor: "#FFFFFF",
-        borderWidth: 2
+        borderWidth: 3
+    },
+    username: {
+        fontSize: FS(20),
+        color: COLORS.BLACK,
+    },
+    inputs: {
+        fontSize: FS(14),
+        color: COLORS.BLACK,
+        start: 14
+    },
+    icon: {
+        width: 16,
+        height: 16,
+    },
+    line: {
+        height: 1,
+        backgroundColor: "#D2D2D2",
+        width: "100%",
+        flexDirection: "row",
+        marginTop: VP(14.9),
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: "flex",
     },
 });
 

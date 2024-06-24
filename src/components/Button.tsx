@@ -26,6 +26,7 @@ type Props = {
     activityIndicatorColor?: string;
     textStyle?: StyleProp<TextStyle>;
     activeButtonText?: StyleProp<TextStyle>;
+    LinearGradienrColor?: string[]
 };
 
 export const Button: React.FunctionComponent<Props> = ({
@@ -39,6 +40,7 @@ export const Button: React.FunctionComponent<Props> = ({
     contentContainerStyle,
     activityIndicatorColor,
     activeButtonText,
+    LinearGradienrColor = ['#5C44E4', '#753E8D']
 }) => {
     const handleButtonPress = () => {
         if (isLoading || disabled) {
@@ -75,38 +77,42 @@ export const Button: React.FunctionComponent<Props> = ({
             );
         } else {
             return (
-                <View
-                    style={[
-                        styles.buttonContentContainer,
-                        contentContainerStyle,
-                    ]}
-                >
-                    {Icon ? Icon : null}
-                    <RNText
-                        textStyle={[
-                            disabled || isLoading
-                                ? activeButtonText
-                                : styles.activeButtonText,
-                            textStyle,
+                <>
+                    <View
+                        style={[
+                            styles.buttonContentContainer,
+                            contentContainerStyle,
                         ]}
                     >
-                        {text}
-                    </RNText>
-                </View>
+                        {Icon ? Icon : null}
+                        <RNText
+                            textStyle={[
+                                disabled || isLoading
+                                    ? activeButtonText
+                                    : styles.activeButtonText,
+                                textStyle,
+                            ]}
+                        >
+                            {text}
+                        </RNText>
+                    </View>
+                </>
             );
         }
     };
 
     return (
-        <LinearGradient start={{x: 0, y: 0}} end={{x: 2, y: 0}} colors={['#5C44E4', '#753E8D']}>
-            <TouchableOpacity
-                onPress={handleButtonPress}
-                disabled={isButtonDisabled()}
-                style={[styles.button, getButtonStyle(), style]}
-            >
-                {renderButton()}
-            </TouchableOpacity>
-        </LinearGradient>
+        <>
+            <LinearGradient style={{ borderRadius: HP(8) }} start={{ x: 0, y: 0 }} end={{ x: 2, y: 0 }} colors={LinearGradienrColor}>
+                <TouchableOpacity
+                    onPress={handleButtonPress}
+                    disabled={isButtonDisabled()}
+                    style={[styles.button, getButtonStyle(), style]}
+                >
+                    {renderButton()}
+                </TouchableOpacity>
+            </LinearGradient>
+        </>
     );
 };
 
@@ -115,7 +121,6 @@ const styles = StyleSheet.create({
         width: HP(343),
         height: HP(44),
         borderRadius: HP(8),
-        // backgroundColor: '#5C44E4',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -125,12 +130,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
+        flexDirection: "row",
+        gap: 10,
     },
     disabledButton: {
         backgroundColor: COLORS.PRIMARY,
     },
     activeButtonText: {
-        ...TextStyles.MUKTA_SEMI_BOLD,
+        ...TextStyles.SOFIA_SEMI_BOLD,
         color: COLORS.WHITE,
     },
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import RecordingList from '../../components/RecordingList';
 import OuterLayout from '../../components/OuterLayout';
 import InnerBlock from '../../components/InnerBlock';
@@ -9,19 +9,28 @@ import { TextStyles } from '../../utils/TextStyles';
 import { FS, VP } from '../../utils/Responsive';
 import { Button } from '../../components/Button';
 import Profile from '../../components/Profile';
+import ProfileEdit from '../../components/ProfileEdit';
+import { useIsFocused } from '@react-navigation/native';
 
-function ProfileScreen(): React.JSX.Element {
+function ProfileScreen({ navigation }: { navigation: any }): React.JSX.Element {
+    const isFocused = useIsFocused();
+
+    const [editScreen, setEditScreen] = useState(false);
+
+    const screenChangeHandler = (): void => {
+        setEditScreen((pre) => !pre);
+    }
+
+    useEffect(() => {
+        if (isFocused) {
+            setEditScreen(false);
+        }
+    }, [isFocused])
+
     return (
         <OuterLayout containerStyle={{ backgroundColor: COLORS.BACKGROUND }}>
             <InnerBlock>
-                <Profile />
-                <View style={{ margin: "auto" }}>
-                    <Button
-                        text={'Edit Profile'}
-                        onPress={() => void (0)}
-                        textStyle={styles.buttonStyle}
-                    />
-                </View>
+                {editScreen ? (<ProfileEdit handler={screenChangeHandler} />) : (<Profile navigation={navigation} handler={screenChangeHandler} />)}
             </InnerBlock>
         </OuterLayout>
     )
@@ -38,12 +47,7 @@ const styles = StyleSheet.create({
     heading: {
         ...TextStyles.SOFIA_SEMI_BOLD,
         fontSize: FS(14)
-    },
-    buttonStyle: {
-        ...TextStyles.SOFIA_MEDIUM,
-        fontSize: FS(16),
-        color: COLORS.WHITE,
-    },
+    }
 });
 
 export default ProfileScreen;
