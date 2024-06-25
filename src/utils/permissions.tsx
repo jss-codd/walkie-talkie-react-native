@@ -8,6 +8,7 @@ import * as Permissions from 'react-native-permissions'
 import { AlertMessages, BACKEND_URL } from './constants';
 import { saveStorage } from './storage';
 import { showAlert } from './alert';
+import { getConfig } from './axiosConfig';
 
 const hasLocationPermission = async () => {
     let locationPermission: any;
@@ -54,13 +55,12 @@ const hasLocationPermission = async () => {
 
 const getFcmToken = async () => {
     let fcmToken = await AsyncStorage.getItem('fcmToken');
+    
     if (fcmToken === null) {
         try {
             const getToken = await messaging().getToken();
             if (getToken) {
-                await AsyncStorage.setItem('fcmToken', getToken);
                 saveToken(getToken);
-                saveStorage({ token: getToken });
             }
         } catch (err) {
             console.log('Error while getting FCM Token', err);
@@ -75,10 +75,14 @@ const saveToken = async (token: string) => {
             token: token,
         };
 
+        const getAxiosConfig = await getConfig();
+
         axios
-            .post(BACKEND_URL + '/device-token', dataPayload)
-            .then(response => {
+            .post(BACKEND_URL + '/device-token', dataPayload, getAxiosConfig)
+            .then(async response => {
                 console.log('saveToken ', response.data);
+                await AsyncStorage.setItem('fcmToken', token);
+                saveStorage({ token: token });
             })
             .catch(error => {
                 console.error('Error sending data: ', error);

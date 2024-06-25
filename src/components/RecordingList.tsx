@@ -44,7 +44,7 @@ const RecordingList = () => {
             });
         };
 
-        const sound: any = new Sound(item.data.audio_url, null, error => callback(error, sound));
+        const sound: any = new Sound(item.data.audio_url, undefined, error => callback(error, sound));
     }
 
     const deleteNotification = async (item: any, index: number) => {
@@ -62,7 +62,7 @@ const RecordingList = () => {
             <Image source={require('../assets/images/image.png')} style={styles.avatar} />
             <View style={styles.threadContent}>
                 <RNText textStyle={styles.username}>
-                    Audio Message sent by <RNText textStyle={styles.sentBy}>Michel</RNText>
+                    Audio Message sent by <RNText textStyle={styles.sentBy}>{item.data.user_name}</RNText>
                 </RNText>
                 <RNText textStyle={styles.timestamp}>
                     {TimeAgo.inWords(item.sentTime)}

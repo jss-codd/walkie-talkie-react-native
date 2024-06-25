@@ -19,6 +19,7 @@ import Microphone from '../../assets/svgs/microphone.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import { loadStorage } from '../../utils/storage';
+import { getConfig } from '../../utils/axiosConfig';
 
 export const LinearGradientComp = ({ children, status, style }: { status: boolean, children: any, style?: any }) => {
   return (
@@ -48,15 +49,17 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
 
   const fetchNearDevices = async () => {
     try {
-      const token = await loadStorage();
       const location = await returnLocation();
 
       const dataPayload = {
-        token: token?.token || '',
         location: JSON.stringify(location)
       };
 
-      const response = await axios.post(BACKEND_URL + '/fetch-near-devices', dataPayload);
+      const getAxiosConfig = await getConfig();
+
+      const response = await axios.post(BACKEND_URL + '/fetch-near-devices', dataPayload, getAxiosConfig);
+
+      console.log(response.data.data, 'fetchNearDevices')
 
       setMarkers(response.data.data || []);
     } catch (error: any) {
@@ -216,7 +219,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                       latitude: +marker.lat || 0,
                       longitude: +marker.lng || 0,
                     }}
-                    title={`User ${index+1}`}
+                    title={`${marker.name || ""}`}
                   />
                 ))}
             </MapView>
@@ -459,6 +462,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     overflow: 'hidden',
+    // zIndex: 999
   },
   mapStyle: {
     position: 'absolute',

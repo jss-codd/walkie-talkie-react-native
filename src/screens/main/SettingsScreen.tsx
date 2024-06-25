@@ -12,6 +12,7 @@ import InnerBlock from '../../components/InnerBlock';
 import { HP, VP } from '../../utils/Responsive';
 import { RNText } from '../../components/RNText';
 import { TextStyles } from '../../utils/TextStyles';
+import { getConfig } from '../../utils/axiosConfig';
 
 function SettingsScreen(): React.JSX.Element {
     const settings = useContext<any>(SettingContext);
@@ -25,14 +26,13 @@ function SettingsScreen(): React.JSX.Element {
     const toggleNotification = async (e: boolean) => {
         setLoader(true);
 
-        const token: any = await loadStorage();
+        const getAxiosConfig = await getConfig();
 
         const dataPayload = {
-            "token": token?.token || "",
             "status": e
         };
 
-        axios.put(BACKEND_URL + '/notification-status', dataPayload)
+        axios.put(BACKEND_URL + '/notification-status', dataPayload, getAxiosConfig)
             .then(response => {
                 console.log("response.data: ", response.data);
                 settings.handler('notificationStatus', e)
@@ -47,14 +47,13 @@ function SettingsScreen(): React.JSX.Element {
 
     const togglePlayAudio = async (e: boolean) => {
         setLoader(true)
-        const token: any = await loadStorage();
+        const getAxiosConfig = await getConfig();
 
         const dataPayload = {
-            "token": token?.token || "",
             "status": e
         };
 
-        axios.put(BACKEND_URL + '/audio-play-status', dataPayload)
+        axios.put(BACKEND_URL + '/audio-play-status', dataPayload, getAxiosConfig)
             .then(response => {
                 console.log("response.data: ", response.data);
                 settings.handler('audioPlayStatus', e)

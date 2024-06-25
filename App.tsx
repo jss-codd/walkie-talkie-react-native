@@ -20,7 +20,7 @@ const settingsDefault = {
 }
 
 function App(): React.JSX.Element {
-  const [isConnected, setConnected] = useState(false);
+  const [isConnected, setConnected] = useState(true);
   const [settings, setSettings] = useState(settingsDefault);
 
   const settingHandler = (key: any, data: any) => {

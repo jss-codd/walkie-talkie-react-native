@@ -18,60 +18,51 @@ import { loadStorage, removeStorage, saveStorage } from '../../../utils/storage'
 import OTPInput from '../../../components/OTPInput';
 import axios from 'axios';
 import { showAlert } from '../../../utils/alert';
+import { getConfig } from '../../../utils/axiosConfig';
 
-type NavigationProp = NativeStackScreenProps<MainStackParamList>;
+const pinCheck = /^[0-9]{4}$/;
 
-const otpCheck = /^[0-9]{4}$/;
-
-const VerifyCode: React.FunctionComponent<any> = ({
+const PinLogin: React.FunctionComponent<any> = ({
     navigation,
 }) => {
-    const [value, setValue] = useState('');
-    const [error, setError] = useState({ status: false, text: "" });
+    const [pin, setPin] = useState('');
+    const [errorPin, setErrorPin] = useState({ status: false, text: "" });
     const [loading, setLoading] = useState(false);
-    const [mobileNo, setMobileNo] = useState("");
 
     const handleOnPress = async () => {
         try {
-            const signupMobile = await loadStorage("signupMobile");
+            const userDetails = await loadStorage("userDetails");
 
-            if (!signupMobile || !signupMobile.hasOwnProperty("mobile")) {
-                navigation.navigate(
-                    navigationString.REGISTER_SCREEN,
-                )
-            }
+            const inputValue = pin.trim();
 
-            const inputValue = value.trim();
-
-            if (otpCheck.test(inputValue) == false) {
-                throw new Error(errorMessage.otp);
+            if (pinCheck.test(inputValue) == false) {
+                throw new Error(errorMessage.pin);
             }
 
             setLoading(true);
 
-            setError({ status: false, text: "" });
+            setErrorPin({ status: false, text: "" });
 
             const dataPayload = {
-                "otp": inputValue,
-                "mobile": signupMobile.mobile
-
+                "pin": inputValue,
+                "mobile": userDetails.mobile
             };
 
-            axios.post(BACKEND_URL + '/otp-verification', dataPayload)
+            console.log(dataPayload, 'dataPayload pin-login')
+
+            axios.post(BACKEND_URL + '/pin-login', dataPayload)
                 .then(response => {
-                    // console.log("response.data: ", response.data);
+                    console.log("pin-login: ", response.data);
                     setLoading(false);
 
                     if (response.data.success && response.data.mobile && response.data.jwt) {
-                        removeStorage("signupMobile");
-
                         saveStorage({ "mobile": response.data.mobile, "jwt": response.data.jwt }, "userDetails");
 
                         navigation.reset({
                             index: 0,
                             routes: [
                                 {
-                                    name: 'PinSetScreen',
+                                    name: 'MainTabNavigator',
                                 },
                             ],
                         });
@@ -89,20 +80,34 @@ const VerifyCode: React.FunctionComponent<any> = ({
                 });
 
         } catch (err: any) {
-            setError((pre) => ({ status: true, text: err.message }))
+            setErrorPin((pre) => ({ status: true, text: err.message }))
         }
     };
 
+    const handleForgotPress = () => {
+        navigation.reset({
+            index: 0,
+            routes: [
+                {
+                    name: 'RegisterScreen',
+                },
+            ],
+        });
+    }
+
     useEffect(() => {
         (async () => {
-            const signupMobile = await loadStorage("signupMobile");
+            const userDetails = await loadStorage("userDetails");
 
-            if (!signupMobile || !signupMobile.hasOwnProperty("mobile")) {
-                navigation.navigate(
-                    navigationString.REGISTER_SCREEN,
-                )
-            } else {
-                setMobileNo(signupMobile.mobile);
+            if (!userDetails || !userDetails.hasOwnProperty("mobile") || !userDetails.hasOwnProperty("jwt")) {
+                navigation.reset({
+                    index: 0,
+                    routes: [
+                        {
+                            name: 'RegisterScreen',
+                        },
+                    ],
+                });
             }
         })()
     }, [])
@@ -111,44 +116,42 @@ const VerifyCode: React.FunctionComponent<any> = ({
         <OuterLayout containerStyle={styles.containerStyle}>
             <InnerBlock>
                 <View style={styles.container}>
-                    <View style={{ marginLeft: VP(20), marginTop: VP(20), }}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                navigation.navigate(
-                                    navigationString.REGISTER_SCREEN,
-                                )}
-                        >
-                            <ArrowLeftSquare height={21} width={21} />
-                        </TouchableOpacity>
+                    <View style={{ marginLeft: VP(20), marginTop: VP(20) }}>
                     </View>
+
                     <ScrollView showsVerticalScrollIndicator={false}>
                         <View style={styles.startContainer}>
                             <Mobile height={VP(160)} />
                         </View>
                         <View style={styles.paraContainer}>
                             <RNText textStyle={styles.paraHeadingStyle}>
-                                OTP Verification
+                                Enter 4 Digit Pin
                             </RNText>
                         </View>
                         <View style={{ alignSelf: 'center', marginTop: VP(18) }}>
                             <RNText textStyle={styles.paraStyle}>
-                                Enter The OTP Sent to <RNText textStyle={styles.paraBold}>{mobileNo}</RNText>
+                                To access your account
                             </RNText>
                         </View>
                         <View style={styles.formContainer}>
                             <View style={styles.inputContainer}>
-                                <OTPInput formProps={{ value, setValue, error }} />
+                                <OTPInput formProps={{ value: pin, setValue: setPin, error: errorPin }} />
                             </View>
 
-                            <View style={styles.signInTextContainer}>
+                            <View style={{ ...styles.signInTextContainer, paddingHorizontal: HP(10) }}>
                                 <RNText textStyle={styles.signInTextStyle}>
-                                    Didn’t receive the OTP? <RNText textStyle={{ color: COLORS.PRIMARY }}>Resend</RNText>
+                                    Oh-Oh Invalid PIN! Only 4 attemps are left.
+                                    <TouchableOpacity
+                                        onPress={handleForgotPress}
+                                    >
+                                        <RNText textStyle={{ color: COLORS.PRIMARY }}>Forgot PIN?</RNText>
+                                    </TouchableOpacity>
                                 </RNText>
                             </View>
 
                             <View style={{ marginTop: VP(34) }}>
                                 <Button
-                                    text={'Verify & Proceed'}
+                                    text={'Enter & Proceed'}
                                     onPress={() => handleOnPress()}
                                     textStyle={styles.buttonStyle}
                                     isLoading={loading}
@@ -161,4 +164,4 @@ const VerifyCode: React.FunctionComponent<any> = ({
         </OuterLayout>
     );
 };
-export default VerifyCode;
+export default PinLogin;

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, TouchableOpacity, View, Image, BackHandler } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
 import OuterLayout from '../../../components/OuterLayout';
 import { AuthStackParamList } from '../../../navigations/AuthStackNavigator';
 import { styles } from './styles';
@@ -13,7 +16,6 @@ import { BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
 import { HP, VP } from '../../../utils/Responsive';
 import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
-import axios from 'axios';
 import { showAlert } from '../../../utils/alert';
 import { removeStorage, saveStorage } from '../../../utils/storage';
 
@@ -30,9 +32,6 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
 
     const handleOnPress = () => {
         try {
-            // navigation.navigate(
-            //     navigationString.VERIFY_CODE,
-            // )
             const inputValue = text.trim();
 
             if (mob.test(inputValue) == false) {
@@ -75,8 +74,19 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
         // navigation.goBack();
     };
 
-    useEffect(() => {
+    const dumpStorage = async () => {
         removeStorage("signupMobile");
+        removeStorage("userDetails");
+        removeStorage("recordingList");
+        removeStorage("savedLocation");
+        removeStorage("fcm");
+
+        // removeItem
+        await AsyncStorage.removeItem('fcmToken');
+    }
+
+    useEffect(() => {
+        dumpStorage();
     }, [])
 
     return (

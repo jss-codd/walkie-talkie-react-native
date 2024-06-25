@@ -13,10 +13,12 @@ import { returnLocation } from '../utils/location';
 import Microphone from '../assets/svgs/microphone.svg';
 import { LinearGradientComp } from '../screens/main/HomeScreen';
 import { RNText } from './RNText';
+import { getConfig } from '../utils/axiosConfig';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
 const dirs = RNFetchBlob.fs.dirs;
+
 const path = Platform.select({
     ios: 'sound.m4a',
     android: `${dirs.CacheDir}/sound.mp3`,
@@ -98,9 +100,9 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
 
             setAudioPath(result);
 
-            const token: any = await loadStorage();
-
             const location = await returnLocation();
+
+            const getAxiosConfig = await getConfig();
 
             //call curl here
             RNFetchBlob.fetch(
@@ -109,6 +111,7 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
                 {
                     // this is required, otherwise it won't be process as a multipart/form-data request
                     'Content-Type': 'multipart/form-data',
+                    'authorization': getAxiosConfig.headers['authorization']
                 },
                 [
                     {
@@ -121,10 +124,6 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
                                 : result,
                         ),
                         // type: mimeType,
-                    },
-                    {
-                        name: 'token',
-                        data: token?.token || '',
                     },
                     {
                         name: 'location',
