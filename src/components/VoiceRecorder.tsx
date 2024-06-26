@@ -111,7 +111,7 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
                 {
                     // this is required, otherwise it won't be process as a multipart/form-data request
                     'Content-Type': 'multipart/form-data',
-                    'authorization': getAxiosConfig.headers['authorization']
+                    'Authorization': 'Bearer ' + getAxiosConfig.headers['authorization']
                 },
                 [
                     {
@@ -152,7 +152,7 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
                 });
         } catch (err: any) {
             setLoader(false);
-            showAlert('Recording Failed', err);
+            showAlert('Recording Failed', err.message);
             console.error(err, 'err')
         }
     };

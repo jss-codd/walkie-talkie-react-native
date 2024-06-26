@@ -14,10 +14,11 @@ import { FS, HP, VP } from "../utils/Responsive";
 import { RNText } from "./RNText";
 import Pencil from '../assets/svgs/pencil.svg';
 import { Button } from "./Button";
-import PencilEdit from '../assets/svgs/pencil-edit.svg';
+import User from '../assets/svgs/user.svg';
 
-const ProfileEdit = (props: { handler: () => void }) => {
-    const { handler } = props;
+const ProfileEdit = (props: { handler: () => void, profile: any, inputChange: (arg1: any, arg2: any) => void, submitHandler: () => void, loading: boolean, error: any }) => {
+    const { handler, profile, inputChange, submitHandler, loading, error } = props;
+
     return (
         <>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -28,54 +29,77 @@ const ProfileEdit = (props: { handler: () => void }) => {
                             <Pencil height={40} width={40} />
                         </View>
                     </View>
-                    <View style={{ ...styles.container, marginTop: VP(22) }}>
+                    {/* <View style={{ ...styles.container, marginTop: VP(22) }}>
                         <RNText textStyle={styles.username}>
                             Terry Migua
                         </RNText>
-                    </View>
-                    <View style={{ ...styles.container, marginTop: VP(25), justifyContent: "flex-start" }}>
+                    </View> */}
+                    <View style={{ ...styles.container, marginTop: VP(47), justifyContent: "flex-start" }}>
                         <View style={styles.formContainer}>
-                            <Image source={require('../assets/icons/mail.png')} style={{ padding: 5, ...styles.icon }} />
+                            <User width={18} height={18} />
                             <TextInput
                                 style={styles.input}
-                                // onChangeText={onChangeNumber}
-                                value={"terrymigua2@gmail.com"}
-                                placeholder="useless placeholder"
+                                onChangeText={(e: any) => inputChange('name', e)}
+                                value={profile.name || ""}
+                                placeholder="Enter your name here"
+                                placeholderTextColor={COLORS.PLACEHOLDER_COLOR}
+                                maxLength={25}
                             />
                         </View>
                     </View>
                     <View style={{ ...styles.container, marginTop: VP(10), justifyContent: "flex-start" }}>
                         <View style={styles.formContainer}>
-                            <Image source={require('../assets/icons/phone.png')} style={{ padding: 5, ...styles.icon }} />
+                            <Image source={require('../assets/icons/mail.png')} style={{ padding: 5, ...styles.icon }} />
                             <TextInput
                                 style={styles.input}
-                                // onChangeText={onChangeNumber}
-                                value={"0420 222 585"}
-                                placeholder="useless placeholder"
-                                keyboardType="numeric"
+                                onChangeText={(e: any) => inputChange('email', e)}
+                                value={profile.email || ""}
+                                placeholder="Enter your email here"
+                                placeholderTextColor={COLORS.PLACEHOLDER_COLOR}
+                                maxLength={25}
                             />
                         </View>
                     </View>
+                    {/* <View style={{ ...styles.container, marginTop: VP(10), justifyContent: "flex-start" }}>
+                        <View style={styles.formContainer}>
+                            <Image source={require('../assets/icons/phone.png')} style={{ padding: 5, ...styles.icon }} />
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={(e: any) => inputChange('mobile', e)}
+                                value={profile.mobile || ""}
+                                placeholder="Enter your mobile here"
+                                keyboardType="numeric"
+                                placeholderTextColor={COLORS.PLACEHOLDER_COLOR}
+                                maxLength={10}
+                            />
+                        </View>
+                    </View> */}
                     <View style={{ ...styles.container, marginTop: VP(10), justifyContent: "flex-start" }}>
                         <View style={{ ...styles.formContainer, borderBottomWidth: 0 }}>
                             <Image source={require('../assets/icons/location.png')} style={{ padding: 5, ...styles.icon }} />
                             <TextInput
                                 style={styles.input}
-                                // onChangeText={onChangeNumber}
-                                value={"melbourne"}
-                                placeholder="useless placeholder"
+                                onChangeText={(e: any) => inputChange('location', e)}
+                                value={profile.location || ""}
+                                placeholder="Enter your location here"
+                                placeholderTextColor={COLORS.PLACEHOLDER_COLOR}
+                                maxLength={25}
                             />
                         </View>
                     </View>
                 </View>
-                <View style={{ margin: "auto", flexDirection: "row", gap: 10, marginTop: VP(71) }}>
+                <View style={{ ...styles.container, marginTop: VP(20), justifyContent: "center" }}>
+                    <RNText textStyle={{ ...TextStyles.SOFIA_SEMI_BOLD, color: COLORS.RED, fontSize: HP(16) }}>{error.status && (<>{error.text}</>)}</RNText>
+                </View>
+                <View style={{ margin: "auto", flexDirection: "row", gap: 10, marginTop: VP(50) }}>
                     <View style={{ width: "46%" }}>
                         <Button
                             text={'Save'}
-                            onPress={handler}
+                            onPress={submitHandler}
                             textStyle={styles.buttonStyle}
                             Icon={<Image source={require('../assets/icons/save.png')} style={styles.icon} />}
                             style={{ width: "100%" }}
+                            isLoading={loading}
                         />
                     </View>
                     <View style={{ width: "46%" }}>
@@ -86,6 +110,7 @@ const ProfileEdit = (props: { handler: () => void }) => {
                             Icon={<Image source={require('../assets/icons/cancel.png')} style={styles.icon} />}
                             style={{ borderColor: "#6017EB", borderWidth: 1, width: "100%" }}
                             LinearGradienrColor={['#FDFDFD', '#FDFDFD']}
+                            isLoading={loading}
                         />
                     </View>
                 </View>

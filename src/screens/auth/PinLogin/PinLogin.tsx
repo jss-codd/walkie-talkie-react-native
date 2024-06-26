@@ -19,6 +19,7 @@ import OTPInput from '../../../components/OTPInput';
 import axios from 'axios';
 import { showAlert } from '../../../utils/alert';
 import { getConfig } from '../../../utils/axiosConfig';
+import { maskInput } from '../../../utils/commonHelper';
 
 const pinCheck = /^[0-9]{4}$/;
 
@@ -28,6 +29,7 @@ const PinLogin: React.FunctionComponent<any> = ({
     const [pin, setPin] = useState('');
     const [errorPin, setErrorPin] = useState({ status: false, text: "" });
     const [loading, setLoading] = useState(false);
+    const [maskMobile, setMaskMobile] = useState("");
 
     const handleOnPress = async () => {
         try {
@@ -48,15 +50,15 @@ const PinLogin: React.FunctionComponent<any> = ({
                 "mobile": userDetails.mobile
             };
 
-            console.log(dataPayload, 'dataPayload pin-login')
+            // console.log(dataPayload, 'dataPayload pin-login')
 
             axios.post(BACKEND_URL + '/pin-login', dataPayload)
                 .then(response => {
-                    console.log("pin-login: ", response.data);
+                    // console.log("pin-login: ", response.data);
                     setLoading(false);
 
                     if (response.data.success && response.data.mobile && response.data.jwt) {
-                        saveStorage({ "mobile": response.data.mobile, "jwt": response.data.jwt }, "userDetails");
+                        saveStorage({ ...userDetails, "mobile": response.data.mobile, "jwt": response.data.jwt }, "userDetails");
 
                         navigation.reset({
                             index: 0,
@@ -108,6 +110,8 @@ const PinLogin: React.FunctionComponent<any> = ({
                         },
                     ],
                 });
+            } else {
+                setMaskMobile(maskInput(userDetails.mobile));
             }
         })()
     }, [])
@@ -139,12 +143,20 @@ const PinLogin: React.FunctionComponent<any> = ({
                             </View>
 
                             <View style={{ ...styles.signInTextContainer, paddingHorizontal: HP(10) }}>
-                                <RNText textStyle={styles.signInTextStyle}>
-                                    Oh-Oh Invalid PIN! Only 4 attemps are left.
+                                <RNText textStyle={{ ...styles.signInTextStyle }}>
+                                    {/* Oh-Oh Invalid PIN! Only 4 attemps are left. */}
                                     <TouchableOpacity
                                         onPress={handleForgotPress}
                                     >
                                         <RNText textStyle={{ color: COLORS.PRIMARY }}>Forgot PIN?</RNText>
+                                    </TouchableOpacity>
+                                </RNText>
+                                <RNText textStyle={{ ...styles.signInTextStyle }}>
+                                    {/* Oh-Oh Invalid PIN! Only 4 attemps are left. */}
+                                    <TouchableOpacity
+                                        onPress={handleForgotPress}
+                                    >
+                                        <RNText textStyle={{ color: COLORS.PRIMARY }}>Not {maskMobile}?</RNText>
                                     </TouchableOpacity>
                                 </RNText>
                             </View>

@@ -5,8 +5,8 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 
 import { showAlert } from '../../utils/alert';
 import { AlertMessages, BACKEND_URL, COLORS } from '../../utils/constants';;
-import { askInitialPermission, checkPermissions } from '../../utils/permissions';
-import { clearWatch, getLocation, returnLocation, watchPosition } from '../../utils/location';
+import { askInitialPermission, checkPermissions, hasLocationPermissionBG } from '../../utils/permissions';
+import { clearWatch, compareLocation, getLocation, returnLocation, watchPosition } from '../../utils/location';
 import VoiceRecorder from '../../components/VoiceRecorder';
 import LocationAlertModal from '../../components/LocationAlertModal';
 import { FS, HP, VP } from '../../utils/Responsive';
@@ -55,9 +55,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
         location: JSON.stringify(location)
       };
 
-      const getAxiosConfig = await getConfig();
-
-      const response = await axios.post(BACKEND_URL + '/fetch-near-devices', dataPayload, getAxiosConfig);
+      const response = await axios.post(BACKEND_URL + '/fetch-near-devices', dataPayload);
 
       console.log(response.data.data, 'fetchNearDevices')
 
@@ -80,6 +78,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
       }
 
       getLocation(setLocation, setModalVisible);
+
       fetchNearDevices();
     })();
   }, []);
@@ -119,13 +118,21 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
   // checkPermissions
   useEffect(() => {
     checkPermissions();
+
+    // compareLocation({latitude: -36.3602234, longitude: 145.3786707}, {latitude: 22.6870259, longitude: 75.8712694});
   }, [])
 
   const startTask = () => {
     console.log('Watcher started');
-    getLocation(setLocation, setModalVisible);
-    setBackgroundListener(true);
-    watchPosition(setLocation, setSubscriptionId);
+    hasLocationPermissionBG().then(function (res) {
+      if (!res) {
+        showAlert(AlertMessages.location_access_bg_error.title, AlertMessages.location_access_bg_error.message);
+      }
+      console.log(res, 'hasLocationPermissionBG');
+      getLocation(setLocation, setModalVisible);
+      setBackgroundListener(true);
+      watchPosition(setLocation, setSubscriptionId);
+    })
   };
 
   const stopTask = () => {
@@ -201,26 +208,40 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
               //   });
               // }}
               loadingEnabled={true}
-              customMapStyle={mapStyle}
+            // customMapStyle={mapStyle}
             >
               <Marker
-                // image={require('../assets/images/custom_pin.png')}
+                rotation={180}
+                // image={{ uri: require('../../assets/images/truck.png') }}
                 coordinate={{
                   latitude: location?.coords?.latitude || 0,
                   longitude: location?.coords?.longitude || 0,
                 }}
-              />
+              >
+                <Image
+                  source={require('../../assets/images/truck.png')}
+                  style={{ width: HP(29.42), height: VP(76) }}
+                  resizeMode="contain"
+                />
+              </Marker>
 
               {markers &&
                 markers.map((marker: any, index: number) => (
                   <Marker
+                    rotation={180}
                     key={index}
                     coordinate={{
                       latitude: +marker.lat || 0,
                       longitude: +marker.lng || 0,
                     }}
                     title={`${marker.name || ""}`}
-                  />
+                  >
+                    <Image
+                      source={require('../../assets/images/truck.png')}
+                      style={{ width: HP(29.42), height: VP(76) }}
+                      resizeMode="contain"
+                    />
+                  </Marker>
                 ))}
             </MapView>
           ) : null}
@@ -252,7 +273,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
           </MapView> */}
         </View>
 
-        <View style={{ bottom: 0, height: VP(123), position: "absolute", backgroundColor: "#ffffff", borderTopLeftRadius: 30, borderTopRightRadius: 30, flex: 1 }}>
+        <View style={{ bottom: 0, height: VP(123), position: "absolute", backgroundColor: "#ffffff", borderTopLeftRadius: 0, borderTopRightRadius: 0, flex: 1 }}>
           <View style={{
             flexDirection: "row", justifyContent: "space-between", width: "100%", margin: "auto", padding: "auto", paddingHorizontal: 16, paddingVertical: 12, alignItems: "center"
           }}>

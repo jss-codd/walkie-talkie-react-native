@@ -12,7 +12,6 @@ import { getConfig } from './axiosConfig';
 
 const hasLocationPermission = async () => {
     let locationPermission: any;
-    let bgPermission: any;
 
     if (Platform.OS === 'android') {
         const grantedPermission = await PermissionsAndroid.request(
@@ -32,6 +31,12 @@ const hasLocationPermission = async () => {
         locationPermission = grantedPermission === 'granted';
     }
 
+    return locationPermission;
+};
+
+const hasLocationPermissionBG = async () => {
+    let bgPermission: any;
+
     if (Platform.OS === 'android') {
         const granted2 = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
@@ -50,12 +55,12 @@ const hasLocationPermission = async () => {
         bgPermission = true;
     }
 
-    return locationPermission && bgPermission;
+    return bgPermission;
 };
 
 const getFcmToken = async () => {
     let fcmToken = await AsyncStorage.getItem('fcmToken');
-    
+
     if (fcmToken === null) {
         try {
             const getToken = await messaging().getToken();
@@ -115,8 +120,9 @@ const notificationPermission = async () => {
 };
 
 const askInitialPermission = async () => {
-    const grantedLocation = await hasLocationPermission();
     const grantedNotification = await notificationPermission();
+    const grantedLocation = await hasLocationPermission();
+
     if (grantedNotification) {
         getFcmToken();
     }
@@ -151,7 +157,7 @@ const requestAudioPermissions = async () => {
 const checkPermissions = async () => {
     if (Platform.OS === 'android') {
         const notification = await Permissions.check('android.permission.POST_NOTIFICATIONS');
-        // console.log(notification, 'notification');
+
         if (
             notification !== PermissionsAndroid.RESULTS.GRANTED &&
             notification !== PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
@@ -160,12 +166,8 @@ const checkPermissions = async () => {
         }
 
         const location = await Permissions.check('android.permission.ACCESS_FINE_LOCATION');
-        const locationbg = await Permissions.check('android.permission.ACCESS_BACKGROUND_LOCATION');
 
-        if (
-            location !== PermissionsAndroid.RESULTS.GRANTED ||
-            locationbg !== PermissionsAndroid.RESULTS.GRANTED
-        ) {
+        if (location !== PermissionsAndroid.RESULTS.GRANTED) {
             showAlert(AlertMessages.location_access_error.title, AlertMessages.location_access_error.message);
         }
     } else {
@@ -185,4 +187,20 @@ const checkPermissions = async () => {
     }
 }
 
-export { hasLocationPermission, askInitialPermission, requestAudioPermissions, notificationPermission, checkPermissions };
+const checkPermissionsBGLocation = async () => {
+    if (Platform.OS === 'android') {
+        const locationbg = await Permissions.check('android.permission.ACCESS_BACKGROUND_LOCATION');
+
+        if (locationbg !== PermissionsAndroid.RESULTS.GRANTED) {
+            showAlert(AlertMessages.location_access_bg_error.title, AlertMessages.location_access_bg_error.message);
+        }
+    } else {
+        const location = await Permissions.check('ios.permission.LOCATION_ALWAYS');
+
+        if (location !== PermissionsAndroid.RESULTS.GRANTED) {
+            showAlert(AlertMessages.location_access_bg_error.title, AlertMessages.location_access_bg_error.message);
+        }
+    }
+}
+
+export { hasLocationPermission, askInitialPermission, requestAudioPermissions, notificationPermission, checkPermissions, hasLocationPermissionBG };

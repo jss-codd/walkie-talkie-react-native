@@ -12,7 +12,7 @@ import { RNText } from '../../../components/RNText';
 import ValidationTextInput from '../../../components/ValidationTextInput';
 import { Button } from '../../../components/Button';
 import { navigationString } from '../../../utils/navigationString';
-import { BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
+import { BACKEND_URL, COLORS, errorMessage, mobileRegex } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
 import { HP, VP } from '../../../utils/Responsive';
 import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
@@ -20,8 +20,6 @@ import { showAlert } from '../../../utils/alert';
 import { removeStorage, saveStorage } from '../../../utils/storage';
 
 type NavigationProp = NativeStackScreenProps<AuthStackParamList>;
-
-const mob = /^[1-9]{1}[0-9]{9}$/;
 
 const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
     navigation,
@@ -34,7 +32,7 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
         try {
             const inputValue = text.trim();
 
-            if (mob.test(inputValue) == false) {
+            if (mobileRegex.test(inputValue) == false) {
                 throw new Error(errorMessage.mobile_no);
             }
 

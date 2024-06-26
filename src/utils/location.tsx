@@ -138,4 +138,19 @@ const distanceGet = (lat1: number, lon1: number, lat2: number, lon2: number) => 
     return d;
 }
 
-export { getLocation, watchPosition, clearWatch, returnLocation };
+const calculateHeading = (cord1: { latitude: number; longitude: number; }, cord2: { latitude: number; longitude: number; }) => {
+    if (cord2) {
+        const { latitude: lat1, longitude: lng1 } = cord1;
+        const { latitude: lat2, longitude: lng2 } = cord2;
+        const y = Math.sin(lng2 - lng1) * Math.cos(lat2);
+        const x =
+            Math.cos(lat1) * Math.sin(lat2) -
+            Math.sin(lat1) * Math.cos(lat2) * Math.cos(lng2 - lng1);
+        const θ = Math.atan2(y, x);
+        const brng = ((θ * 180) / Math.PI + 360) % 360;
+        return brng;
+    }
+    return 0;
+}
+
+export { getLocation, watchPosition, clearWatch, returnLocation, compareLocation };

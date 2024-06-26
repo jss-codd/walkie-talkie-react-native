@@ -16,7 +16,7 @@ import { RNText } from "./RNText";
 
 Sound.setCategory('Playback'); // true = mixWithOthers
 
-const RecordingList = () => {
+const RecordingList = ({ reload }: { reload: number }) => {
     const isFocused = useIsFocused();
 
     const [recordingList, setRecordingList] = useState([]);
@@ -105,7 +105,7 @@ const RecordingList = () => {
         if (isFocused) {
             loadRecordingFromStorage();
         }
-    }, [isFocused])
+    }, [isFocused, reload])
 
     return (
         <>

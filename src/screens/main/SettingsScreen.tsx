@@ -12,7 +12,6 @@ import InnerBlock from '../../components/InnerBlock';
 import { HP, VP } from '../../utils/Responsive';
 import { RNText } from '../../components/RNText';
 import { TextStyles } from '../../utils/TextStyles';
-import { getConfig } from '../../utils/axiosConfig';
 
 function SettingsScreen(): React.JSX.Element {
     const settings = useContext<any>(SettingContext);
@@ -26,15 +25,13 @@ function SettingsScreen(): React.JSX.Element {
     const toggleNotification = async (e: boolean) => {
         setLoader(true);
 
-        const getAxiosConfig = await getConfig();
-
         const dataPayload = {
             "status": e
         };
 
-        axios.put(BACKEND_URL + '/notification-status', dataPayload, getAxiosConfig)
+        axios.put(BACKEND_URL + '/notification-status', dataPayload)
             .then(response => {
-                console.log("response.data: ", response.data);
+                // console.log("response.data: ", response.data);
                 settings.handler('notificationStatus', e)
                 setLoader(false)
             })
@@ -42,20 +39,22 @@ function SettingsScreen(): React.JSX.Element {
                 setLoader(false);
                 showAlert('Error to change', "");
                 console.warn("Error sending data: ", error);
+
+                console.warn(error.response.data, 'error.response.data');
+                console.warn(error.response.status, 'error.response.status');
             });
     }
 
     const togglePlayAudio = async (e: boolean) => {
-        setLoader(true)
-        const getAxiosConfig = await getConfig();
+        setLoader(true);
 
         const dataPayload = {
             "status": e
         };
 
-        axios.put(BACKEND_URL + '/audio-play-status', dataPayload, getAxiosConfig)
+        axios.put(BACKEND_URL + '/audio-play-status', dataPayload)
             .then(response => {
-                console.log("response.data: ", response.data);
+                // console.log("response.data: ", response.data);
                 settings.handler('audioPlayStatus', e)
                 setLoader(false)
             })
@@ -118,7 +117,7 @@ function SettingsScreen(): React.JSX.Element {
                         </View>
                     </View>
                     <View style={{ flexDirection: 'row', gap: HP(10), marginTop: VP(20) }}>
-                        <RNText textStyle={{color: "#000"}}>
+                        <RNText textStyle={{ color: "#000" }}>
                             Token: {tokenShow}
                         </RNText>
                     </View>

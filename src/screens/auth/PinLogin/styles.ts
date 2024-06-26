@@ -4,11 +4,9 @@ import { TextStyles } from '../../../utils/TextStyles';
 import { COLORS } from '../../../utils/constants';
 
 export const styles = StyleSheet.create({
-    //
     container: {
         flex: 1,
     },
-    //
     formContainer: {
         justifyContent: 'center',
         alignItems: 'center',
@@ -16,32 +14,27 @@ export const styles = StyleSheet.create({
         // paddingBottom: VP(60),
 
     },
-    //
     containerStyle: {
         backgroundColor: COLORS.BACKGROUND,
     },
-    //
     startContainer: {
         // marginLeft: HP(49),
         // marginTop: VP(95),
         marginTop: VP(45),
         alignSelf: 'center',
     },
-    //
     paraContainer: {
         // marginHorizontal: HP(49),
         marginTop: VP(40),
         marginBottom: VP(11),
         alignSelf: 'center',
     },
-    //
     paraHeadingStyle: {
         ...TextStyles.SOFIA_SEMI_BOLD,
         fontSize: FS(24),
         color: COLORS.BLACK,
         lineHeight: 28.8,
     },
-    //
     paraStyle: {
         ...TextStyles.SOFIA_SEMI_LIGHT,
         fontSize: FS(16),
@@ -49,7 +42,6 @@ export const styles = StyleSheet.create({
         lineHeight: 20,
         textAlign: "center"
     },
-    //
     paraBold: {
         ...TextStyles.SOFIA_BOLD,
         fontSize: FS(16),
@@ -64,24 +56,19 @@ export const styles = StyleSheet.create({
         lineHeight: 25,
         textAlign: "center"
     },
-    //
     inputContainer: {
         marginBottom: VP(11),
     },
-    //
     buttonStyle: {
         ...TextStyles.SOFIA_MEDIUM,
         fontSize: FS(16),
         color: COLORS.WHITE,
     },
-    //
     signInTextContainer: {
         marginTop: VP(15),
         flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
+        gap: HP(125),
     },
-    //
     signInTextStyle: {
         ...TextStyles.SOFIA_REGULAR,
         fontSize: FS(16),

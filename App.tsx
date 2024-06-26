@@ -13,11 +13,62 @@ import { AlertMessages, BACKEND_URL } from './src/utils/constants';
 import { loadStorage, recordingStorage, saveStorage } from './src/utils/storage';
 import { SettingContext } from './src/context/SettingContext';
 import MainStackNavigator from './src/navigations/MainStackNavigator';
+import { refreshAuthToken } from './src/utils/apiCall';
 
 const settingsDefault = {
   notificationStatus: true,
   audioPlayStatus: true
 }
+
+axios.interceptors.request.use(
+  async config => {
+    const userDetails = await loadStorage("userDetails");
+    const token = userDetails.jwt;
+    if (token) {
+      config.headers['Authorization'] = 'Bearer ' + token
+    }
+    // config.headers['Content-Type'] = 'application/json';
+    return config
+  },
+  error => {
+    Promise.reject(error)
+  }
+)
+
+axios.interceptors.response.use(
+  response => {
+    return response
+  },
+  async function (error) {
+    const originalRequest = error.config;
+
+    if (error.response.status === 401 || error.response.status === 403) {
+      console.log('------------------unauthorized');
+      originalRequest._retry = true;
+
+      const userDetails = await loadStorage("userDetails");
+
+      console.log(userDetails, '-----------------userDetails');
+
+      const dataPayload = {
+        "pin": userDetails.pin,
+        "mobile": userDetails.mobile
+      };
+
+      const response: any = await refreshAuthToken(dataPayload);
+
+      if (response.data.success && response.data.jwt && response.data.mobile) {
+        saveStorage({ ...userDetails, "jwt": response.data.jwt, "mobile": response.data.mobile }, "userDetails");
+        axios.defaults.headers.common['Authorization'] =
+          'Bearer ' + response.data.jwt
+      }
+
+      return axios(originalRequest)
+    }
+
+    return Promise.reject(error)
+  }
+)
 
 function App(): React.JSX.Element {
   const [isConnected, setConnected] = useState(true);
@@ -102,10 +153,12 @@ function App(): React.JSX.Element {
   // fetch settings
   useEffect(() => {
     (async () => {
-      const settings = await loadStorage("settings");
+      const settingsData = await loadStorage("settings");
 
-      if (!settings || !settings.hasOwnProperty("notificationStatus")) {
+      if (!settingsData || !settingsData.hasOwnProperty("notificationStatus")) {
         saveStorage(settings, "settings");
+      } else {
+        setSettings((pre) => ({ ...settingsData }));
       }
 
       // fetchSettings();

@@ -23,7 +23,7 @@ export const saveStorage = (data: any, key = 'fcm') => {
 
 export const loadStorage = async (key = 'fcm') => {
   try {
-    const token = await storage.load({ key })
+    const token = await storage.load({ key });
     return token;
   } catch (err: any) {
     console.log(err.message, key + ' load error');

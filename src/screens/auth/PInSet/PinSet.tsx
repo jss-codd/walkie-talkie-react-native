@@ -82,12 +82,17 @@ const PinSet: React.FunctionComponent<any> = ({
 
             const getAxiosConfig = await getConfig();
 
+            const userDetails = await loadStorage("userDetails");
+
             axios.post(BACKEND_URL + '/pin-set', dataPayload, getAxiosConfig)
                 .then(response => {
                     console.log("response.data: ", response.data);
                     setLoading(false);
 
-                    if (response.data.success) {
+                    if (response.data.success && response.data.pin) {
+
+                        saveStorage({ ...userDetails, "pin": response.data.pin }, "userDetails");
+
                         navigation.reset({
                             index: 0,
                             routes: [

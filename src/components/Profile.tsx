@@ -17,8 +17,8 @@ import { Button } from "./Button";
 import PencilEdit from '../assets/svgs/pencil-edit.svg';
 import { navigationString } from "../utils/navigationString";
 
-const Profile = (props: { handler: () => void, navigation: any }) => {
-    const { handler, navigation } = props;
+const Profile = (props: { handler: () => void, navigation: any, profile: any }) => {
+    const { handler, navigation, profile } = props;
     return (
         <>
             <View style={{ backgroundColor: "#E6E6E6", paddingHorizontal: 16, paddingVertical: 12, borderBottomLeftRadius: 60, borderBottomRightRadius: 60, paddingBottom: VP(40) }}>
@@ -30,12 +30,12 @@ const Profile = (props: { handler: () => void, navigation: any }) => {
                 </View>
                 <View style={{ ...styles.container, marginTop: VP(22) }}>
                     <RNText textStyle={styles.username}>
-                        Terry Migua
+                        {profile.name || 'NA'}
                     </RNText>
                 </View>
                 <View style={{ ...styles.container, marginTop: VP(47), justifyContent: "flex-start" }}>
                     <RNText textStyle={styles.inputs}>
-                        <Image source={require('../assets/icons/mail.png')} style={styles.icon} /> terrymigua2@gmail.com
+                        <Image source={require('../assets/icons/mail.png')} style={styles.icon} /> {profile.email || 'NA'}
                     </RNText>
                 </View>
                 <View style={{ ...styles.container, paddingLeft: 14, paddingRight: 14 }}>
@@ -43,7 +43,7 @@ const Profile = (props: { handler: () => void, navigation: any }) => {
                 </View>
                 <View style={{ ...styles.container, marginTop: VP(20), justifyContent: "flex-start" }}>
                     <RNText textStyle={styles.inputs}>
-                        <Image source={require('../assets/icons/phone.png')} style={styles.icon} /> 0420 222 585
+                        <Image source={require('../assets/icons/phone.png')} style={styles.icon} /> {profile.mobile || 'NA'}
                     </RNText>
                 </View>
                 <View style={{ ...styles.container, paddingLeft: 14, paddingRight: 14 }}>
@@ -51,7 +51,7 @@ const Profile = (props: { handler: () => void, navigation: any }) => {
                 </View>
                 <View style={{ ...styles.container, marginTop: VP(20), justifyContent: "flex-start" }}>
                     <RNText textStyle={styles.inputs}>
-                        <Image source={require('../assets/icons/location.png')} style={styles.icon} /> melbourne
+                        <Image source={require('../assets/icons/location.png')} style={styles.icon} /> {profile.location || 'NA'}
                     </RNText>
                 </View>
                 <View style={{ ...styles.container, paddingLeft: 14, paddingRight: 14 }}>
