@@ -28,19 +28,23 @@ const refreshAuthToken = async (dataPayload: any) => {
   });
 }
 
-const getProfileDetails = async () => {
+const getProfileDetails = async (settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
   try {
-    const res = await axios.get<ProfileDetails>(BACKEND_URL + '/profile-details');
+    const res = await axios.get(BACKEND_URL + '/profile-details');
+    saveStorage(res.data.data, "userProfile");
+    settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
     console.log(res.data, '---------------getProfileDetails');
     return res.data;
-  } catch (error) {
-    console.error("Error getProfileDetails: ", error);
+  } catch (error: any) {
+    console.error("Error getProfileDetails: ", error.response.data.error || error);
   }
 }
 
-const submitProfileDetails = async (dataPayload: any) => {
+const submitProfileDetails = async (dataPayload: any, settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
   try {
-    const res = await axios.post<ProfileDetails>(BACKEND_URL + '/profile-details', dataPayload);
+    const res = await axios.post(BACKEND_URL + '/profile-details', dataPayload);
+    saveStorage(res.data.data, "userProfile");
+    settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
     console.log(res.data, '---------------submitProfileDetails');
     return res.data;
   } catch (error: any) {
@@ -49,4 +53,16 @@ const submitProfileDetails = async (dataPayload: any) => {
   }
 }
 
-export { saveLocation, refreshAuthToken, getProfileDetails, submitProfileDetails };
+const reportUserCall = async (id: any) => {
+  try {
+    const res = await axios.post(BACKEND_URL + '/report-user/' + id);
+
+    console.log(res.data, '---------------submitProfileDetails');
+    return res.data;
+  } catch (error: any) {
+    console.error("Error reportUser: ", error);
+    throw new Error('Failed to submit, ' + error.message);
+  }
+}
+
+export { saveLocation, refreshAuthToken, getProfileDetails, submitProfileDetails, reportUserCall };

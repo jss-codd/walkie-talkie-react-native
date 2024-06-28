@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, Text, StyleSheet, Image } from 'react-native';
+import { View, FlatList, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Sound from 'react-native-sound';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -9,10 +9,13 @@ import { showAlert } from "../utils/alert";
 import Play from '../assets/svgs/play.svg';
 import Delete from '../assets/svgs/delete.svg';
 import Pause from '../assets/svgs/pause.svg';
-import { COLORS } from "../utils/constants";
+import Report from '../assets/svgs/report.svg';
+import { AlertMessages, COLORS } from "../utils/constants";
 import { TextStyles } from "../utils/TextStyles";
 import { FS, HP, VP } from "../utils/Responsive";
 import { RNText } from "./RNText";
+import Loader from "./Loader";
+import { reportUserCall } from "../utils/apiCall";
 
 Sound.setCategory('Playback'); // true = mixWithOthers
 
@@ -20,7 +23,8 @@ const RecordingList = ({ reload }: { reload: number }) => {
     const isFocused = useIsFocused();
 
     const [recordingList, setRecordingList] = useState([]);
-    const [isRefreshing, setIsRefreshing] = useState(false)
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [loader, setLoader] = useState(false);
 
     function playSound(item: any, index: number) {
         setRecordingList((pre: any) => (pre.map((d: any, i: number) => { return (i === index) ? { ...d, playStatus: true } : d })))
@@ -57,24 +61,64 @@ const RecordingList = ({ reload }: { reload: number }) => {
         setRecordingList(list)
     }
 
+    const reportUser = async (id: number) => {
+        setLoader(true);
+        try {
+            let list: any = await loadStorage("recordingList");
+
+            const result: any = await reportUserCall(id);
+
+            if (result.success) {
+                showAlert(AlertMessages.report_user_success.title, AlertMessages.report_user_success.message);
+
+
+                list = list.map((d: any, i: number) => { return d.data.id === id ? { ...d, reported: true } : { ...d } });
+
+                saveStorage(list, 'recordingList');
+
+                setRecordingList(list)
+            } else {
+                showAlert(AlertMessages.report_user_failed.title, AlertMessages.report_user_failed.message);
+            }
+            setLoader(false);
+        } catch (err: any) {
+            setLoader(false);
+            showAlert(err.message, "");
+        }
+    }
+
     const ThreadItem = ({ item, index }: { item: any, index: number }) => (
-        <View style={styles.thread}>
-            <Image source={require('../assets/images/image.png')} style={styles.avatar} />
-            <View style={styles.threadContent}>
-                <RNText textStyle={styles.username}>
-                    Audio Message sent by <RNText textStyle={styles.sentBy}>{item.data.user_name}</RNText>
-                </RNText>
-                <RNText textStyle={styles.timestamp}>
-                    {TimeAgo.inWords(item.sentTime)}
-                </RNText>
+        <>
+            <View style={styles.thread}>
+                {item?.data?.profileImage ? (<Image loadingIndicatorSource={require("../assets/images/profile.png")} source={{ uri: item?.data?.profileImage }} style={styles.avatar} />) : (<Image source={require('../assets/images/profile.png')} style={styles.avatar} />)}
+
+                <View style={styles.threadContent}>
+                    <RNText textStyle={styles.username}>
+                        Audio Message sent by <RNText textStyle={styles.sentBy}>{item.data.user_name}</RNText>
+                    </RNText>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <RNText textStyle={styles.timestamp}>
+                            {TimeAgo.inWords(item.sentTime)}
+                        </RNText>
+                        <TouchableOpacity
+                            onPress={() => reportUser(item.data.id)}
+                            disabled={(item?.reported === true) ? true : false}
+                        >
+                            <RNText textStyle={{ ...styles.timestamp, color: COLORS.RED, textDecorationColor: "red", textDecorationLine: "underline" }}>
+                                {(item?.reported === true) ? `Reported` : `Report User`}
+                            </RNText>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View>
+                    {!item.playStatus ? (<Play onPress={() => playSound(item, index)} height={35} width={35} />) : (<Pause height={35} width={35} />)}
+                </View>
+                <View>
+                    <Delete onPress={() => deleteNotification(item, index)} height={32} width={32} />
+                </View>
             </View>
-            <View>
-                {!item.playStatus ? (<Play onPress={() => playSound(item, index)} height={35} width={35} />) : (<Pause height={35} width={35} />)}
-            </View>
-            <View>
-                <Delete onPress={() => deleteNotification(item, index)} height={32} width={32} />
-            </View>
-        </View>
+            <View style={styles.line}></View>
+        </>
     );
 
     const loadRecordingFromStorage = async () => {
@@ -102,6 +146,7 @@ const RecordingList = ({ reload }: { reload: number }) => {
     };
 
     useEffect(() => {
+        console.log(isFocused, 'isFocused');
         if (isFocused) {
             loadRecordingFromStorage();
         }
@@ -109,6 +154,7 @@ const RecordingList = ({ reload }: { reload: number }) => {
 
     return (
         <>
+            <Loader loading={loader} />
             <FlatList
                 data={recordingList}
                 renderItem={({ item, index, separators }) => <ThreadItem item={item} index={index} />}
@@ -130,8 +176,7 @@ const styles = StyleSheet.create({
     },
     thread: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: 16
+        alignItems: 'flex-start'
     },
     avatar: {
         width: 47,
@@ -159,7 +204,18 @@ const styles = StyleSheet.create({
     sentBy: {
         color: "#7609C3",
         fontWeight: 'bold'
-    }
+    },
+    line: {
+        height: 1,
+        backgroundColor: "#D2D2D2",
+        width: "100%",
+        flexDirection: "row",
+        marginTop: VP(19),
+        marginBottom: VP(19),
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: "flex",
+    },
 });
 
 export default RecordingList;

@@ -29,6 +29,7 @@
     "react-native-cli": "^2.0.1",
     "react-native-confirmation-code-field": "^7.4.0",
     "react-native-fs": "^2.20.0",
+    "react-native-image-picker": "^7.1.2",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-maps": "^1.15.6",
     "react-native-permissions": "^4.1.5",

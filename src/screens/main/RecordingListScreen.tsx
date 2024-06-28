@@ -39,7 +39,7 @@ function RecordingListScreen({ navigation }: { navigation: any }): React.JSX.Ele
                     </RNText>
                 </View>
                 <RecordingList reload={reload} />
-                <View style={{ margin: "auto", paddingHorizontal: 16, paddingVertical: 12 }}>
+                <View style={{ margin: "auto", paddingHorizontal: 0, paddingVertical: 12 }}>
                     <Button
                         text={'Clear Notifications'}
                         onPress={clearNotification}

@@ -15,6 +15,7 @@ import { RNText } from "./RNText";
 import Pencil from '../assets/svgs/pencil.svg';
 import { Button } from "./Button";
 import User from '../assets/svgs/user.svg';
+import ProfileImageContainer from "./ProfileImageContainer";
 
 const ProfileEdit = (props: { handler: () => void, profile: any, inputChange: (arg1: any, arg2: any) => void, submitHandler: () => void, loading: boolean, error: any }) => {
     const { handler, profile, inputChange, submitHandler, loading, error } = props;
@@ -24,16 +25,8 @@ const ProfileEdit = (props: { handler: () => void, profile: any, inputChange: (a
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={{ backgroundColor: "#E6E6E6", paddingHorizontal: 16, paddingVertical: 12, borderBottomLeftRadius: 60, borderBottomRightRadius: 60, paddingBottom: VP(40) }}>
                     <View style={styles.container}>
-                        <Image source={require('../assets/images/image.png')} style={styles.avatar} />
-                        <View style={{ position: "absolute", top: VP(120), right: HP(115) }}>
-                            <Pencil height={40} width={40} />
-                        </View>
+                        <ProfileImageContainer profile={profile} />
                     </View>
-                    {/* <View style={{ ...styles.container, marginTop: VP(22) }}>
-                        <RNText textStyle={styles.username}>
-                            Terry Migua
-                        </RNText>
-                    </View> */}
                     <View style={{ ...styles.container, marginTop: VP(47), justifyContent: "flex-start" }}>
                         <View style={styles.formContainer}>
                             <User width={18} height={18} />

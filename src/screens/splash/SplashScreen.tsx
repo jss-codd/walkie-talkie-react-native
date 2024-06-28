@@ -24,7 +24,7 @@ import { getConfig } from '../../utils/axiosConfig';
 function SplashScreen({ navigation }: { navigation: any }): React.JSX.Element {
 
   useEffect(() => {
-    (async () => {
+    setTimeout(async () => {
       const userDetails = await loadStorage("userDetails");
 
       if (userDetails && userDetails.hasOwnProperty("jwt") && userDetails.hasOwnProperty("mobile")) {
@@ -46,7 +46,8 @@ function SplashScreen({ navigation }: { navigation: any }): React.JSX.Element {
           ],
         });
       }
-    })()
+
+    }, 1000)
   }, [])
 
   return (

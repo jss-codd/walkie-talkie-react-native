@@ -21,7 +21,7 @@ const returnLocation = () => {
     })
 };
 
-const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, setModalVisible: (arg0: any) => void) => {
+const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, setLocationRegion: (arg0: GeolocationResponse) => void, setModalVisible: (arg0: any) => void) => {
     Geolocation.getCurrentPosition(
         async (pos) => {
             setLocation(pos);
@@ -34,6 +34,7 @@ const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, set
             const compareDistance = await compareLocation({ latitude, longitude }, savedLocation);
 
             if (compareDistance) {
+                setLocationRegion(pos);
                 loadStorage().then(
                     token => {
                         const dataPayload = {
@@ -63,7 +64,7 @@ const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, set
     );
 };
 
-const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setSubscriptionId: (arg0: number) => void) => {
+const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setLocationRegion: (arg0: GeolocationResponse) => void, setSubscriptionId: (arg0: number) => void) => {
     try {
         const watchID = Geolocation.watchPosition(
             async (position) => {
@@ -77,6 +78,7 @@ const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setSubs
                 const compareDistance = await compareLocation({ latitude, longitude }, savedLocation);
 
                 if (compareDistance) {
+                    setLocationRegion(position);
                     loadStorage().then(
                         token => {
                             const dataPayload = {

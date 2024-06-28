@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import RecordingList from '../../components/RecordingList';
 import OuterLayout from '../../components/OuterLayout';
 import InnerBlock from '../../components/InnerBlock';
@@ -13,8 +13,11 @@ import ProfileEdit from '../../components/ProfileEdit';
 import { useIsFocused } from '@react-navigation/native';
 import { getProfileDetails, submitProfileDetails } from '../../utils/apiCall';
 import Loader from '../../components/Loader';
+import { SettingContext } from '../../context/SettingContext';
 
 function ProfileScreen({ navigation }: { navigation: any }): React.JSX.Element {
+    const settings = useContext<any>(SettingContext);
+    
     const isFocused = useIsFocused();
 
     const [loading, setLoading] = useState(false);
@@ -59,7 +62,7 @@ function ProfileScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 ...profile
             };
 
-            const res = await submitProfileDetails(dataPayload);
+            const res = await submitProfileDetails(dataPayload, settings);
 
             setLoading(false);
 
@@ -80,7 +83,7 @@ function ProfileScreen({ navigation }: { navigation: any }): React.JSX.Element {
     }, [isFocused])
 
     const setProfileDetails = async () => {
-        const data: any = await getProfileDetails();
+        const data: any = await getProfileDetails(settings);
         setProfile(data?.data || {});
     }
 

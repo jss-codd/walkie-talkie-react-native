@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Button, AppState, TextInput, Image, TouchableOpacity, TouchableHighlight, Pressable } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
 import MapView, { Marker, Polyline } from 'react-native-maps';
@@ -20,6 +20,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import { loadStorage } from '../../utils/storage';
 import { getConfig } from '../../utils/axiosConfig';
+import { SettingContext } from '../../context/SettingContext';
 
 export const LinearGradientComp = ({ children, status, style }: { status: boolean, children: any, style?: any }) => {
   return (
@@ -38,7 +39,10 @@ export const LinearGradientComp = ({ children, status, style }: { status: boolea
 }
 
 function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
+  const settings = useContext<any>(SettingContext);
+
   const [location, setLocation] = useState<any>(null);
+  const [locationRegion, setLocationRegion] = useState<any>(null);
   const [subscriptionId, setSubscriptionId] = useState<any>(null);
 
   const appState = useRef(AppState.currentState);
@@ -77,7 +81,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
         );
       }
 
-      getLocation(setLocation, setModalVisible);
+      getLocation(setLocation, setLocationRegion, setModalVisible);
 
       fetchNearDevices();
     })();
@@ -99,7 +103,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState.match(/inactive|background/)) {
         BackgroundTimer.runBackgroundTimer(() => {
-          getLocation(setLocation, () => void (0));
+          getLocation(setLocation, setLocationRegion, () => void (0));
         }, 5000);
 
         console.log('App has come to the foreground!');
@@ -129,9 +133,9 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
         showAlert(AlertMessages.location_access_bg_error.title, AlertMessages.location_access_bg_error.message);
       }
       console.log(res, 'hasLocationPermissionBG');
-      getLocation(setLocation, setModalVisible);
+      getLocation(setLocation, setLocationRegion, setModalVisible);
       setBackgroundListener(true);
-      watchPosition(setLocation, setSubscriptionId);
+      watchPosition(setLocation, setLocationRegion, setSubscriptionId);
     })
   };
 
@@ -179,7 +183,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
               )}
             style={{}}
           >
-            <Image source={require('../../assets/images/images.jpeg')} style={styles.avatar} />
+            {settings.proflieDetails.profile_img ? (<><Image loadingIndicatorSource={require("../../assets/images/profile.png")} source={{ uri: settings.proflieDetails.profile_img }} style={styles.avatar} /></>) : (<Image source={require('../../assets/images/profile.png')} style={styles.avatar} />)}
           </TouchableOpacity>
         </View>
       </View>
@@ -191,9 +195,9 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
             <MapView
               style={styles.mapStyle}
               region={{
-                latitude: location?.coords?.latitude || 22.6870138,
+                latitude: locationRegion?.coords?.latitude || 22.6870138,
                 longitude:
-                  location?.coords?.longitude || 75.8712195,
+                  locationRegion?.coords?.longitude || 75.8712195,
                 latitudeDelta: 0.01, // 0.0922 || 0.01
                 longitudeDelta: 0.001, // 0.0421 || 0.0011
               }}

@@ -61,7 +61,7 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
                 })
                 .catch(error => {
                     setLoading(false);
-                    showAlert(errorMessage.commonError, "");
+                    showAlert(errorMessage.commonError, error.response.data.error || "");
                     console.warn("Error sending data: ", error.message);
                 });
 
@@ -78,6 +78,7 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
         removeStorage("recordingList");
         removeStorage("savedLocation");
         removeStorage("fcm");
+        removeStorage("userProfile");
 
         // removeItem
         await AsyncStorage.removeItem('fcmToken');

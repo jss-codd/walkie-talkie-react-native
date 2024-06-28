@@ -20,6 +20,14 @@ const settingsDefault = {
   audioPlayStatus: true
 }
 
+const profileDefault = {
+  name: "",
+  email: "",
+  mobile: "",
+  location: "",
+  profile_img: ""
+}
+
 axios.interceptors.request.use(
   async config => {
     const userDetails = await loadStorage("userDetails");
@@ -73,13 +81,14 @@ axios.interceptors.response.use(
 function App(): React.JSX.Element {
   const [isConnected, setConnected] = useState(true);
   const [settings, setSettings] = useState(settingsDefault);
+  const [proflieDetails, setProflieDetails] = useState(profileDefault);
 
   const settingHandler = (key: any, data: any) => {
     saveStorage({ ...settings, [key]: data }, "settings");
     setSettings((pre) => ({ ...pre, [key]: data }));
   }
 
-  const contextData = { ...settings, handler: settingHandler };
+  const contextData = { ...settings, handler: settingHandler, proflieDetails, setProflieDetails };
 
   const fetchSettings = async () => {
     // setLoader(true);
@@ -154,11 +163,18 @@ function App(): React.JSX.Element {
   useEffect(() => {
     (async () => {
       const settingsData = await loadStorage("settings");
+      const userProfile = await loadStorage("userProfile");
 
       if (!settingsData || !settingsData.hasOwnProperty("notificationStatus")) {
         saveStorage(settings, "settings");
       } else {
         setSettings((pre) => ({ ...settingsData }));
+      }
+
+      if (!userProfile || !userProfile.hasOwnProperty("name")) {
+        saveStorage(proflieDetails, "userProfile");
+      } else {
+        setProflieDetails((pre) => ({ ...userProfile }));
       }
 
       // fetchSettings();

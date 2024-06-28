@@ -16,6 +16,7 @@ import Pencil from '../assets/svgs/pencil.svg';
 import { Button } from "./Button";
 import PencilEdit from '../assets/svgs/pencil-edit.svg';
 import { navigationString } from "../utils/navigationString";
+import ProfileImageContainer from "./ProfileImageContainer";
 
 const Profile = (props: { handler: () => void, navigation: any, profile: any }) => {
     const { handler, navigation, profile } = props;
@@ -23,10 +24,7 @@ const Profile = (props: { handler: () => void, navigation: any, profile: any }) 
         <>
             <View style={{ backgroundColor: "#E6E6E6", paddingHorizontal: 16, paddingVertical: 12, borderBottomLeftRadius: 60, borderBottomRightRadius: 60, paddingBottom: VP(40) }}>
                 <View style={styles.container}>
-                    <Image source={require('../assets/images/image.png')} style={styles.avatar} />
-                    <View style={{ position: "absolute", top: VP(120), right: HP(115) }}>
-                        <Pencil height={40} width={40} />
-                    </View>
+                    <ProfileImageContainer profile={profile} />
                 </View>
                 <View style={{ ...styles.container, marginTop: VP(22) }}>
                     <RNText textStyle={styles.username}>
