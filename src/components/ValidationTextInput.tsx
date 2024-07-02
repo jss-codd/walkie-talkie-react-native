@@ -7,6 +7,7 @@ import {
     TextInputProps,
     TextStyle,
 } from 'react-native';
+
 import { COLORS } from '../utils/constants';
 import { FS, HP, VP } from '../utils/Responsive';
 import { TextStyles } from '../utils/TextStyles';

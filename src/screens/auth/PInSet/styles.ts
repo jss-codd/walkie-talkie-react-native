@@ -1,4 +1,5 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
+
 import { FS, HP, VP } from '../../../utils/Responsive';
 import { TextStyles } from '../../../utils/TextStyles';
 import { COLORS } from '../../../utils/constants';

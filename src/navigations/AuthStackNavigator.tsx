@@ -1,5 +1,6 @@
 import React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import { navigationString } from '../utils/navigationString';
 import RegisterScreen from '../screens/auth/Register/RegisterScreen';
 import VerifyCode from '../screens/auth/VerifyCode/VerifyCode';
@@ -18,7 +19,7 @@ export type AuthStackParamList = {
 const AuthStackNavigator: React.FunctionComponent = () => {
     const Stack = createNativeStackNavigator<AuthStackParamList>();
     return (
-        <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen
                 name={navigationString.SPLASH_SCREEN}
                 component={SplashScreen as React.FunctionComponent}

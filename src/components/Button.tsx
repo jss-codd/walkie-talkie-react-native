@@ -8,11 +8,12 @@ import {
     ActivityIndicator,
     TextStyle,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+
 import { RNText } from './RNText';
 import { HP } from '../utils/Responsive';
 import { COLORS } from '../utils/constants';
 import { TextStyles } from '../utils/TextStyles';
-import LinearGradient from 'react-native-linear-gradient';
 
 
 type Props = {

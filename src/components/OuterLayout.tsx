@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react';
+import React, { ReactNode } from 'react';
 import {
     SafeAreaView,
     StatusBar,
@@ -7,6 +7,7 @@ import {
     View,
     ViewStyle,
 } from 'react-native';
+
 import { COLORS } from '../utils/constants';
 
 interface OuterLayoutProps {

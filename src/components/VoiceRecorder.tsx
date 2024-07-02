@@ -3,10 +3,8 @@ import { View, Button, Text, Platform, Alert, StyleSheet, TouchableOpacity } fro
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import RNFetchBlob from 'rn-fetch-blob'
 
-import { BACKEND_URL } from '../utils/constants'
+import { BACKEND_URL, errorMessage } from '../utils/constants'
 import Loader from './Loader';
-import { loadStorage } from '../utils/storage';
-import Clock from '../assets/svgs/clock.svg';
 import { requestAudioPermissions } from '../utils/permissions';
 import { showAlert } from '../utils/alert';
 import { returnLocation } from '../utils/location';
@@ -140,15 +138,17 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
                     console.log('progress', received / total);
                 })
                 .then(resp => {
-                    const res = JSON.parse(resp.data) || { success: false };
+                    const errorResponse = `{ "success": false, "error": "${errorMessage.commonError}" }`;
+                    const res = JSON.parse(resp?.data || errorResponse) || { success: false, error: errorMessage.commonError };
+                    console.log(res, '-------upload result');
                     setLoader(false);
                     if (res?.success) showAlert('Recording Success', "");
-                    else showAlert('Recording Failed', "");
+                    else showAlert('Recording Failed', res?.error || errorMessage.commonError);
                 })
                 .catch(err => {
                     setLoader(false);
                     showAlert('Recording Failed', err.message);
-                    console.log(err, 'err');
+                    console.error(err, 'err');
                 });
         } catch (err: any) {
             setLoader(false);

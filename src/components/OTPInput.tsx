@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { SafeAreaView, Text, View, StyleSheet } from 'react-native';
-
 import {
     CodeField,
     Cursor,
     useBlurOnFulfill,
     useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
+
 import { FS, VP } from '../utils/Responsive';
 import { COLORS } from '../utils/constants';
 

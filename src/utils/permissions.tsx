@@ -8,7 +8,6 @@ import * as Permissions from 'react-native-permissions'
 import { AlertMessages, BACKEND_URL } from './constants';
 import { saveStorage } from './storage';
 import { showAlert } from './alert';
-import { getConfig } from './axiosConfig';
 
 const hasLocationPermission = async () => {
     let locationPermission: any;
@@ -80,10 +79,8 @@ const saveToken = async (token: string) => {
             token: token,
         };
 
-        const getAxiosConfig = await getConfig();
-
         axios
-            .post(BACKEND_URL + '/device-token', dataPayload, getAxiosConfig)
+            .post(BACKEND_URL + '/device-token', dataPayload)
             .then(async response => {
                 console.log('saveToken ', response.data);
                 await AsyncStorage.setItem('fcmToken', token);

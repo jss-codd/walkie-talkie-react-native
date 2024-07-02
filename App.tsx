@@ -1,10 +1,8 @@
-import React, { createContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import messaging from '@react-native-firebase/messaging';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import { Header, getHeaderTitle } from '@react-navigation/elements';
 import axios from 'axios';
 
 import HeadlessTask from './HeadlessTask';

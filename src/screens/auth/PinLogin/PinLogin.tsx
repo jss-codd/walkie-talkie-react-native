@@ -1,27 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ScrollView, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
+import axios from 'axios';
+
 import OuterLayout from '../../../components/OuterLayout';
-import { AuthStackParamList } from '../../../navigations/AuthStackNavigator';
 import { styles } from './styles';
 import InnerBlock from '../../../components/InnerBlock';
 import { RNText } from '../../../components/RNText';
-import ValidationTextInput from '../../../components/ValidationTextInput';
 import { Button } from '../../../components/Button';
-import { navigationString } from '../../../utils/navigationString';
 import { BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
 import { HP, VP } from '../../../utils/Responsive';
-import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
-import { MainStackParamList } from '../../../navigations/MainStackNavigator';
-import { loadStorage, removeStorage, saveStorage } from '../../../utils/storage';
+import { loadStorage, saveStorage } from '../../../utils/storage';
 import OTPInput from '../../../components/OTPInput';
-import axios from 'axios';
 import { showAlert } from '../../../utils/alert';
-import { getConfig } from '../../../utils/axiosConfig';
 import { maskInput } from '../../../utils/commonHelper';
 
 const pinCheck = /^[0-9]{4}$/;
+const otpRetryCount = 5;
 
 const PinLogin: React.FunctionComponent<any> = ({
     navigation,
@@ -30,6 +25,7 @@ const PinLogin: React.FunctionComponent<any> = ({
     const [errorPin, setErrorPin] = useState({ status: false, text: "" });
     const [loading, setLoading] = useState(false);
     const [maskMobile, setMaskMobile] = useState("");
+    const [wrongOTP, setWrongOTP] = useState(0);
 
     const handleOnPress = async () => {
         try {
@@ -49,8 +45,6 @@ const PinLogin: React.FunctionComponent<any> = ({
                 "pin": inputValue,
                 "mobile": userDetails.mobile
             };
-
-            // console.log(dataPayload, 'dataPayload pin-login')
 
             axios.post(BACKEND_URL + '/pin-login', dataPayload)
                 .then(response => {
@@ -75,6 +69,11 @@ const PinLogin: React.FunctionComponent<any> = ({
                 .catch(error => {
                     setLoading(false);
                     showAlert(error.response.data.error || errorMessage.commonError, "");
+
+                    if (error.response.status == 400) {
+                        setWrongOTP(+error.response.data.otp_retry_count || 1);
+                    }
+
                     console.warn("Error sending data: ", error.message);
 
                     console.warn(error.response.data, 'error.response.data');
@@ -143,16 +142,24 @@ const PinLogin: React.FunctionComponent<any> = ({
                             </View>
 
                             <View style={{ ...styles.signInTextContainer, paddingHorizontal: HP(10) }}>
+                                {wrongOTP > 0 && (
+                                    <RNText textStyle={{ ...styles.signInTextStyle }}>
+                                        Oh-Oh Invalid PIN! {(otpRetryCount - wrongOTP) > 0 ? `Only ${otpRetryCount - wrongOTP}` : `no`} attemps are left.
+                                    </RNText>
+                                )}
+                            </View>
+
+                            <View style={{ ...styles.signInTextContainer, paddingHorizontal: HP(10) }}>
+                                {wrongOTP > 0 && (
+                                    <RNText textStyle={{ ...styles.signInTextStyle }}>
+                                        <TouchableOpacity
+                                            onPress={handleForgotPress}
+                                        >
+                                            <RNText textStyle={{ color: COLORS.PRIMARY }}>Forgot PIN?</RNText>
+                                        </TouchableOpacity>
+                                    </RNText>
+                                )}
                                 <RNText textStyle={{ ...styles.signInTextStyle }}>
-                                    {/* Oh-Oh Invalid PIN! Only 4 attemps are left. */}
-                                    <TouchableOpacity
-                                        onPress={handleForgotPress}
-                                    >
-                                        <RNText textStyle={{ color: COLORS.PRIMARY }}>Forgot PIN?</RNText>
-                                    </TouchableOpacity>
-                                </RNText>
-                                <RNText textStyle={{ ...styles.signInTextStyle }}>
-                                    {/* Oh-Oh Invalid PIN! Only 4 attemps are left. */}
                                     <TouchableOpacity
                                         onPress={handleForgotPress}
                                     >
@@ -167,6 +174,8 @@ const PinLogin: React.FunctionComponent<any> = ({
                                     onPress={() => handleOnPress()}
                                     textStyle={styles.buttonStyle}
                                     isLoading={loading}
+                                    disabled={wrongOTP >= otpRetryCount ? true : false}
+                                    activeButtonText={{ opacity: .65 }}
                                 />
                             </View>
                         </View>

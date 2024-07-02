@@ -1,25 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ScrollView, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import { ScrollView, TouchableOpacity, View, Text } from 'react-native';
+import axios from 'axios';
+
 import OuterLayout from '../../../components/OuterLayout';
-import { AuthStackParamList } from '../../../navigations/AuthStackNavigator';
 import { styles } from './styles';
 import InnerBlock from '../../../components/InnerBlock';
 import { RNText } from '../../../components/RNText';
-import ValidationTextInput from '../../../components/ValidationTextInput';
 import { Button } from '../../../components/Button';
 import { navigationString } from '../../../utils/navigationString';
-import { BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
+import { AlertMessages, BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
-import { HP, VP } from '../../../utils/Responsive';
+import { VP } from '../../../utils/Responsive';
 import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
 import { MainStackParamList } from '../../../navigations/MainStackNavigator';
 import { loadStorage, removeStorage, saveStorage } from '../../../utils/storage';
 import OTPInput from '../../../components/OTPInput';
-import axios from 'axios';
 import { showAlert } from '../../../utils/alert';
-
-type NavigationProp = NativeStackScreenProps<MainStackParamList>;
+import Loader from '../../../components/Loader';
 
 const otpCheck = /^[0-9]{4}$/;
 
@@ -30,6 +28,38 @@ const VerifyCode: React.FunctionComponent<any> = ({
     const [error, setError] = useState({ status: false, text: "" });
     const [loading, setLoading] = useState(false);
     const [mobileNo, setMobileNo] = useState("");
+    const [loader, setLoader] = useState(false);
+
+    const resendOTP = async () => {
+        try {
+            setLoader(true);
+            const signupMobile = await loadStorage("signupMobile");
+
+            if (!signupMobile || !signupMobile.hasOwnProperty("mobile")) {
+                navigation.navigate(
+                    navigationString.REGISTER_SCREEN,
+                )
+            }
+
+            const dataPayload = {
+                "mobile": signupMobile.mobile
+            };
+
+            const response: any = await axios.post(BACKEND_URL + '/mobile-verification', dataPayload);
+
+            if (response?.data?.success && response?.data?.mobile) {
+                showAlert(AlertMessages.resend_otp.title, AlertMessages.resend_otp.message);
+            } else {
+                showAlert(errorMessage.commonError, "");
+            }
+
+            setLoader(false);
+        } catch (error: any) {
+            setLoader(false);
+            showAlert(errorMessage.commonError, error?.response?.data?.error || "");
+            console.error(error, '------resendOTP error')
+        }
+    }
 
     const handleOnPress = async () => {
         try {
@@ -110,6 +140,7 @@ const VerifyCode: React.FunctionComponent<any> = ({
     return (
         <OuterLayout containerStyle={styles.containerStyle}>
             <InnerBlock>
+                <Loader loading={loader} />
                 <View style={styles.container}>
                     <View style={{ marginLeft: VP(20), marginTop: VP(20), }}>
                         <TouchableOpacity
@@ -142,7 +173,14 @@ const VerifyCode: React.FunctionComponent<any> = ({
 
                             <View style={styles.signInTextContainer}>
                                 <RNText textStyle={styles.signInTextStyle}>
-                                    Didn’t receive the OTP? <RNText textStyle={{ color: COLORS.PRIMARY }}>Resend</RNText>
+                                    Didn’t receive the OTP?
+                                </RNText>
+                                <RNText>
+                                    <TouchableOpacity
+                                        onPress={resendOTP}
+                                    >
+                                        <Text style={{ ...styles.signInTextStyle, color: COLORS.PRIMARY }}> Resend</Text>
+                                    </TouchableOpacity>
                                 </RNText>
                             </View>
 

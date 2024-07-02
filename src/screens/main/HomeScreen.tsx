@@ -1,12 +1,14 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Button, AppState, TextInput, Image, TouchableOpacity, TouchableHighlight, Pressable } from 'react-native';
+import { View, StyleSheet, AppState, TextInput, Image, TouchableOpacity } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
 import MapView, { Marker, Polyline } from 'react-native-maps';
+import axios from 'axios';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { showAlert } from '../../utils/alert';
-import { AlertMessages, BACKEND_URL, COLORS } from '../../utils/constants';;
+import { AlertMessages, BACKEND_URL } from '../../utils/constants';;
 import { askInitialPermission, checkPermissions, hasLocationPermissionBG } from '../../utils/permissions';
-import { clearWatch, compareLocation, getLocation, returnLocation, watchPosition } from '../../utils/location';
+import { clearWatch, getLocation, returnLocation, watchPosition } from '../../utils/location';
 import VoiceRecorder from '../../components/VoiceRecorder';
 import LocationAlertModal from '../../components/LocationAlertModal';
 import { FS, HP, VP } from '../../utils/Responsive';
@@ -15,11 +17,6 @@ import { RNText } from '../../components/RNText';
 import { TextStyles } from '../../utils/TextStyles';
 import History from '../../assets/svgs/history.svg';
 import Location from '../../assets/svgs/location.svg';
-import Microphone from '../../assets/svgs/microphone.svg';
-import LinearGradient from 'react-native-linear-gradient';
-import axios from 'axios';
-import { loadStorage } from '../../utils/storage';
-import { getConfig } from '../../utils/axiosConfig';
 import { SettingContext } from '../../context/SettingContext';
 
 export const LinearGradientComp = ({ children, status, style }: { status: boolean, children: any, style?: any }) => {
@@ -81,11 +78,11 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
         );
       }
 
-      getLocation(setLocation, setLocationRegion, setModalVisible);
+      getLocation(setLocation, setLocationRegion, locationRegion, setModalVisible);
 
       fetchNearDevices();
     })();
-  }, []);
+  }, [modalVisible]);
 
   // clear watch
   useEffect(() => {
@@ -103,7 +100,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState.match(/inactive|background/)) {
         BackgroundTimer.runBackgroundTimer(() => {
-          getLocation(setLocation, setLocationRegion, () => void (0));
+          getLocation(setLocation, setLocationRegion, locationRegion, () => void (0));
         }, 5000);
 
         console.log('App has come to the foreground!');
@@ -126,6 +123,15 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
     // compareLocation({latitude: -36.3602234, longitude: 145.3786707}, {latitude: 22.6870259, longitude: 75.8712694});
   }, [])
 
+  // fetchNearDevices setInterval
+  useEffect(() => {
+    const timer = setInterval(() => {
+      fetchNearDevices();
+    }, 60000)
+
+    return () => clearInterval(timer);
+  }, [])
+
   const startTask = () => {
     console.log('Watcher started');
     hasLocationPermissionBG().then(function (res) {
@@ -133,7 +139,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
         showAlert(AlertMessages.location_access_bg_error.title, AlertMessages.location_access_bg_error.message);
       }
       console.log(res, 'hasLocationPermissionBG');
-      getLocation(setLocation, setLocationRegion, setModalVisible);
+      getLocation(setLocation, setLocationRegion, locationRegion, setModalVisible);
       setBackgroundListener(true);
       watchPosition(setLocation, setLocationRegion, setSubscriptionId);
     })

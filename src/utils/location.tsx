@@ -1,4 +1,5 @@
 import Geolocation, { GeolocationResponse } from '@react-native-community/geolocation';
+import { SetStateAction } from 'react';
 
 import { showAlert } from './alert';
 import { loadStorage } from './storage';
@@ -21,10 +22,14 @@ const returnLocation = () => {
     })
 };
 
-const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, setLocationRegion: (arg0: GeolocationResponse) => void, setModalVisible: (arg0: any) => void) => {
+const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, setLocationRegion: (arg0: GeolocationResponse) => void, locationRegion: { (): undefined; (value: SetStateAction<boolean>): void; coords?: any; } | undefined, setModalVisible: (arg0: any) => void) => {
     Geolocation.getCurrentPosition(
         async (pos) => {
             setLocation(pos);
+
+            if(!locationRegion?.coords?.latitude) {
+                setLocationRegion(pos);
+            }
 
             const savedLocation = await loadStorage('savedLocation');
 
@@ -101,7 +106,7 @@ const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setLoca
                 console.log('WatchPosition Error', JSON.stringify(error));
                 // showAlert('WatchPosition Error', JSON.stringify(error)) 
             },
-            { distanceFilter: 0, interval: 5000, timeout: 10000 }
+            { distanceFilter: 100, interval: 5000, timeout: 10000 }
         );
 
         setSubscriptionId(watchID);

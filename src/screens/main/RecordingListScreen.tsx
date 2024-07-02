@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+
 import RecordingList from '../../components/RecordingList';
 import OuterLayout from '../../components/OuterLayout';
 import InnerBlock from '../../components/InnerBlock';
 import { COLORS } from '../../utils/constants';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { RNText } from '../../components/RNText';
 import { TextStyles } from '../../utils/TextStyles';
 import { FS, VP } from '../../utils/Responsive';

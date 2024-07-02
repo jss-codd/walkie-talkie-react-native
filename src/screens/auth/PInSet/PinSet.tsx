@@ -1,24 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ScrollView, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
+import axios from 'axios';
+
 import OuterLayout from '../../../components/OuterLayout';
-import { AuthStackParamList } from '../../../navigations/AuthStackNavigator';
 import { styles } from './styles';
 import InnerBlock from '../../../components/InnerBlock';
 import { RNText } from '../../../components/RNText';
-import ValidationTextInput from '../../../components/ValidationTextInput';
 import { Button } from '../../../components/Button';
 import { navigationString } from '../../../utils/navigationString';
-import { BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
+import { BACKEND_URL, errorMessage } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
-import { HP, VP } from '../../../utils/Responsive';
+import { VP } from '../../../utils/Responsive';
 import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
-import { MainStackParamList } from '../../../navigations/MainStackNavigator';
-import { loadStorage, removeStorage, saveStorage } from '../../../utils/storage';
+import { loadStorage, saveStorage } from '../../../utils/storage';
 import OTPInput from '../../../components/OTPInput';
-import axios from 'axios';
 import { showAlert } from '../../../utils/alert';
-import { getConfig } from '../../../utils/axiosConfig';
 
 const pinSteps = { currentStep: 1, pin1: "", pin2: "" }
 
@@ -80,11 +76,9 @@ const PinSet: React.FunctionComponent<any> = ({
 
             };
 
-            const getAxiosConfig = await getConfig();
-
             const userDetails = await loadStorage("userDetails");
 
-            axios.post(BACKEND_URL + '/pin-set', dataPayload, getAxiosConfig)
+            axios.post(BACKEND_URL + '/pin-set', dataPayload)
                 .then(response => {
                     console.log("response.data: ", response.data);
                     setLoading(false);

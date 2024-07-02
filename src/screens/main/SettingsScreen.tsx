@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, FlatList, Text, StyleSheet, Image, Button, Alert, Switch } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, StyleSheet, Switch } from 'react-native';
 import axios from 'axios';
 
 import { loadStorage } from '../../utils/storage';

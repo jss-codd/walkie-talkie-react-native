@@ -9,7 +9,6 @@ import { showAlert } from "../utils/alert";
 import Play from '../assets/svgs/play.svg';
 import Delete from '../assets/svgs/delete.svg';
 import Pause from '../assets/svgs/pause.svg';
-import Report from '../assets/svgs/report.svg';
 import { AlertMessages, COLORS } from "../utils/constants";
 import { TextStyles } from "../utils/TextStyles";
 import { FS, HP, VP } from "../utils/Responsive";

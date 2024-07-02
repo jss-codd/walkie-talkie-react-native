@@ -1,13 +1,12 @@
-import { View, FlatList, Text, StyleSheet, Image, TextInput, ScrollView, Platform, TouchableOpacity } from 'react-native';
-import { Asset, launchImageLibrary } from 'react-native-image-picker';
+import { StyleSheet, Image, Platform, TouchableOpacity } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { useContext, useEffect, useState } from 'react';
+import axios from 'axios';
 
 import Pencil from '../assets/svgs/pencil.svg';
 import { HP, VP } from '../utils/Responsive';
 import { BACKEND_URL } from '../utils/constants';
-import User from '../assets/svgs/user.svg';
 import Loader from './Loader';
-import axios from 'axios';
 import { showAlert } from '../utils/alert';
 import { SettingContext } from '../context/SettingContext';
 import { saveStorage } from '../utils/storage';

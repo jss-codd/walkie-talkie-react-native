@@ -1,18 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { View, FlatList, Text, StyleSheet, Image, TextInput, ScrollView } from 'react-native';
-import Sound from 'react-native-sound';
-import { useIsFocused } from '@react-navigation/native';
+import React from "react";
+import { View, StyleSheet, Image, TextInput, ScrollView } from 'react-native';
 
-import { loadStorage, saveStorage } from "../utils/storage";
-import { TimeAgo } from "../utils/timeAgo";
-import { showAlert } from "../utils/alert";
-import Play from '../assets/svgs/play.svg';
-import Delete from '../assets/svgs/delete.svg';
 import { COLORS } from "../utils/constants";
 import { TextStyles } from "../utils/TextStyles";
 import { FS, HP, VP } from "../utils/Responsive";
 import { RNText } from "./RNText";
-import Pencil from '../assets/svgs/pencil.svg';
 import { Button } from "./Button";
 import User from '../assets/svgs/user.svg';
 import ProfileImageContainer from "./ProfileImageContainer";

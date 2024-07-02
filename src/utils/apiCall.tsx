@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 
 import { BACKEND_URL } from "./constants";
 import { saveStorage } from "./storage";
@@ -36,6 +36,7 @@ const getProfileDetails = async (settings: { setProflieDetails: (arg0: (pre: any
     console.log(res.data, '---------------getProfileDetails');
     return res.data;
   } catch (error: any) {
+    return {};
     console.error("Error getProfileDetails: ", error.response.data.error || error);
   }
 }

@@ -1,29 +1,28 @@
 import React, { useContext, useEffect, useState } from 'react';
-import RecordingList from '../../components/RecordingList';
+import { StyleSheet } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
+
 import OuterLayout from '../../components/OuterLayout';
 import InnerBlock from '../../components/InnerBlock';
-import { COLORS, emailRegex, errorMessage, mobileRegex, nameRegex } from '../../utils/constants';
-import { View, Text, StyleSheet } from 'react-native';
-import { RNText } from '../../components/RNText';
+import { COLORS, emailRegex, errorMessage, nameRegex } from '../../utils/constants';
 import { TextStyles } from '../../utils/TextStyles';
-import { FS, VP } from '../../utils/Responsive';
-import { Button } from '../../components/Button';
+import { FS } from '../../utils/Responsive';
 import Profile from '../../components/Profile';
 import ProfileEdit from '../../components/ProfileEdit';
-import { useIsFocused } from '@react-navigation/native';
 import { getProfileDetails, submitProfileDetails } from '../../utils/apiCall';
 import Loader from '../../components/Loader';
 import { SettingContext } from '../../context/SettingContext';
 
 function ProfileScreen({ navigation }: { navigation: any }): React.JSX.Element {
     const settings = useContext<any>(SettingContext);
-    
+
     const isFocused = useIsFocused();
 
     const [loading, setLoading] = useState(false);
     const [editScreen, setEditScreen] = useState(false);
     const [profile, setProfile] = useState<any>({});
     const [error, setError] = useState({ status: false, text: "" });
+    const [loader, setLoader] = useState(false);
 
     const inputChange = (key: any, value: any) => {
         setProfile((pre: any) => ({ ...pre, [key]: value }));
@@ -83,8 +82,10 @@ function ProfileScreen({ navigation }: { navigation: any }): React.JSX.Element {
     }, [isFocused])
 
     const setProfileDetails = async () => {
+        setLoader(true);
         const data: any = await getProfileDetails(settings);
         setProfile(data?.data || {});
+        setLoader(false);
     }
 
     useEffect(() => {
@@ -94,6 +95,7 @@ function ProfileScreen({ navigation }: { navigation: any }): React.JSX.Element {
     return (
         <OuterLayout containerStyle={{ backgroundColor: COLORS.BACKGROUND }}>
             <InnerBlock>
+                <Loader loading={loader} />
                 {editScreen ? (<ProfileEdit error={error} loading={loading} submitHandler={profileSubmitHandler} inputChange={inputChange} handler={screenChangeHandler} profile={profile} />) : (<Profile navigation={navigation} handler={screenChangeHandler} profile={profile} />)}
             </InnerBlock>
         </OuterLayout>

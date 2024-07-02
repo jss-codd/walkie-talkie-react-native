@@ -12,7 +12,7 @@ import { RNText } from '../../../components/RNText';
 import ValidationTextInput from '../../../components/ValidationTextInput';
 import { Button } from '../../../components/Button';
 import { navigationString } from '../../../utils/navigationString';
-import { BACKEND_URL, COLORS, errorMessage, mobileRegex } from '../../../utils/constants';
+import { BACKEND_URL, errorMessage, mobileRegex } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
 import { HP, VP } from '../../../utils/Responsive';
 import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
@@ -46,7 +46,6 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
 
             axios.post(BACKEND_URL + '/mobile-verification', dataPayload)
                 .then(response => {
-                    // console.log("response.data: ", response.data);
                     setLoading(false);
 
                     if (response.data.success && response.data.mobile) {
@@ -68,8 +67,6 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
         } catch (err: any) {
             setError((pre) => ({ status: true, text: err.message }))
         }
-
-        // navigation.goBack();
     };
 
     const dumpStorage = async () => {
