@@ -109,6 +109,7 @@ const RecordingList = ({ reload }: { reload: number }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
+
                 <View>
                     {!item.playStatus ? (<Play onPress={() => playSound(item, index)} height={35} width={35} />) : (<Pause height={35} width={35} />)}
                 </View>
@@ -145,7 +146,6 @@ const RecordingList = ({ reload }: { reload: number }) => {
     };
 
     useEffect(() => {
-        console.log(isFocused, 'isFocused');
         if (isFocused) {
             loadRecordingFromStorage();
         }
@@ -185,6 +185,7 @@ const styles = StyleSheet.create({
     },
     threadContent: {
         flex: 1,
+        paddingHorizontal: HP(5),
     },
     username: {
         ...TextStyles.SOFIA_SEMI_BOLD,

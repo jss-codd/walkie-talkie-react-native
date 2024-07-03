@@ -96,7 +96,7 @@ const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setLoca
                 console.log('WatchPosition Error', JSON.stringify(error));
                 // showAlert('WatchPosition Error', JSON.stringify(error)) 
             },
-            { distanceFilter: 100, interval: 5000, timeout: 10000 }
+            { distanceFilter: 10, interval: 5000, timeout: 10000 }
         );
 
         setSubscriptionId(watchID);

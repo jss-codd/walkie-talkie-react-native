@@ -50,8 +50,11 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
   const [locationState, setLocationState] = useState(false);
   const [markers, setMarkers] = useState([]);
 
+  console.log(markers, 'markers')
+
   const fetchNearDevices = async () => {
     try {
+      // return;
       const location = await returnLocation();
 
       const dataPayload = {
@@ -145,9 +148,13 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
     );
 
     return () => {
-      SystemSetting?.removeListener(locationListener);
+      // SystemSetting?.removeListener(locationListener);
     }
   }, []);
+
+  // useEffect(() => {
+
+  // }, [locationState]);
 
   const startTask = () => {
     console.log('Watcher started');
@@ -221,20 +228,29 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 latitude: locationRegion?.coords?.latitude || 22.6870138,
                 longitude:
                   locationRegion?.coords?.longitude || 75.8712195,
-                latitudeDelta: 0.006, // 0.0922 || 0.01
+                latitudeDelta: 0.01, // 0.0922 || 0.01
                 longitudeDelta: 0.001, // 0.0421 || 0.0011
               }}
               showsUserLocation={true}
+              // onUserLocationChange={(e: any) => {
+              //   setLocation({
+              //     coords: {
+              //       latitude: e.nativeEvent.coordinate.latitude,
+              //       longitude:
+              //         e.nativeEvent.coordinate.longitude,
+              //     },
+              //   });
+              // }}
               loadingEnabled={true}
+            // customMapStyle={mapStyle}
             >
               <Marker
                 rotation={location?.coords?.heading || 0}
+                // image={{ uri: require('../../assets/images/truck.png') }}
                 coordinate={{
                   latitude: location?.coords?.latitude || 0,
                   longitude: location?.coords?.longitude || 0,
                 }}
-                zIndex={1}
-                // tracksViewChanges={false}
               >
                 <Image
                   source={require('../../assets/images/truck.png')}
@@ -253,8 +269,6 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                       longitude: +marker.lng || 0,
                     }}
                     title={`${marker.name || ""}`}
-                    zIndex={(index+1)}
-                    // tracksViewChanges={false}
                   >
                     <Image
                       source={require('../../assets/images/truck.png')}
@@ -265,6 +279,32 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 ))}
             </MapView>
           ) : null}
+
+          {/* <MapView
+            style={styles.mapStyle}
+            initialRegion={{
+              latitude: 37.8025259,
+              longitude: -122.4351431,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}>
+            <Polyline
+              coordinates={[
+                { latitude: 37.8025259, longitude: -122.4351431 },
+                { latitude: 37.7896386, longitude: -122.421646 },
+              ]}
+              strokeColor="blue" // fallback for when `strokeColors` is not supported by the map-provider
+              strokeColors={[
+                '#7F0000',
+                '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
+                '#B24112',
+                '#E5845C',
+                '#238C23',
+                '#7F0000',
+              ]}
+              strokeWidth={6}
+            />
+          </MapView> */}
         </View>
 
         <View style={{ bottom: 0, height: VP(123), position: "absolute", backgroundColor: "#ffffff", borderTopLeftRadius: 0, borderTopRightRadius: 0, flex: 1 }}>
