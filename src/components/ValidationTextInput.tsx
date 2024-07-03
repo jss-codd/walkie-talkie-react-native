@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     placeholder: {
         position: 'absolute',
         left: HP(65),
-        zIndex: 1,
+        // zIndex: 1,
         backgroundColor: 'transparent',
         textAlign: "center"
     },

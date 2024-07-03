@@ -221,7 +221,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
             // customMapStyle={mapStyle}
             >
               <Marker
-                rotation={180}
+                rotation={location?.coords?.heading || 0}
                 // image={{ uri: require('../../assets/images/truck.png') }}
                 coordinate={{
                   latitude: location?.coords?.latitude || 0,
@@ -238,7 +238,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
               {markers &&
                 markers.map((marker: any, index: number) => (
                   <Marker
-                    rotation={180}
+                    rotation={+marker.heading || 0}
                     key={index}
                     coordinate={{
                       latitude: +marker.lat || 0,

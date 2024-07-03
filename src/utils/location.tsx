@@ -24,10 +24,10 @@ const returnLocation = () => {
 
 const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, setLocationRegion: (arg0: GeolocationResponse) => void, locationRegion: { (): undefined; (value: SetStateAction<boolean>): void; coords?: any; } | undefined, setModalVisible: (arg0: any) => void) => {
     Geolocation.getCurrentPosition(
-        async (pos) => {
+        async (pos: GeolocationResponse) => {
             setLocation(pos);
 
-            if(!locationRegion?.coords?.latitude) {
+            if (!locationRegion?.coords?.latitude) {
                 setLocationRegion(pos);
             }
 
@@ -35,27 +35,22 @@ const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, set
 
             const latitude = pos?.coords?.latitude;
             const longitude = pos?.coords?.longitude;
+            const heading = pos?.coords?.heading;
 
             const compareDistance = await compareLocation({ latitude, longitude }, savedLocation);
 
             if (compareDistance) {
                 setLocationRegion(pos);
-                loadStorage().then(
-                    token => {
-                        const dataPayload = {
-                            latitude: latitude,
-                            longitude: longitude,
-                            token: token?.token || '',
-                        };
 
-                        console.log(dataPayload, 'dataPayload1');
+                const dataPayload = {
+                    latitude: latitude,
+                    longitude: longitude,
+                    heading: heading
+                };
 
-                        saveLocation(dataPayload);
-                    },
-                    err => {
-                        console.error(err, 'token error'); // Error!
-                    },
-                );
+                console.log(dataPayload, 'dataPayload1');
+
+                saveLocation(dataPayload);
             }
         },
         (error) => {
@@ -77,6 +72,7 @@ const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setLoca
 
                 const latitude = position?.coords?.latitude;
                 const longitude = position?.coords?.longitude;
+                const heading = position?.coords?.heading;
 
                 const savedLocation = await loadStorage('savedLocation');
 
@@ -84,22 +80,16 @@ const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setLoca
 
                 if (compareDistance) {
                     setLocationRegion(position);
-                    loadStorage().then(
-                        token => {
-                            const dataPayload = {
-                                latitude: latitude,
-                                longitude: longitude,
-                                token: token?.token || '',
-                            };
 
-                            console.log(dataPayload, 'dataPayload2');
+                    const dataPayload = {
+                        latitude: latitude,
+                        longitude: longitude,
+                        heading
+                    };
 
-                            saveLocation(dataPayload);
-                        },
-                        err => {
-                            console.error(err, 'token error'); // Error!
-                        },
-                    );
+                    console.log(dataPayload, 'dataPayload2');
+
+                    saveLocation(dataPayload);
                 }
             },
             (error) => {
