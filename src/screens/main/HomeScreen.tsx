@@ -234,7 +234,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                   longitude: location?.coords?.longitude || 0,
                 }}
                 zIndex={1}
-                // tracksViewChanges={false}
+              // tracksViewChanges={false}
               >
                 <Image
                   source={require('../../assets/images/truck.png')}
@@ -253,8 +253,8 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                       longitude: +marker.lng || 0,
                     }}
                     title={`${marker.name || ""}`}
-                    zIndex={(index+1)}
-                    // tracksViewChanges={false}
+                    zIndex={(index + 1)}
+                  // tracksViewChanges={false}
                   >
                     <Image
                       source={require('../../assets/images/truck.png')}

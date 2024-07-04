@@ -46,10 +46,6 @@ function ProfileScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 throw new Error(errorMessage.email);
             }
 
-            // if (mobileRegex.test(profile.mobile) === false) {
-            //     throw new Error(errorMessage.mobile_no);
-            // }
-
             if (nameRegex.test(profile.location) === false) {
                 throw new Error(errorMessage.location);
             }
@@ -67,7 +63,8 @@ function ProfileScreen({ navigation }: { navigation: any }): React.JSX.Element {
 
             screenChangeHandler();
         } catch (err: any) {
-            setError((pre) => ({ status: true, text: err.message }))
+            setError((pre) => ({ status: true, text: err.message }));
+            setLoading(false);
         }
     }
 

@@ -42,7 +42,9 @@ const VerifyCode: React.FunctionComponent<any> = ({
             }
 
             const dataPayload = {
-                "mobile": signupMobile.mobile
+                "mobile": signupMobile.mobile,
+                "countryCode": signupMobile.countryCode,
+                "callingCode": signupMobile.callingCode
             };
 
             const response: any = await axios.post(BACKEND_URL + '/mobile-verification', dataPayload);

@@ -13,7 +13,7 @@ export const COLORS = {
     BLACK: '#000000',
 };
 
-export const errorMessage = { mobile_no: "Mobile number should be in 10 digits!", commonError: "Failed to process! Try again later.", otp: "Invalid OTP entered.", pin: "Invalid PIN entered.", pinConfirm: "PIN not matched.", email: "Enter a valid email address!", name: "Enter a valid name!", location: "Enter a valid location!" }
+export const errorMessage = { mobile_no: "Invalid mobile number!", commonError: "Failed to process! Try again later.", otp: "Invalid OTP entered.", pin: "Invalid PIN entered.", pinConfirm: "PIN not matched.", email: "Enter a valid email address!", name: "Enter a valid name!", location: "Enter a valid location!" }
 
 export const mobileRegex = /^[1-9]{1}[0-9]{9}$/;
 

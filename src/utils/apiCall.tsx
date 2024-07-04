@@ -46,11 +46,10 @@ const submitProfileDetails = async (dataPayload: any, settings: { setProflieDeta
     const res = await axios.post(BACKEND_URL + '/profile-details', dataPayload);
     saveStorage(res.data.data, "userProfile");
     settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
-    console.log(res.data, '---------------submitProfileDetails');
     return res.data;
   } catch (error: any) {
     console.error("Error submitProfileDetails: ", error);
-    throw new Error('Failed to submit, ' + error.message);
+    throw new Error('Failed to submit, ' + error.response.data.message || error.message);
   }
 }
 

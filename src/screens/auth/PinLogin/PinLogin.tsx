@@ -71,7 +71,7 @@ const PinLogin: React.FunctionComponent<any> = ({
                     showAlert(error.response.data.error || errorMessage.commonError, "");
 
                     if (error.response.status == 400) {
-                        setWrongOTP(+error.response.data.otp_retry_count || 1);
+                        setWrongOTP(+error.response.data.pin_retry_count || 1);
                     }
 
                     console.warn("Error sending data: ", error.message);

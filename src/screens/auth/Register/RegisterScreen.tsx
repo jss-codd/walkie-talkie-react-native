@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ScrollView, TouchableOpacity, View, Image, BackHandler } from 'react-native';
+import { ScrollView, TouchableOpacity, View, Image, BackHandler, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import PhoneInput from "react-native-phone-number-input";
 
 import OuterLayout from '../../../components/OuterLayout';
 import { AuthStackParamList } from '../../../navigations/AuthStackNavigator';
@@ -12,21 +13,31 @@ import { RNText } from '../../../components/RNText';
 import ValidationTextInput from '../../../components/ValidationTextInput';
 import { Button } from '../../../components/Button';
 import { navigationString } from '../../../utils/navigationString';
-import { BACKEND_URL, errorMessage, mobileRegex } from '../../../utils/constants';
+import { BACKEND_URL, COLORS, errorMessage, mobileRegex } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
-import { HP, VP } from '../../../utils/Responsive';
+import { FS, HP, VP } from '../../../utils/Responsive';
 import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
 import { showAlert } from '../../../utils/alert';
 import { removeStorage, saveStorage } from '../../../utils/storage';
+import { TextStyles } from '../../../utils/TextStyles';
 
 type NavigationProp = NativeStackScreenProps<AuthStackParamList>;
 
 const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
     navigation,
 }) => {
+    const phoneInput = useRef<PhoneInput>(null);
+
     const [text, setText] = useState('');
     const [error, setError] = useState({ status: false, text: "" });
     const [loading, setLoading] = useState(false);
+
+    const [value, setValue] = useState("");
+    const [formattedValue, setFormattedValue] = useState("");
+    const [showMessage, setShowMessage] = useState(false);
+    const [valid, setValid] = useState(false);
+    const [code, setCode] = useState("");
+    const [code1, setCode1] = useState("");
 
     const handleOnPress = () => {
         try {
@@ -81,6 +92,56 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
         await AsyncStorage.removeItem('fcmToken');
     }
 
+    const handleOnPressV1 = () => {
+        try {
+            const checkValid = phoneInput.current?.isValidNumber(value) || false;
+
+            if (!checkValid) {
+                throw new Error(errorMessage.mobile_no);
+            }
+
+            const countryCode = phoneInput.current?.getCountryCode() || "";
+            const callingCode = phoneInput.current?.getCallingCode() || "";
+
+            if (!countryCode || !callingCode || !formattedValue) {
+                throw new Error(errorMessage.mobile_no);
+            }
+
+            setLoading(true);
+
+            setError({ status: false, text: "" });
+
+            const dataPayload = {
+                "mobile": formattedValue,
+                "countryCode": countryCode,
+                "callingCode": callingCode
+            };
+
+            axios.post(BACKEND_URL + '/mobile-verification', dataPayload)
+                .then(response => {
+                    setLoading(false);
+
+                    if (response.data.success && response.data.mobile) {
+                        saveStorage({ "mobile": response.data.mobile, "countryCode": countryCode, "callingCode": callingCode }, "signupMobile");
+
+                        navigation.navigate(
+                            navigationString.VERIFY_CODE,
+                        )
+                    } else {
+                        showAlert(errorMessage.commonError, "");
+                    }
+                })
+                .catch(error => {
+                    setLoading(false);
+                    showAlert(errorMessage.commonError, error.response.data.error || "");
+                    console.warn("Error sending data: ", error.message);
+                });
+
+        } catch (err: any) {
+            setError((pre) => ({ status: true, text: err.message }))
+        }
+    };
+
     useEffect(() => {
         dumpStorage();
     }, [])
@@ -112,13 +173,41 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
                         </View>
                         <View style={styles.formContainer}>
                             <View style={styles.inputContainer}>
-                                <ValidationTextInput placeholder="Enter Mobile number" keyboardType="numeric" maxLength={10} formProps={{ text, setText, error }} />
+                                {/* <ValidationTextInput placeholder="Enter Mobile number" keyboardType="numeric" maxLength={10} formProps={{ text, setText, error }} /> */}
+
+                                <PhoneInput
+                                    ref={phoneInput}
+                                    defaultValue={value}
+                                    defaultCode="IN"
+                                    layout="second"
+                                    onChangeText={(text) => {
+                                        setValue(text);
+                                    }}
+                                    onChangeFormattedText={(text) => {
+                                        setFormattedValue(text);
+                                    }}
+                                    // withDarkTheme
+                                    // withShadow
+                                    // autoFocus
+                                    disableArrowIcon={false}
+                                    containerStyle={{ borderBottomColor: error.status ? COLORS.RED : "#A1A1A1", borderBottomWidth: 1, width: HP(294), }}
+                                    textContainerStyle={{ backgroundColor: "#fff", paddingLeft: 0, }}
+                                    textInputStyle={{ ...TextStyles.SOFIA_REGULAR, fontSize: FS(20), paddingLeft: 0, }}
+                                    codeTextStyle={{ ...TextStyles.SOFIA_REGULAR, fontSize: FS(20) }}
+                                    textInputProps={{
+                                        placeholder: "Enter Mobile number",
+                                        placeholderTextColor: '#7B7B7B',
+                                    }}
+                                />
                             </View>
+                            {error.status && error.text && (
+                                <RNText textStyle={{ ...TextStyles.SOFIA_REGULAR, color: COLORS.RED, textAlign: "center", marginBottom: 5 }}>{error.text}</RNText>
+                            )}
 
                             <View style={{ marginTop: VP(34) }}>
                                 <Button
                                     text={'Get OTP'}
-                                    onPress={() => handleOnPress()}
+                                    onPress={() => handleOnPressV1()}
                                     textStyle={styles.buttonStyle}
                                     isLoading={loading}
                                 />

@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
         ...TextStyles.SOFIA_SEMI_LIGHT,
         fontSize: FS(16),
         color: COLORS.TEXT,
-        lineHeight: VP(20),
+        // lineHeight: VP(20),
         textAlign: "center",
     },
     //
