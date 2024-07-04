@@ -12,6 +12,7 @@ import { loadStorage, recordingStorage, saveStorage } from './src/utils/storage'
 import { SettingContext } from './src/context/SettingContext';
 import MainStackNavigator from './src/navigations/MainStackNavigator';
 import { refreshAuthToken } from './src/utils/apiCall';
+import { onDisplayNotification } from './src/utils/notifeeHelper';
 
 const settingsDefault = {
   notificationStatus: true,
@@ -138,6 +139,8 @@ function App(): React.JSX.Element {
         HeadlessTask(message);
 
         recordingStorage(message);
+
+        onDisplayNotification(message.notification.title, message.notification.body);
       },
     );
 

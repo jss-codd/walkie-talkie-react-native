@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState, useTransition } from 'react';
-import { View, StyleSheet, AppState, TextInput, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, AppState, TextInput, Image, TouchableOpacity, Button } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import axios from 'axios';
@@ -19,6 +19,8 @@ import { TextStyles } from '../../utils/TextStyles';
 import History from '../../assets/svgs/history.svg';
 import Location from '../../assets/svgs/location.svg';
 import { SettingContext } from '../../context/SettingContext';
+import { onDisplayNotification } from '../../utils/notifeeHelper';
+import Modals from '../../components/Modals';
 
 export const LinearGradientComp = ({ children, status, style }: { status: boolean, children: any, style?: any }) => {
   return (
@@ -168,9 +170,13 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
     clearWatch(subscriptionId, setSubscriptionId);
   };
 
+  const modalProps = {
+    modalVisible, setModalVisible, content: AlertMessages.location_turn_on
+  }
+
   return (
     <>
-      <LocationAlertModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <Modals {...modalProps} />
 
       <View style={styles.main}>
         <View style={{ flexDirection: "column", flexBasis: "5%" }}>
@@ -280,6 +286,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
             </TouchableOpacity>
 
             <VoiceRecorder iconContainer={styles.iconContainer} iconText={styles.iconText} />
+            {/* <Button title="Display" onPress={() => onDisplayNotification('title', 'body')} /> */}
 
             <View style={{ alignItems: "center" }}>
               <LinearGradientComp status={backgroundListener}>
