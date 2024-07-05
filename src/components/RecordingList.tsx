@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, FlatList, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Sound from 'react-native-sound';
 import { useIsFocused } from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
 
 import { loadStorage, saveStorage } from "../utils/storage";
 import { TimeAgo } from "../utils/timeAgo";
@@ -50,14 +51,16 @@ const RecordingList = ({ reload }: { reload: number }) => {
         const sound: any = new Sound(item.data.audio_url, undefined, error => callback(error, sound));
     }
 
-    const deleteNotification = async (item: any, index: number) => {
+    const deleteNotification = async (item: any, index: number, ref: any) => {
         let list: any = await loadStorage("recordingList");
 
         list = list.filter((d: any, i: number) => i !== index);
 
         saveStorage(list, 'recordingList');
 
-        setRecordingList(list)
+        // setRecordingList(list);
+
+        ref?.current?.fadeOutLeft(300).then((endState: any) => setRecordingList(list));
     }
 
     const reportUser = async (id: number) => {
@@ -86,40 +89,48 @@ const RecordingList = ({ reload }: { reload: number }) => {
         }
     }
 
-    const ThreadItem = ({ item, index }: { item: any, index: number }) => (
-        <>
-            <View style={styles.thread}>
-                {item?.data?.profileImage ? (<Image loadingIndicatorSource={require("../assets/images/profile.png")} source={{ uri: item?.data?.profileImage }} style={styles.avatar} />) : (<Image source={require('../assets/images/profile.png')} style={styles.avatar} />)}
+    const ThreadItem = ({ item, index }: { item: any, index: number }) => {
+        const handleViewRef = useRef<any>(null);
 
-                <View style={styles.threadContent}>
-                    <RNText textStyle={styles.username}>
-                        Audio Message sent by <RNText textStyle={styles.sentBy}>{item.data.user_name}</RNText>
-                    </RNText>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                        <RNText textStyle={styles.timestamp}>
-                            {TimeAgo.inWords(item.sentTime)}
-                        </RNText>
-                        <TouchableOpacity
-                            onPress={() => reportUser(item.data.id)}
-                            disabled={(item?.reported === true) ? true : false}
-                        >
-                            <RNText textStyle={{ ...styles.timestamp, color: COLORS.RED, textDecorationColor: "red", textDecorationLine: "underline" }}>
-                                {(item?.reported === true) ? `Reported` : `Report User`}
+        return (
+            <>
+                <Animatable.View ref={handleViewRef}>
+                    <View style={styles.thread}>
+                        {item?.data?.profileImage ? (<Image loadingIndicatorSource={require("../assets/images/profile.png")} source={{ uri: item?.data?.profileImage }} style={styles.avatar} />) : (<Image source={require('../assets/images/profile.png')} style={styles.avatar} />)}
+
+                        <View style={styles.threadContent}>
+                            <RNText textStyle={styles.username}>
+                                Audio Message sent by <RNText textStyle={styles.sentBy}>{item.data.user_name}</RNText>
                             </RNText>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                <RNText textStyle={styles.timestamp}>
+                                    {TimeAgo.inWords(item.sentTime)}
+                                </RNText>
+                                <TouchableOpacity
+                                    onPress={() => reportUser(item.data.id)}
+                                    disabled={(item?.reported === true) ? true : false}
+                                >
+                                    <RNText textStyle={{ ...styles.timestamp, color: COLORS.RED, textDecorationColor: "red", textDecorationLine: "underline" }}>
+                                        {(item?.reported === true) ? `Reported` : `Report User`}
+                                    </RNText>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
 
-                <View>
-                    {!item.playStatus ? (<Play onPress={() => playSound(item, index)} height={35} width={35} />) : (<Pause height={35} width={35} />)}
-                </View>
-                <View>
-                    <Delete onPress={() => deleteNotification(item, index)} height={32} width={32} />
-                </View>
-            </View>
-            <View style={styles.line}></View>
-        </>
-    );
+                        <View>
+                            {!item.playStatus ? (<Play onPress={() => playSound(item, index)} height={35} width={35} />) : (<Pause height={35} width={35} />)}
+                        </View>
+                        <View>
+                            <Delete onPress={() => deleteNotification(item, index, handleViewRef)} height={32} width={32} />
+                        </View>
+
+
+                    </View>
+                    <View style={styles.line}></View>
+                </Animatable.View>
+            </>
+        )
+    }
 
     const loadRecordingFromStorage = async () => {
         let list: any = await loadStorage("recordingList");

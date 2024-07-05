@@ -239,8 +239,8 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                   latitude: location?.coords?.latitude || 0,
                   longitude: location?.coords?.longitude || 0,
                 }}
-                zIndex={1}
-              // tracksViewChanges={false}
+                // zIndex={1}
+                // tracksViewChanges={false}
               >
                 <Image
                   source={require('../../assets/images/truck.png')}
@@ -249,26 +249,25 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 />
               </Marker>
 
-              {markers &&
-                markers.map((marker: any, index: number) => (
-                  <Marker
-                    rotation={+marker.heading || 0}
-                    key={index.toString()}
-                    coordinate={{
-                      latitude: +marker.lat || 0,
-                      longitude: +marker.lng || 0,
-                    }}
-                    title={`${marker.name || ""}`}
-                    zIndex={(index + 1)}
+              {markers && markers?.map((marker: any, index: number) => (
+                <Marker
+                  rotation={+marker.heading || 0}
+                  key={index.toString()}
+                  coordinate={{
+                    latitude: +marker.lat || 0,
+                    longitude: +marker.lng || 0,
+                  }}
+                  title={`${marker.name || ""}`}
+                  // zIndex={(index + 1)}
                   // tracksViewChanges={false}
-                  >
-                    <Image
-                      source={require('../../assets/images/truck.png')}
-                      style={{ width: HP(25), height: VP(61) }}
-                      resizeMode="contain"
-                    />
-                  </Marker>
-                ))}
+                >
+                  <Image
+                    source={require('../../assets/images/truck.png')}
+                    style={{ width: HP(25), height: VP(61) }}
+                    resizeMode="contain"
+                  />
+                </Marker>
+              ))}
             </MapView>
           ) : null}
         </View>
@@ -286,7 +285,10 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
             </TouchableOpacity>
 
             <VoiceRecorder iconContainer={styles.iconContainer} iconText={styles.iconText} />
+
             {/* <Button title="Display" onPress={() => onDisplayNotification('title', 'body')} /> */}
+
+            {/* <Button title="Display" onPress={() => navigation.navigate('MyModal')} /> */}
 
             <View style={{ alignItems: "center" }}>
               <LinearGradientComp status={backgroundListener}>

@@ -4,22 +4,45 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import { HP, VP } from '../../utils/Responsive';
 import { loadStorage } from '../../utils/storage';
+import { refreshAuthToken } from '../../utils/apiCall';
 
 function SplashScreen({ navigation }: { navigation: any }): React.JSX.Element {
   useEffect(() => {
     setTimeout(async () => {
-      const userDetails = await loadStorage("userDetails");
+      try {
+        const userDetails = await loadStorage("userDetails");
+        const tokenGet = await loadStorage();
 
-      if (userDetails && userDetails.hasOwnProperty("jwt") && userDetails.hasOwnProperty("mobile")) {
-        navigation.reset({
-          index: 0,
-          routes: [
-            {
-              name: 'PinLoginScreen',
-            },
-          ],
-        });
-      } else {
+        if (userDetails && userDetails.hasOwnProperty("jwt") && userDetails.hasOwnProperty("mobile") && userDetails.hasOwnProperty("pin")) {
+          // get user details
+          const dataPayload = {
+            "pin": userDetails.pin,
+            "mobile": userDetails.mobile
+          };
+
+          const response: any = await refreshAuthToken(dataPayload);
+
+          if (response.data.success && response.data.jwt && response.data.mobile && response.data.token) {
+            if (tokenGet.token !== response.data.token) {
+              throw new Error('Logged Out User');
+            }
+          } else {
+            throw new Error('Logged Out User');
+          }
+
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'PinLoginScreen',
+              },
+            ],
+          });
+        } else {
+          throw new Error('Logged Out User');
+        }
+      } catch (err) {
+        console.warn(err, 'err');
         navigation.reset({
           index: 0,
           routes: [
@@ -29,7 +52,6 @@ function SplashScreen({ navigation }: { navigation: any }): React.JSX.Element {
           ],
         });
       }
-
     }, 1000)
   }, [])
 

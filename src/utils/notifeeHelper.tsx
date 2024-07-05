@@ -7,8 +7,9 @@ async function onDisplayNotification(title: string, body: string) {
 
     // Create a channel (required for Android)
     const channelId = await notifee.createChannel({
-        id: 'sound',
+        id: 'soundChannel',
         name: 'Default Channel',
+        sound: "default",
     });
 
     // Display a notification
@@ -21,7 +22,6 @@ async function onDisplayNotification(title: string, body: string) {
             pressAction: {
                 id: 'default',
             },
-            sound: "default"
         },
         ios: {
             sound: 'default',

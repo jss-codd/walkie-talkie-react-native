@@ -147,12 +147,12 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
                 })
                 .catch(err => {
                     setLoader(false);
-                    showAlert('Recording Failed', err.message);
+                    showAlert('Recording Failed', err);
                     console.error(err, 'err');
                 });
         } catch (err: any) {
             setLoader(false);
-            showAlert('Recording Failed', err.message);
+            showAlert('Recording Failed', err);
             console.error(err, 'err')
         }
     };
