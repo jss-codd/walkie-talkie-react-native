@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState, useTransition } from 'react';
-import { View, StyleSheet, AppState, TextInput, Image, TouchableOpacity, Button } from 'react-native';
+import { View, StyleSheet, AppState, TextInput, Image, TouchableOpacity, Button, Text, ToastAndroid } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import MapView, { Callout, Marker, Polyline } from 'react-native-maps';
 import axios from 'axios';
 import LinearGradient from 'react-native-linear-gradient';
 import SystemSetting from 'react-native-system-setting'
@@ -21,6 +21,7 @@ import Location from '../../assets/svgs/location.svg';
 import { SettingContext } from '../../context/SettingContext';
 import { onDisplayNotification } from '../../utils/notifeeHelper';
 import Modals from '../../components/Modals';
+import { inputSubStr } from '../../utils/commonHelper';
 
 export const LinearGradientComp = ({ children, status, style }: { status: boolean, children: any, style?: any }) => {
   return (
@@ -147,7 +148,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
     );
 
     return () => {
-      SystemSetting?.removeListener(locationListener);
+      // SystemSetting?.removeListener(locationListener);
     }
   }, []);
 
@@ -224,9 +225,9 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
             <MapView
               style={styles.mapStyle}
               region={{
-                latitude: locationRegion?.coords?.latitude || 22.6870138,
+                latitude: locationRegion?.coords?.latitude || 0,
                 longitude:
-                  locationRegion?.coords?.longitude || 75.8712195,
+                  locationRegion?.coords?.longitude || 0,
                 latitudeDelta: 0.006, // 0.0922 || 0.01
                 longitudeDelta: 0.001, // 0.0421 || 0.0011
               }}
@@ -239,8 +240,8 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                   latitude: location?.coords?.latitude || 0,
                   longitude: location?.coords?.longitude || 0,
                 }}
-                // zIndex={1}
-                // tracksViewChanges={false}
+              // zIndex={1}
+              // tracksViewChanges={false}
               >
                 <Image
                   source={require('../../assets/images/truck.png')}
@@ -258,14 +259,30 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                     longitude: +marker.lng || 0,
                   }}
                   title={`${marker.name || ""}`}
-                  // zIndex={(index + 1)}
-                  // tracksViewChanges={false}
+                  zIndex={(index + 1)}
+                // tracksViewChanges={false}
+                // style={{ transform: [{ rotate: `${+marker.heading || 0}deg` }] }}
                 >
-                  <Image
-                    source={require('../../assets/images/truck.png')}
-                    style={{ width: HP(25), height: VP(61) }}
-                    resizeMode="contain"
-                  />
+                  {/* transform: [{ rotate: '-'+(+marker.heading || 0) + 'deg'}] */}
+                  <View style={{}}>
+                    <View style={{ bottom: -8 }}>
+                      <View style={{ backgroundColor: "#341049", flexDirection: "row", borderRadius: 50, borderWidth: 1, borderColor: "#341049", alignItems: "center", padding: 2, justifyContent: "space-around" }}>
+
+                        <Image resizeMode="contain" loadingIndicatorSource={require("../../assets/images/profile.png")} source={require("../../assets/images/profile.png")} style={{ width: HP(20), height: VP(20), borderRadius: 20, paddingRight: 5, paddingLeft: 5, flexShrink: 0 }} />
+
+                        <RNText textStyle={{ ...TextStyles.SOFIA_SEMI_BOLD, fontSize: FS(12.06), color: "#fff", paddingRight: 5, paddingLeft: 5, }}>
+                          {`${inputSubStr(marker.name || "Unknown")}`}
+                        </RNText>
+                      </View>
+
+                      <Image resizeMode="contain" source={require("../../assets/icons/down.png")} style={{ width: HP(13), height: VP(8), left: 8, top: -2 }} />
+                    </View>
+                    <Image
+                      source={require('../../assets/images/truck.png')}
+                      style={{ width: HP(25), height: VP(61) }}
+                      resizeMode="contain"
+                    />
+                  </View>
                 </Marker>
               ))}
             </MapView>

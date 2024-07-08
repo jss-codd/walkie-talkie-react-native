@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Button, Text, Platform, Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Button, Text, Platform, Alert, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import RNFetchBlob from 'rn-fetch-blob'
 
 import { BACKEND_URL, errorMessage } from '../utils/constants'
 import Loader from './Loader';
 import { requestAudioPermissions } from '../utils/permissions';
-import { showAlert } from '../utils/alert';
+import { showAlert, showFadeAlert } from '../utils/alert';
 import { returnLocation } from '../utils/location';
 import Microphone from '../assets/svgs/microphone.svg';
 import { LinearGradientComp } from '../screens/main/HomeScreen';
@@ -142,8 +142,13 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
                     const res = JSON.parse(resp?.data || errorResponse) || { success: false, error: errorMessage.commonError };
                     console.log(res, '-------upload result');
                     setLoader(false);
-                    if (res?.success) showAlert('Recording Success', "");
-                    else showAlert('Recording Failed', res?.error || errorMessage.commonError);
+                    if (res?.success) {
+                        // showAlert('Recording Success', "");
+                        showFadeAlert("Recording Success");
+                    }
+                    else {
+                        showAlert('Recording Failed', res?.error || errorMessage.commonError);
+                    }
                 })
                 .catch(err => {
                     setLoader(false);

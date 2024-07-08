@@ -3,4 +3,9 @@ const maskInput = (input: string, show: number = 4) => {
     return last4Digits.padStart(input.length, "*");
 }
 
-export { maskInput };
+const inputSubStr = (input: string, show: number = 12) => {
+    const res = input.slice(0, show);
+    return res + (input.length > res.length ? '...' : '');
+}
+
+export { maskInput, inputSubStr };

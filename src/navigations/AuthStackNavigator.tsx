@@ -7,6 +7,7 @@ import VerifyCode from '../screens/auth/VerifyCode/VerifyCode';
 import PinSet from '../screens/auth/PInSet/PinSet';
 import SplashScreen from '../screens/splash/SplashScreen';
 import PinLogin from '../screens/auth/PinLogin/PinLogin';
+// import HomeScreen from '../screens/main/HomeScreen';
 
 export type AuthStackParamList = {
     RegisterScreen: undefined;
@@ -40,6 +41,10 @@ const AuthStackNavigator: React.FunctionComponent = () => {
                 name={navigationString.PIN_LOGIN_SCREEN}
                 component={PinLogin as React.FunctionComponent}
             />
+            {/* <Stack.Screen
+                name={navigationString.HOME_SCREEN}
+                component={HomeScreen as React.FunctionComponent}
+            /> */}
         </Stack.Navigator>
     );
 };

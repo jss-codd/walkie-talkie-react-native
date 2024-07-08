@@ -7,7 +7,7 @@ import Pencil from '../assets/svgs/pencil.svg';
 import { HP, VP } from '../utils/Responsive';
 import { BACKEND_URL } from '../utils/constants';
 import Loader from './Loader';
-import { showAlert } from '../utils/alert';
+import { showAlert, showFadeAlert } from '../utils/alert';
 import { SettingContext } from '../context/SettingContext';
 import { saveStorage } from '../utils/storage';
 
@@ -63,6 +63,8 @@ function ProfileImageContainer(props: any) {
             saveStorage(res.data.data, "userProfile");
             settings.setProflieDetails((pre: any) => ({ ...pre, ...res.data.data }))
             setLoader(false);
+
+            showFadeAlert("Profile image uploaded successfully");
         } catch (error: any) {
             setLoader(false);
             setPhoto(null);

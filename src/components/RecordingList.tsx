@@ -6,7 +6,7 @@ import * as Animatable from 'react-native-animatable';
 
 import { loadStorage, saveStorage } from "../utils/storage";
 import { TimeAgo } from "../utils/timeAgo";
-import { showAlert } from "../utils/alert";
+import { showAlert, showFadeAlert } from "../utils/alert";
 import Play from '../assets/svgs/play.svg';
 import Delete from '../assets/svgs/delete.svg';
 import Pause from '../assets/svgs/pause.svg';
@@ -71,7 +71,9 @@ const RecordingList = ({ reload }: { reload: number }) => {
             const result: any = await reportUserCall(id);
 
             if (result.success) {
-                showAlert(AlertMessages.report_user_success.title, AlertMessages.report_user_success.message);
+                // showAlert(AlertMessages.report_user_success.title, AlertMessages.report_user_success.message);
+
+                showFadeAlert(AlertMessages.report_user_success.title);
 
 
                 list = list.map((d: any, i: number) => { return d.data.id === id ? { ...d, reported: true } : { ...d } });
@@ -80,12 +82,14 @@ const RecordingList = ({ reload }: { reload: number }) => {
 
                 setRecordingList(list)
             } else {
-                showAlert(AlertMessages.report_user_failed.title, AlertMessages.report_user_failed.message);
+                // showAlert(AlertMessages.report_user_failed.title, AlertMessages.report_user_failed.message);
+                showFadeAlert(AlertMessages.report_user_failed.title);
             }
             setLoader(false);
         } catch (err: any) {
             setLoader(false);
-            showAlert(err.message, "");
+            // showAlert(err.message, "");
+            showFadeAlert(err.message);
         }
     }
 
