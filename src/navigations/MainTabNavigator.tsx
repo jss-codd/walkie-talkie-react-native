@@ -10,6 +10,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { Button, View, Animated, TouchableOpacity } from 'react-native';
 import Microphone from '../assets/svgs/microphone.svg';
 import { HP } from '../utils/Responsive';
+import ProfileDrawer from '../components/ProfileDrawer';
 
 function ModalScreen({ navigation }) {
     return (
@@ -61,6 +62,7 @@ const MainTabNavigator: React.FunctionComponent = () => {
 
             <Stack.Group screenOptions={{ presentation: 'transparentModal' }}>
                 <Stack.Screen name="MyModal" component={ModalScreen} />
+                <Stack.Screen name="ProfileDrawer" component={ProfileDrawer} />
             </Stack.Group>
         </Stack.Navigator>
     );

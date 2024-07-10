@@ -8,7 +8,7 @@ import InnerBlock from '../../../components/InnerBlock';
 import { RNText } from '../../../components/RNText';
 import { Button } from '../../../components/Button';
 import { navigationString } from '../../../utils/navigationString';
-import { BACKEND_URL, errorMessage } from '../../../utils/constants';
+import { apiEndpoints, BACKEND_URL, errorMessage } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
 import { VP } from '../../../utils/Responsive';
 import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
@@ -78,7 +78,7 @@ const PinSet: React.FunctionComponent<any> = ({
 
             const userDetails = await loadStorage("userDetails");
 
-            axios.post(BACKEND_URL + '/pin-set', dataPayload)
+            axios.post(BACKEND_URL + apiEndpoints.pinSet, dataPayload)
                 .then(response => {
                     console.log("response.data: ", response.data);
                     setLoading(false);

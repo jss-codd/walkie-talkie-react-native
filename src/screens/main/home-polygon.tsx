@@ -7,7 +7,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import SystemSetting from 'react-native-system-setting'
 
 import { showAlert } from '../../utils/alert';
-import { AlertMessages, BACKEND_URL } from '../../utils/constants';;
+import { AlertMessages, apiEndpoints, BACKEND_URL } from '../../utils/constants';;
 import { askInitialPermission, checkPermissions, hasLocationPermissionBG } from '../../utils/permissions';
 import { clearWatch, getLocation, returnLocation, watchPosition } from '../../utils/location';
 import VoiceRecorder from '../../components/VoiceRecorder';
@@ -61,7 +61,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
         location: JSON.stringify(location)
       };
 
-      const response = await axios.post(BACKEND_URL + '/fetch-near-devices', dataPayload);
+      const response = await axios.post(BACKEND_URL + apiEndpoints.fetchNearDevices, dataPayload);
 
       console.log(response.data.data, 'fetchNearDevices')
 

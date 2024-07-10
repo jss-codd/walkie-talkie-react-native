@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import axios from 'axios';
 
@@ -7,13 +7,14 @@ import { styles } from './styles';
 import InnerBlock from '../../../components/InnerBlock';
 import { RNText } from '../../../components/RNText';
 import { Button } from '../../../components/Button';
-import { BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
+import { apiEndpoints, BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
 import { HP, VP } from '../../../utils/Responsive';
 import { loadStorage, saveStorage } from '../../../utils/storage';
 import OTPInput from '../../../components/OTPInput';
 import { showAlert } from '../../../utils/alert';
 import { maskInput } from '../../../utils/commonHelper';
+import { SettingContext } from '../../../context/SettingContext';
 
 const pinCheck = /^[0-9]{4}$/;
 const otpRetryCount = 5;
@@ -21,6 +22,8 @@ const otpRetryCount = 5;
 const PinLogin: React.FunctionComponent<any> = ({
     navigation,
 }) => {
+    const settings = useContext<any>(SettingContext);
+
     const [pin, setPin] = useState('');
     const [errorPin, setErrorPin] = useState({ status: false, text: "" });
     const [loading, setLoading] = useState(false);
@@ -46,13 +49,15 @@ const PinLogin: React.FunctionComponent<any> = ({
                 "mobile": userDetails.mobile
             };
 
-            axios.post(BACKEND_URL + '/pin-login', dataPayload)
+            axios.post(BACKEND_URL + apiEndpoints.pinLogin, dataPayload)
                 .then(response => {
-                    // console.log("pin-login: ", response.data);
                     setLoading(false);
 
                     if (response.data.success && response.data.mobile && response.data.jwt) {
                         saveStorage({ ...userDetails, "mobile": response.data.mobile, "jwt": response.data.jwt }, "userDetails");
+
+                        saveStorage(response.data.data, "userProfile");
+                        settings.setProflieDetails((pre: any) => ({ ...pre, ...response?.data?.data }))
 
                         navigation.reset({
                             index: 0,

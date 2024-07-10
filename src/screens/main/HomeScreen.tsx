@@ -7,7 +7,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import SystemSetting from 'react-native-system-setting'
 
 import { showAlert } from '../../utils/alert';
-import { AlertMessages, BACKEND_URL } from '../../utils/constants';;
+import { AlertMessages, apiEndpoints, BACKEND_URL } from '../../utils/constants';;
 import { askInitialPermission, checkPermissions, hasLocationPermissionBG } from '../../utils/permissions';
 import { clearWatch, getLocation, returnLocation, watchPosition } from '../../utils/location';
 import VoiceRecorder from '../../components/VoiceRecorder';
@@ -22,6 +22,10 @@ import { SettingContext } from '../../context/SettingContext';
 import { onDisplayNotification } from '../../utils/notifeeHelper';
 import Modals from '../../components/Modals';
 import { inputSubStr } from '../../utils/commonHelper';
+import Menu from '../../assets/svgs/menu.svg';
+import RouteSelect from '../../components/RouteSelect';
+import RouteBox from '../../components/RouteBox';
+import RouteBoxOld from '../../components/RouteBoxOld';
 
 export const LinearGradientComp = ({ children, status, style }: { status: boolean, children: any, style?: any }) => {
   return (
@@ -41,6 +45,7 @@ export const LinearGradientComp = ({ children, status, style }: { status: boolea
 
 function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
   const settings = useContext<any>(SettingContext);
+
   const [isPending, startTransition] = useTransition();
 
   const [location, setLocation] = useState<any>(null);
@@ -61,7 +66,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
         location: JSON.stringify(location)
       };
 
-      const response = await axios.post(BACKEND_URL + '/fetch-near-devices', dataPayload);
+      const response = await axios.post(BACKEND_URL + apiEndpoints.fetchNearDevices, dataPayload);
 
       console.log(response.data.data, 'fetchNearDevices')
 
@@ -178,48 +183,15 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
   return (
     <>
       <Modals {...modalProps} />
+      {/* Top Div */}
 
-      <View style={styles.main}>
-        <View style={{ flexDirection: "column", flexBasis: "5%" }}>
-          <View style={{ gap: 5, alignItems: "center" }}>
-            <Image source={require('../../assets/icons/radio-fill.png')} style={{ height: 20, width: 20 }} />
-            <Image source={require('../../assets/icons/line.png')} style={{ height: 18, width: 6 }} />
-            <Image source={require('../../assets/icons/group-location.png')} style={{ height: 19, width: 14 }} />
-          </View>
-        </View>
-        <View style={{ flexDirection: "column", gap: 8, flexBasis: "70%", justifyContent: "center" }}>
-          <View style={{ flexDirection: "row", }}>
-            <View style={{ flexBasis: "100%" }}>
-              <TextInput
-                style={{ ...styles.input, color: "#000" }}
-                value={""}
-              />
-            </View>
-          </View>
-          <View style={{ flexDirection: "row", }}>
-            <View style={{ flexBasis: "100%" }}>
-              <TextInput
-                style={{ ...styles.input, color: "#000" }}
-                value={""}
-              />
-            </View>
-          </View>
-        </View>
-        <View style={{ flexBasis: "25%", alignItems: "center" }}>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate(
-                navigationString.PROFILE_SCREEN,
-              )}
-            style={{}}
-          >
-            {settings.proflieDetails.profile_img ? (<><Image loadingIndicatorSource={require("../../assets/images/profile.png")} source={{ uri: settings.proflieDetails.profile_img }} style={styles.avatar} /></>) : (<Image source={require('../../assets/images/profile.png')} style={styles.avatar} />)}
-          </TouchableOpacity>
-        </View>
-      </View>
+      {/* <RouteBoxOld settings={settings} navigation={navigation} /> */}
 
-      {/* Map Div */}
+      <RouteBox route={settings.route} setRoute={settings.setRoute} navigation={navigation} />
+
+      {/* Map Div & Bottom Icons */}
       <View style={{ flex: 1, alignItems: 'center', backgroundColor: "#ffffff" }}>
+        {/* Map Div */}
         <View style={styles.container}>
           {location?.coords?.latitude && location?.coords?.longitude ? (
             <MapView
@@ -265,7 +237,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 >
                   {/* transform: [{ rotate: '-'+(+marker.heading || 0) + 'deg'}] */}
                   <View style={{}}>
-                    <View style={{ bottom: -8 }}>
+                    {/* <View style={{ bottom: -8 }}>
                       <View style={{ backgroundColor: "#341049", flexDirection: "row", borderRadius: 50, borderWidth: 1, borderColor: "#341049", alignItems: "center", padding: 2, justifyContent: "space-around" }}>
 
                         <Image resizeMode="contain" loadingIndicatorSource={require("../../assets/images/profile.png")} source={require("../../assets/images/profile.png")} style={{ width: HP(20), height: VP(20), borderRadius: 20, paddingRight: 5, paddingLeft: 5, flexShrink: 0 }} />
@@ -276,7 +248,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                       </View>
 
                       <Image resizeMode="contain" source={require("../../assets/icons/down.png")} style={{ width: HP(13), height: VP(8), left: 8, top: -2 }} />
-                    </View>
+                    </View> */}
                     <Image
                       source={require('../../assets/images/truck.png')}
                       style={{ width: HP(25), height: VP(61) }}
@@ -289,6 +261,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
           ) : null}
         </View>
 
+        {/* Bottom Bar */}
         <View style={{ bottom: 0, height: VP(123), position: "absolute", backgroundColor: "#ffffff", borderTopLeftRadius: 0, borderTopRightRadius: 0, flex: 1 }}>
           <View style={{
             flexDirection: "row", justifyContent: "space-between", width: "100%", margin: "auto", padding: "auto", paddingHorizontal: 16, paddingVertical: 12, alignItems: "center"
@@ -495,7 +468,7 @@ const mapStyle = [
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: VP(-20),
+    top: VP(-50),
     left: 0,
     right: 0,
     bottom: VP(0),
@@ -507,44 +480,11 @@ const styles = StyleSheet.create({
   },
   mapStyle: {
     position: 'absolute',
-    top: 0,
+    top: VP(40),
     left: 0,
     right: 0,
     bottom: VP(123),
     borderCurve: "circular",
-  },
-  input: {
-    height: VP(32),
-    borderWidth: 1,
-    borderColor: "#D0CCFF",
-    borderRadius: 8,
-  },
-  avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 70
-  },
-  main: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 5,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    paddingBottom: VP(32),
-    paddingTop: VP(30),
-    alignItems: 'center',
-    backgroundColor: "#ffffff",
-    zIndex: 999,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.30,
-    shadowRadius: 4.65,
-    elevation: 4,
-
   },
   iconText: {
     ...TextStyles.SOFIA_SEMI_BOLD,

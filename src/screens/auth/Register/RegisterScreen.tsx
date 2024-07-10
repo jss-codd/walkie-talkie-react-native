@@ -13,7 +13,7 @@ import { RNText } from '../../../components/RNText';
 import ValidationTextInput from '../../../components/ValidationTextInput';
 import { Button } from '../../../components/Button';
 import { navigationString } from '../../../utils/navigationString';
-import { BACKEND_URL, COLORS, errorMessage, mobileRegex } from '../../../utils/constants';
+import { apiEndpoints, BACKEND_URL, COLORS, errorMessage, mobileRegex } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
 import { FS, HP, VP } from '../../../utils/Responsive';
 import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
@@ -55,7 +55,7 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
                 "mobile": inputValue
             };
 
-            axios.post(BACKEND_URL + '/mobile-verification', dataPayload)
+            axios.post(BACKEND_URL + apiEndpoints.mobileVerification, dataPayload)
                 .then(response => {
                     setLoading(false);
 
@@ -117,7 +117,7 @@ const RegisterScreen: React.FunctionComponent<NavigationProp> = ({
                 "callingCode": callingCode
             };
 
-            axios.post(BACKEND_URL + '/mobile-verification', dataPayload)
+            axios.post(BACKEND_URL + apiEndpoints.mobileVerification, dataPayload)
                 .then(response => {
                     setLoading(false);
 

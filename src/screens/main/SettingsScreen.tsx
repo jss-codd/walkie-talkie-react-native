@@ -3,7 +3,7 @@ import { View, StyleSheet, Switch } from 'react-native';
 import axios from 'axios';
 
 import { loadStorage } from '../../utils/storage';
-import { BACKEND_URL, COLORS } from '../../utils/constants';
+import { apiEndpoints, BACKEND_URL, COLORS } from '../../utils/constants';
 import { showAlert } from '../../utils/alert';
 import Loader from '../../components/Loader';
 import { SettingContext } from '../../context/SettingContext';
@@ -29,7 +29,7 @@ function SettingsScreen(): React.JSX.Element {
             "status": e
         };
 
-        axios.put(BACKEND_URL + '/notification-status', dataPayload)
+        axios.put(BACKEND_URL + apiEndpoints.notificationStatus, dataPayload)
             .then(response => {
                 // console.log("response.data: ", response.data);
                 settings.handler('notificationStatus', e)
@@ -52,7 +52,7 @@ function SettingsScreen(): React.JSX.Element {
             "status": e
         };
 
-        axios.put(BACKEND_URL + '/audio-play-status', dataPayload)
+        axios.put(BACKEND_URL + apiEndpoints.audioPlayStatus, dataPayload)
             .then(response => {
                 // console.log("response.data: ", response.data);
                 settings.handler('audioPlayStatus', e)

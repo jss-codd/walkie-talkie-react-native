@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import Pencil from '../assets/svgs/pencil.svg';
 import { HP, VP } from '../utils/Responsive';
-import { BACKEND_URL } from '../utils/constants';
+import { apiEndpoints, BACKEND_URL } from '../utils/constants';
 import Loader from './Loader';
 import { showAlert, showFadeAlert } from '../utils/alert';
 import { SettingContext } from '../context/SettingContext';
@@ -54,7 +54,7 @@ function ProfileImageContainer(props: any) {
 
             setLoader(true);
 
-            const res = await axios.post(BACKEND_URL + '/profile-upload', formData, {
+            const res = await axios.post(BACKEND_URL + apiEndpoints.profileUpload, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     'accept': 'application/json',
@@ -91,7 +91,7 @@ function ProfileImageContainer(props: any) {
 
             <TouchableOpacity
                 onPress={handleChoosePhoto}
-                style={{ position: "absolute", top: VP(120), right: HP(115) }}
+                style={{ position: "absolute", top: VP(115), right: HP(80) }}
             >
                 <Pencil height={40} width={40} />
             </TouchableOpacity>

@@ -1,12 +1,12 @@
 import axios from "axios";
 
-import { BACKEND_URL } from "./constants";
+import { apiEndpoints, BACKEND_URL } from "./constants";
 import { saveStorage } from "./storage";
 
 const saveLocation = async (dataPayload: any) => {
   const { latitude, longitude } = dataPayload;
 
-  axios.post(BACKEND_URL + '/save-location', dataPayload)
+  axios.post(BACKEND_URL + apiEndpoints.saveLocation, dataPayload)
     .then(response => {
       saveStorage({ latitude, longitude }, "savedLocation");
     })
@@ -18,7 +18,7 @@ const saveLocation = async (dataPayload: any) => {
 const refreshAuthToken = async (dataPayload: any) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const res = await axios.post(BACKEND_URL + '/pin-login', dataPayload);
+      const res = await axios.post(BACKEND_URL + apiEndpoints.pinLogin, dataPayload);
       console.log(res.data, '---------res refreshAuthToken');
       resolve(res);
     } catch (error: any) {
@@ -30,7 +30,7 @@ const refreshAuthToken = async (dataPayload: any) => {
 
 const getProfileDetails = async (settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
   try {
-    const res = await axios.get(BACKEND_URL + '/profile-details');
+    const res = await axios.get(BACKEND_URL + apiEndpoints.profileDetails);
     saveStorage(res.data.data, "userProfile");
     settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
     console.log(res.data, '---------------getProfileDetails');
@@ -43,7 +43,7 @@ const getProfileDetails = async (settings: { setProflieDetails: (arg0: (pre: any
 
 const submitProfileDetails = async (dataPayload: any, settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
   try {
-    const res = await axios.post(BACKEND_URL + '/profile-details', dataPayload);
+    const res = await axios.post(BACKEND_URL + apiEndpoints.profileDetails, dataPayload);
     saveStorage(res.data.data, "userProfile");
     settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
     return res.data;
@@ -53,9 +53,45 @@ const submitProfileDetails = async (dataPayload: any, settings: { setProflieDeta
   }
 }
 
+const submitEmailDetails = async (dataPayload: any, settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
+  try {
+    const res = await axios.post(BACKEND_URL + apiEndpoints.emailSubmit, dataPayload);
+    saveStorage(res.data.data, "userProfile");
+    settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
+    return res.data;
+  } catch (error: any) {
+    console.error("Error submitEmailDetails: ", error);
+    throw new Error('Failed to submit, ' + error.response.data.message || error.message);
+  }
+}
+
+const submitLocationDetails = async (dataPayload: any, settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
+  try {
+    const res = await axios.post(BACKEND_URL + apiEndpoints.locationSubmit, dataPayload);
+    saveStorage(res.data.data, "userProfile");
+    settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
+    return res.data;
+  } catch (error: any) {
+    console.error("Error submitLocationDetails: ", error);
+    throw new Error('Failed to submit, ' + error.response.data.message || error.message);
+  }
+}
+
+const submitNameDetails = async (dataPayload: any, settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
+  try {
+    const res = await axios.post(BACKEND_URL + apiEndpoints.nameSubmit, dataPayload);
+    saveStorage(res.data.data, "userProfile");
+    settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
+    return res.data;
+  } catch (error: any) {
+    console.error("Error submitNameDetails: ", error);
+    throw new Error('Failed to submit, ' + error.response.data.message || error.message);
+  }
+}
+
 const reportUserCall = async (id: any) => {
   try {
-    const res = await axios.post(BACKEND_URL + '/report-user/' + id);
+    const res = await axios.post(BACKEND_URL + apiEndpoints.reportUser + '/' + id);
 
     console.log(res.data, '---------------submitProfileDetails');
     return res.data;
@@ -65,4 +101,16 @@ const reportUserCall = async (id: any) => {
   }
 }
 
-export { saveLocation, refreshAuthToken, getProfileDetails, submitProfileDetails, reportUserCall };
+const getChannelList = async () => {
+  try {
+    const res = await axios.get(BACKEND_URL + apiEndpoints.channelList);
+
+    console.log(res.data, '---------------getChannelList');
+    return res.data;
+  } catch (error: any) {
+    console.error("Error getChannelList: ", error.response.data.error || error);
+    return {};
+  }
+}
+
+export { saveLocation, refreshAuthToken, getProfileDetails, submitProfileDetails, reportUserCall, getChannelList, submitEmailDetails, submitLocationDetails, submitNameDetails };

@@ -9,7 +9,7 @@ import InnerBlock from '../../../components/InnerBlock';
 import { RNText } from '../../../components/RNText';
 import { Button } from '../../../components/Button';
 import { navigationString } from '../../../utils/navigationString';
-import { AlertMessages, BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
+import { AlertMessages, apiEndpoints, BACKEND_URL, COLORS, errorMessage } from '../../../utils/constants';
 import Mobile from '../../../assets/svgs/mobile.svg';
 import { VP } from '../../../utils/Responsive';
 import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
@@ -47,7 +47,7 @@ const VerifyCode: React.FunctionComponent<any> = ({
                 "callingCode": signupMobile.callingCode
             };
 
-            const response: any = await axios.post(BACKEND_URL + '/mobile-verification', dataPayload);
+            const response: any = await axios.post(BACKEND_URL + apiEndpoints.mobileVerification, dataPayload);
 
             if (response?.data?.success && response?.data?.mobile) {
                 showAlert(AlertMessages.resend_otp.title, AlertMessages.resend_otp.message);
@@ -89,7 +89,7 @@ const VerifyCode: React.FunctionComponent<any> = ({
 
             };
 
-            axios.post(BACKEND_URL + '/otp-verification', dataPayload)
+            axios.post(BACKEND_URL + apiEndpoints.otpVerification, dataPayload)
                 .then(response => {
                     // console.log("response.data: ", response.data);
                     setLoading(false);

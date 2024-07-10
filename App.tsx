@@ -84,13 +84,14 @@ function App(): React.JSX.Element {
   const [isConnected, setConnected] = useState(true);
   const [settings, setSettings] = useState(settingsDefault);
   const [proflieDetails, setProflieDetails] = useState(profileDefault);
+  const [route, setRoute] = useState({});
 
   const settingHandler = (key: any, data: any) => {
     saveStorage({ ...settings, [key]: data }, "settings");
     setSettings((pre) => ({ ...pre, [key]: data }));
   }
 
-  const contextData = { ...settings, handler: settingHandler, proflieDetails, setProflieDetails };
+  const contextData = { ...settings, handler: settingHandler, proflieDetails, setProflieDetails, route, setRoute };
 
   const fetchSettings = async () => {
     // setLoader(true);

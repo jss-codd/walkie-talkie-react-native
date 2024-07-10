@@ -5,7 +5,7 @@ import { request, PERMISSIONS } from 'react-native-permissions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Permissions from 'react-native-permissions'
 
-import { AlertMessages, BACKEND_URL } from './constants';
+import { AlertMessages, apiEndpoints, BACKEND_URL } from './constants';
 import { saveStorage } from './storage';
 import { showAlert } from './alert';
 
@@ -80,7 +80,7 @@ const saveToken = async (token: string) => {
         };
 
         axios
-            .post(BACKEND_URL + '/device-token', dataPayload)
+            .post(BACKEND_URL + apiEndpoints.deviceToken, dataPayload)
             .then(async response => {
                 console.log('saveToken ', response.data);
                 await AsyncStorage.setItem('fcmToken', token);

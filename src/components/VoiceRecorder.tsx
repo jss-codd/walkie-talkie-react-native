@@ -3,7 +3,7 @@ import { View, Button, Text, Platform, Alert, StyleSheet, TouchableOpacity, Toas
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import RNFetchBlob from 'rn-fetch-blob'
 
-import { BACKEND_URL, errorMessage } from '../utils/constants'
+import { apiEndpoints, BACKEND_URL, errorMessage } from '../utils/constants'
 import Loader from './Loader';
 import { requestAudioPermissions } from '../utils/permissions';
 import { showAlert, showFadeAlert } from '../utils/alert';
@@ -105,7 +105,7 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
             //call curl here
             RNFetchBlob.fetch(
                 'POST',
-                BACKEND_URL + '/upload',
+                BACKEND_URL + apiEndpoints.recordUpload,
                 {
                     // this is required, otherwise it won't be process as a multipart/form-data request
                     'Content-Type': 'multipart/form-data',
@@ -152,13 +152,13 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
                 })
                 .catch(err => {
                     setLoader(false);
-                    showAlert('Recording Failed', err);
-                    console.error(err, 'err');
+                    showAlert('Recording Failed', JSON.stringify(err.message));
+                    console.error(err.message || "Error while audio sending", 'err first catch');
                 });
         } catch (err: any) {
             setLoader(false);
-            showAlert('Recording Failed', err);
-            console.error(err, 'err')
+            showAlert('Recording Failed', JSON.stringify(err.message));
+            console.error(err.message || "Error while audio sending", 'err last catch')
         }
     };
 
