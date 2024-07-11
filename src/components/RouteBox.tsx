@@ -73,10 +73,7 @@ const RouteBox = (props: { route: any; setRoute: any; navigation: any }) => {
                         <View style={styles.main}>
                             <View style={{}}>
                                 <TouchableOpacity
-                                    onPress={() =>
-                                        navigation.navigate("ProfileDrawer")
-                                        // setModalVisible(true)
-                                    }
+                                    onPress={() => navigation.navigate("ProfileDrawer")}
                                     style={{}}
                                 >
                                     <Menu width={36} height={36} />

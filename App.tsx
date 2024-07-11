@@ -13,6 +13,7 @@ import { SettingContext } from './src/context/SettingContext';
 import MainStackNavigator from './src/navigations/MainStackNavigator';
 import { refreshAuthToken } from './src/utils/apiCall';
 import { onDisplayNotification } from './src/utils/notifeeHelper';
+import { socket } from './socket';
 
 const settingsDefault = {
   notificationStatus: true,
@@ -85,13 +86,14 @@ function App(): React.JSX.Element {
   const [settings, setSettings] = useState(settingsDefault);
   const [proflieDetails, setProflieDetails] = useState(profileDefault);
   const [route, setRoute] = useState({});
+  const [markers, setMarkers] = useState([]);
 
   const settingHandler = (key: any, data: any) => {
     saveStorage({ ...settings, [key]: data }, "settings");
     setSettings((pre) => ({ ...pre, [key]: data }));
   }
 
-  const contextData = { ...settings, handler: settingHandler, proflieDetails, setProflieDetails, route, setRoute };
+  const contextData = { ...settings, handler: settingHandler, proflieDetails, setProflieDetails, route, setRoute, markers };
 
   const fetchSettings = async () => {
     // setLoader(true);
@@ -185,6 +187,27 @@ function App(): React.JSX.Element {
       // fetchSettings();
     })()
   }, [])
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    socket.io.on("reconnect", (attempt) => {
+      console.log('Reconnected to server');
+    });
+
+    socket.on('receiveLocation', (data) => {
+      console.log(data, 'receiveLocation')
+      setMarkers(data);
+    });
+
+    return () => {
+      console.log('disconnect');
+      // socket.off('receiveLocation')
+      // socket.disconnect();
+    };
+  }, []);
 
   if (isConnected === false) {
     return (

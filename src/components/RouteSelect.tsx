@@ -4,6 +4,7 @@ import { View, StyleSheet, Text } from 'react-native';
 
 import { getChannelList } from '../utils/apiCall';
 import Arrow from '../assets/svgs/arrow-narrow-right.svg';
+import { roomJoin } from '../utils/socketEvents';
 
 const RouteSelect = (props: { route: any; setRoute: any; }) => {
     const { route, setRoute } = props;
@@ -18,6 +19,12 @@ const RouteSelect = (props: { route: any; setRoute: any; }) => {
         }
     }
 
+    const selectRouteHandler = (selectedItem: any) => {
+        setRoute(selectedItem);
+        
+        roomJoin(selectedItem.value);
+    }
+
     useEffect(() => {
         (async () => {
             fetchChannels();
@@ -29,7 +36,7 @@ const RouteSelect = (props: { route: any; setRoute: any; }) => {
             <SelectDropdown
                 data={items}
                 onSelect={(selectedItem, index) => {
-                    setRoute(selectedItem)
+                    selectRouteHandler(selectedItem)
                 }}
                 renderButton={(selectedItem, isOpened) => {
                     return (

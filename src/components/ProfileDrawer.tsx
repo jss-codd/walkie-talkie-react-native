@@ -173,7 +173,7 @@ const ProfileDrawer = (props: { navigation: any; }) => {
                         {editMode.name ? (
                             <>
                                 <TextInput
-                                    style={{ ...styles.username, padding: 0, flexBasis: "80%" }}
+                                    style={{ ...styles.username, padding: 0, flexBasis: "80%", textAlign: "center" }}
                                     onChangeText={(e: any) => inputChange('name', e)}
                                     value={profile.name || ""}
                                     placeholder="Enter your name here"
@@ -191,7 +191,7 @@ const ProfileDrawer = (props: { navigation: any; }) => {
                             </>
                         ) : (
                             <>
-                                <RNText textStyle={{ ...styles.username, flexBasis: "80%" }}>
+                                <RNText textStyle={{ ...styles.username, flexBasis: "80%", textAlign: "center" }}>
                                     {profile.name || 'NA'}
                                 </RNText>
 
@@ -310,10 +310,12 @@ const ProfileDrawer = (props: { navigation: any; }) => {
                             Settings
                         </RNText>
                         <TouchableOpacity
-                            onPress={() =>
+                            onPress={() => {
+                                // navigation.goBack();
                                 navigation.navigate(
                                     navigationString.SETTING_SCREEN,
-                                )}
+                                )
+                            }}
                             style={{ alignSelf: "center", start: 10 }}
                         >
                             <Pencil height={25} width={25} />

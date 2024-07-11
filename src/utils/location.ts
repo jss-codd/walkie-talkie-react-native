@@ -4,6 +4,7 @@ import { SetStateAction } from 'react';
 import { showAlert } from './alert';
 import { loadStorage } from './storage';
 import { saveLocation } from './apiCall';
+import { sendLocation } from './socketEvents';
 
 const returnLocation = () => {
     return new Promise((resolve, reject) => {
@@ -26,6 +27,8 @@ const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, set
     Geolocation.getCurrentPosition(
         async (pos: GeolocationResponse) => {
             setLocation(pos);
+
+            sendLocation(pos.coords)
 
             if (!locationRegion?.coords?.latitude) {
                 setLocationRegion(pos);
@@ -69,6 +72,8 @@ const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setLoca
         const watchID = Geolocation.watchPosition(
             async (position) => {
                 setLocation(position);
+
+                sendLocation(position.coords)
 
                 const latitude = position?.coords?.latitude;
                 const longitude = position?.coords?.longitude;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import axios from 'axios';
 
@@ -15,6 +15,7 @@ import ArrowLeftSquare from '../../../assets/svgs/arrow-left-square.svg';
 import { loadStorage, saveStorage } from '../../../utils/storage';
 import OTPInput from '../../../components/OTPInput';
 import { showAlert } from '../../../utils/alert';
+import { SettingContext } from '../../../context/SettingContext';
 
 const pinSteps = { currentStep: 1, pin1: "", pin2: "" }
 
@@ -23,6 +24,8 @@ const pinCheck = /^[0-9]{4}$/;
 const PinSet: React.FunctionComponent<any> = ({
     navigation,
 }) => {
+    const settings = useContext<any>(SettingContext);
+    
     const [pin1, setPin1] = useState('');
     const [errorPin1, setErrorPin1] = useState({ status: false, text: "" });
     const [pin2, setPin2] = useState('');
@@ -86,6 +89,9 @@ const PinSet: React.FunctionComponent<any> = ({
                     if (response.data.success && response.data.pin) {
 
                         saveStorage({ ...userDetails, "pin": response.data.pin }, "userDetails");
+
+                        saveStorage(response.data.data, "userProfile");
+                        settings.setProflieDetails((pre: any) => ({ ...pre, ...response?.data?.data }))
 
                         navigation.reset({
                             index: 0,

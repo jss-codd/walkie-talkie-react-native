@@ -19,7 +19,7 @@ const refreshAuthToken = async (dataPayload: any) => {
   return new Promise(async (resolve, reject) => {
     try {
       const res = await axios.post(BACKEND_URL + apiEndpoints.pinLogin, dataPayload);
-      console.log(res.data, '---------res refreshAuthToken');
+      // console.log(res.data, '---------res refreshAuthToken');
       resolve(res);
     } catch (error: any) {
       console.log('API ERROR (refreshAuthToken)', error?.response?.data?.message);
@@ -36,8 +36,8 @@ const getProfileDetails = async (settings: { setProflieDetails: (arg0: (pre: any
     console.log(res.data, '---------------getProfileDetails');
     return res.data;
   } catch (error: any) {
-    return {};
     console.error("Error getProfileDetails: ", error.response.data.error || error);
+    return {};
   }
 }
 
@@ -105,7 +105,7 @@ const getChannelList = async () => {
   try {
     const res = await axios.get(BACKEND_URL + apiEndpoints.channelList);
 
-    console.log(res.data, '---------------getChannelList');
+    // console.log(res.data, '---------------getChannelList');
     return res.data;
   } catch (error: any) {
     console.error("Error getChannelList: ", error.response.data.error || error);

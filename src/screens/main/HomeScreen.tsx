@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState, useTransition } from 'react';
-import { View, StyleSheet, AppState, TextInput, Image, TouchableOpacity, Button, Text, ToastAndroid } from 'react-native';
+import { View, StyleSheet, AppState, Image, TouchableOpacity } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
-import MapView, { Callout, Marker, Polyline } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
 import LinearGradient from 'react-native-linear-gradient';
 import SystemSetting from 'react-native-system-setting'
@@ -11,7 +11,6 @@ import { AlertMessages, apiEndpoints, BACKEND_URL } from '../../utils/constants'
 import { askInitialPermission, checkPermissions, hasLocationPermissionBG } from '../../utils/permissions';
 import { clearWatch, getLocation, returnLocation, watchPosition } from '../../utils/location';
 import VoiceRecorder from '../../components/VoiceRecorder';
-import LocationAlertModal from '../../components/LocationAlertModal';
 import { FS, HP, VP } from '../../utils/Responsive';
 import { navigationString } from '../../utils/navigationString';
 import { RNText } from '../../components/RNText';
@@ -19,13 +18,8 @@ import { TextStyles } from '../../utils/TextStyles';
 import History from '../../assets/svgs/history.svg';
 import Location from '../../assets/svgs/location.svg';
 import { SettingContext } from '../../context/SettingContext';
-import { onDisplayNotification } from '../../utils/notifeeHelper';
 import Modals from '../../components/Modals';
-import { inputSubStr } from '../../utils/commonHelper';
-import Menu from '../../assets/svgs/menu.svg';
-import RouteSelect from '../../components/RouteSelect';
 import RouteBox from '../../components/RouteBox';
-import RouteBoxOld from '../../components/RouteBoxOld';
 
 export const LinearGradientComp = ({ children, status, style }: { status: boolean, children: any, style?: any }) => {
   return (
@@ -46,6 +40,8 @@ export const LinearGradientComp = ({ children, status, style }: { status: boolea
 function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
   const settings = useContext<any>(SettingContext);
 
+  const { markers, proflieDetails } = settings;
+
   const [isPending, startTransition] = useTransition();
 
   const [location, setLocation] = useState<any>(null);
@@ -56,7 +52,6 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
   const [backgroundListener, setBackgroundListener] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [locationState, setLocationState] = useState(false);
-  const [markers, setMarkers] = useState([]);
 
   const fetchNearDevices = async () => {
     try {
@@ -68,9 +63,9 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
 
       const response = await axios.post(BACKEND_URL + apiEndpoints.fetchNearDevices, dataPayload);
 
-      console.log(response.data.data, 'fetchNearDevices')
+      // console.log(response.data.data, 'fetchNearDevices')
 
-      setMarkers(response.data.data || []);
+      // setMarkers(response.data.data || []);
     } catch (error: any) {
       console.warn("Error fetching data fetchNearDevices: ", error);
     }
@@ -90,7 +85,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
 
       getLocation(setLocation, setLocationRegion, locationRegion, setModalVisible);
 
-      fetchNearDevices();
+      // fetchNearDevices();
     })();
   }, [locationState]);
 
@@ -134,13 +129,13 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
   }, [])
 
   // fetchNearDevices setInterval
-  useEffect(() => {
-    const timer = setInterval(() => {
-      fetchNearDevices();
-    }, 60000)
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     fetchNearDevices();
+  //   }, 60000)
 
-    return () => clearInterval(timer);
-  }, [])
+  //   return () => clearInterval(timer);
+  // }, [])
 
   // location on/off addLocationListener
   useEffect(() => {
@@ -222,22 +217,26 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 />
               </Marker>
 
+
+              {/* {console.log(markers, 'markers')} */}
+
               {markers && markers?.map((marker: any, index: number) => (
-                <Marker
-                  rotation={+marker.heading || 0}
-                  key={index.toString()}
-                  coordinate={{
-                    latitude: +marker.lat || 0,
-                    longitude: +marker.lng || 0,
-                  }}
-                  title={`${marker.name || ""}`}
-                  zIndex={(index + 1)}
-                // tracksViewChanges={false}
-                // style={{ transform: [{ rotate: `${+marker.heading || 0}deg` }] }}
-                >
-                  {/* transform: [{ rotate: '-'+(+marker.heading || 0) + 'deg'}] */}
-                  <View style={{}}>
-                    {/* <View style={{ bottom: -8 }}>
+                <React.Fragment key={index.toString()}>
+                  {proflieDetails.id !== marker.id && (
+                    <Marker
+                      rotation={+marker.heading || 0}
+                      coordinate={{
+                        latitude: +marker.latitude || 0,
+                        longitude: +marker.longitude || 0,
+                      }}
+                      title={`${marker.name || ""}`}
+                      zIndex={(index + 1)}
+                    // tracksViewChanges={false}
+                    // style={{ transform: [{ rotate: `${+marker.heading || 0}deg` }] }}
+                    >
+                      {/* transform: [{ rotate: '-'+(+marker.heading || 0) + 'deg'}] */}
+                      <View style={{}}>
+                        {/* <View style={{ bottom: -8 }}>
                       <View style={{ backgroundColor: "#341049", flexDirection: "row", borderRadius: 50, borderWidth: 1, borderColor: "#341049", alignItems: "center", padding: 2, justifyContent: "space-around" }}>
 
                         <Image resizeMode="contain" loadingIndicatorSource={require("../../assets/images/profile.png")} source={require("../../assets/images/profile.png")} style={{ width: HP(20), height: VP(20), borderRadius: 20, paddingRight: 5, paddingLeft: 5, flexShrink: 0 }} />
@@ -249,13 +248,15 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
 
                       <Image resizeMode="contain" source={require("../../assets/icons/down.png")} style={{ width: HP(13), height: VP(8), left: 8, top: -2 }} />
                     </View> */}
-                    <Image
-                      source={require('../../assets/images/truck.png')}
-                      style={{ width: HP(25), height: VP(61) }}
-                      resizeMode="contain"
-                    />
-                  </View>
-                </Marker>
+                        <Image
+                          source={require('../../assets/images/truck.png')}
+                          style={{ width: HP(25), height: VP(61) }}
+                          resizeMode="contain"
+                        />
+                      </View>
+                    </Marker>
+                  )}
+                </React.Fragment>
               ))}
             </MapView>
           ) : null}
