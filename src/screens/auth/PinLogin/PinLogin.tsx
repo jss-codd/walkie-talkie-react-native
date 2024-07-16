@@ -24,7 +24,7 @@ const PinLogin: React.FunctionComponent<any> = ({
 }) => {
     const settings = useContext<any>(SettingContext);
 
-    const [pin, setPin] = useState('');
+    const [pin, setPin] = useState('1111');
     const [errorPin, setErrorPin] = useState({ status: false, text: "" });
     const [loading, setLoading] = useState(false);
     const [maskMobile, setMaskMobile] = useState("");
@@ -118,6 +118,8 @@ const PinLogin: React.FunctionComponent<any> = ({
                 setMaskMobile(maskInput(userDetails.mobile));
             }
         })()
+
+        handleOnPress()
     }, [])
 
     return (

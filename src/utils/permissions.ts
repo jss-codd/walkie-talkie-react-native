@@ -130,6 +130,24 @@ const askInitialPermission = async () => {
 const requestAudioPermissions = async () => {
     if (Platform.OS === 'android') {
         const granted = await PermissionsAndroid.requestMultiple([
+            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        ]);
+
+        if (granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED) {
+            return true;
+        } else {
+            showAlert('Permissions not granted!', "");
+            return false;
+        }
+    } else {
+        const result = await request(PERMISSIONS.IOS.MICROPHONE);
+        return result === 'granted';
+    }
+};
+
+const requestAudioAndStoragePermissions = async () => {
+    if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.requestMultiple([
             PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
             PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
             PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
@@ -200,4 +218,4 @@ const checkPermissionsBGLocation = async () => {
     }
 }
 
-export { hasLocationPermission, askInitialPermission, requestAudioPermissions, notificationPermission, checkPermissions, hasLocationPermissionBG };
+export { hasLocationPermission, askInitialPermission, requestAudioPermissions, notificationPermission, checkPermissions, hasLocationPermissionBG, requestAudioAndStoragePermissions };

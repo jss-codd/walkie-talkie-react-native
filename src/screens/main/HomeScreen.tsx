@@ -8,7 +8,7 @@ import SystemSetting from 'react-native-system-setting'
 
 import { showAlert } from '../../utils/alert';
 import { AlertMessages, apiEndpoints, BACKEND_URL } from '../../utils/constants';;
-import { askInitialPermission, checkPermissions, hasLocationPermissionBG } from '../../utils/permissions';
+import { askInitialPermission, checkPermissions, hasLocationPermissionBG, requestAudioPermissions } from '../../utils/permissions';
 import { clearWatch, getLocation, returnLocation, watchPosition } from '../../utils/location';
 import VoiceRecorder from '../../components/VoiceRecorder';
 import { FS, HP, VP } from '../../utils/Responsive';
@@ -21,7 +21,7 @@ import { SettingContext } from '../../context/SettingContext';
 import Modals from '../../components/Modals';
 import RouteBox from '../../components/RouteBox';
 
-export const LinearGradientComp = ({ children, status, style }: { status: boolean, children: any, style?: any }) => {
+export const LinearGradientComp = ({ children, status, onOffer, style }: { status: boolean, onOffer: boolean, children: any, style?: any }) => {
   return (
     <>
       {status ? (
@@ -282,7 +282,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
             {/* <Button title="Display" onPress={() => navigation.navigate('MyModal')} /> */}
 
             <View style={{ alignItems: "center" }}>
-              <LinearGradientComp status={backgroundListener}>
+              <LinearGradientComp onOffer={false} status={backgroundListener}>
                 <TouchableOpacity style={{ ...styles.iconContainer }} onPress={() => !backgroundListener ? startTask() : stopTask()}>
                   <Location width={31} height={31} />
                 </TouchableOpacity>

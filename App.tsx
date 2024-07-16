@@ -81,7 +81,7 @@ axios.interceptors.response.use(
 LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
 
-function App(): React.JSX.Element {
+function App(): React.JSX.Element {  
   const [isConnected, setConnected] = useState(true);
   const [settings, setSettings] = useState(settingsDefault);
   const [proflieDetails, setProflieDetails] = useState(profileDefault);
@@ -198,14 +198,14 @@ function App(): React.JSX.Element {
     });
 
     socket.on('receiveLocation', (data) => {
-      console.log(data, 'receiveLocation')
+      // console.log(data, 'receiveLocation')
       setMarkers(data);
     });
 
     return () => {
       console.log('disconnect');
-      // socket.off('receiveLocation')
-      // socket.disconnect();
+      socket.off('receiveLocation')
+      socket.disconnect();
     };
   }, []);
 

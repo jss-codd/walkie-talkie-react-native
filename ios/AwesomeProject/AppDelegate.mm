@@ -3,6 +3,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import "RNFBMessagingModule.h"
 #import <GoogleMaps/GoogleMaps.h>
+#import <WebRTC/RTCAudioSessionConfiguration.h>
 
 @implementation AppDelegate
 
@@ -19,6 +20,15 @@
   // [[RCTBackgroundTask sharedInstance] startBackgroundTaskWithName:@"HeadlessTask" userInfo:nil];
   // // Add background fetch for remote notifications
   // [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
+
+  // tell libwebrtc how to configure the app's AVAudioSession singleton
+  
+  RTCAudioSessionConfiguration *webRTCConfiguration = [RTCAudioSessionConfiguration webRTCConfiguration];
+
+  webRTCConfiguration.categoryOptions = (
+     AVAudioSessionCategoryOptionAllowBluetooth | 
+    AVAudioSessionCategoryOptionDefaultToSpeaker
+  );
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
