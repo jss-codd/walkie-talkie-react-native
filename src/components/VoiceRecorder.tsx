@@ -32,29 +32,6 @@ import { navigationString } from '../utils/navigationString';
 import { SettingContext } from '../context/SettingContext';
 import { loadStorage } from '../utils/storage';
 
-const audioRecorderPlayer = new AudioRecorderPlayer();
-
-const dirs = RNFetchBlob.fs.dirs;
-
-const path = Platform.select({
-    ios: 'sound.m4a',
-    android: `${dirs.CacheDir}/sound.mp3`,
-});
-
-const getMimeType = (fileExtension: string) => {
-    // Define a map of file extensions to MIME types
-    const mimeTypes: any = {
-        m4a: 'audio/m4a',
-        mp3: 'audio/mp3',
-    };
-
-    // Get the MIME type from the map based on the file extension
-    const mimeType = mimeTypes[fileExtension.toLowerCase()];
-
-    // Return the MIME type or a default value if not found
-    return mimeType || 'application/octet-stream'; // Default MIME type for unknown file types
-};
-
 const VoiceRecorder = ({ iconContainer, iconText, navigation }: { iconContainer: any, iconText: any, navigation: any }) => {
     const settings = useContext<any>(SettingContext);
 
@@ -66,125 +43,6 @@ const VoiceRecorder = ({ iconContainer, iconText, navigation }: { iconContainer:
 
     const [timerDigit, setTimerDigit] = useState<any>(0);
     const [timerInterval, setTimerInterval] = useState<any>(null);
-
-    const onStartRecord = async () => {
-        const hasPermissions = await requestAudioAndStoragePermissions();
-        if (!hasPermissions) return;
-
-        setRecording(true);
-        const result = await audioRecorderPlayer.startRecorder(path);
-        audioRecorderPlayer.addRecordBackListener((e) => {
-            setRecordTime(audioRecorderPlayer.mmssss(Math.floor(e.currentPosition)));
-            return;
-        });
-        setAudioPath(result);
-
-        const timer = setTimeout(() => {
-            onStopRecord();
-        }, 10000)
-
-        setTimerState(timer);
-    };
-
-    const onCancelRecord = async (timer: string | number | NodeJS.Timeout | undefined) => {
-        await audioRecorderPlayer.stopRecorder();
-        audioRecorderPlayer.removeRecordBackListener();
-
-        clearTimeout(timer);
-        setRecording(false);
-        setRecordTime('00:00:00');
-        setAudioPath('');
-    }
-
-    const onStopRecord = async () => {
-        try {
-            setLoader(true);
-            setRecording(false);
-
-            const result = await audioRecorderPlayer.stopRecorder();
-
-            const fileExtension = result.split('.').pop();
-
-            if (!fileExtension) {
-                setRecordTime('00:00:00');
-                setLoader(false);
-                showAlert('Recording Failed', 'Invalid audio extension!');
-                return;
-            }
-
-            const mimeType = getMimeType(fileExtension);
-
-            const fileNameWithExtension = 'sound.' + fileExtension;
-
-            audioRecorderPlayer.removeRecordBackListener();
-
-            setRecordTime('00:00:00');
-
-            setAudioPath(result);
-
-            const location = await returnLocation();
-
-            const getAxiosConfig = await getConfig();
-
-            //call curl here
-            RNFetchBlob.fetch(
-                'POST',
-                BACKEND_URL + apiEndpoints.recordUpload,
-                {
-                    // this is required, otherwise it won't be process as a multipart/form-data request
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': 'Bearer ' + getAxiosConfig.headers['authorization']
-                },
-                [
-                    {
-                        name: 'file',
-                        filename: fileNameWithExtension,
-                        // upload a file from asset is also possible in version >= 0.6.2
-                        data: RNFetchBlob.wrap(
-                            Platform.OS === 'ios'
-                                ? result.replace('file://', '')
-                                : result,
-                        ),
-                        // type: mimeType,
-                    },
-                    {
-                        name: 'location',
-                        data: JSON.stringify(location)
-                    }
-                ],
-            )
-                // listen to upload progress event
-                .uploadProgress((written, total) => {
-                    console.log('uploaded', written / total);
-                })
-                // listen to download progress event
-                .progress((received, total) => {
-                    console.log('progress', received / total);
-                })
-                .then(resp => {
-                    const errorResponse = `{ "success": false, "error": "${errorMessage.commonError}" }`;
-                    const res = JSON.parse(resp?.data || errorResponse) || { success: false, error: errorMessage.commonError };
-                    console.log(res, '-------upload result');
-                    setLoader(false);
-                    if (res?.success) {
-                        // showAlert('Recording Success', "");
-                        showFadeAlert("Recording Success");
-                    }
-                    else {
-                        showAlert('Recording Failed', res?.error || errorMessage.commonError);
-                    }
-                })
-                .catch(err => {
-                    setLoader(false);
-                    showAlert('Recording Failed', JSON.stringify(err.message));
-                    console.error(err.message || "Error while audio sending", 'err first catch');
-                });
-        } catch (err: any) {
-            setLoader(false);
-            showAlert('Recording Failed', JSON.stringify(err.message));
-            console.error(err.message || "Error while audio sending", 'err last catch')
-        }
-    };
 
     /* This creates an WebRTC Peer Connection, which will be used to set local/remote descriptions and offers. */
     const configuration = {
@@ -247,11 +105,6 @@ const VoiceRecorder = ({ iconContainer, iconText, navigation }: { iconContainer:
             };
         };
 
-        pcRef.current.onaddstream = (event: any) => {
-            console.log(settings.proflieDetails.mobile, '-------------onaddstream')
-            // setRemoteStream(event.stream);
-        };
-
         // Handle incoming stream
         pcRef.current.ontrack = (event: { streams: any[]; }) => {
             console.log(settings.proflieDetails.mobile, '-------------ontrack')
@@ -287,6 +140,8 @@ const VoiceRecorder = ({ iconContainer, iconText, navigation }: { iconContainer:
             try {
                 console.log(settings.proflieDetails.mobile, '-----------------leaveCall');
                 setOnOffer(false);
+                setRemoteStream(null);
+                // pcRef.current.close()
             } catch (error) {
                 console.error('Error leaveCall: ', error);
             }
@@ -325,7 +180,7 @@ const VoiceRecorder = ({ iconContainer, iconText, navigation }: { iconContainer:
 
                 navigation.navigate('MyModal', {
                     username: callerDetails?.name || 'Unknown',
-                    distance: (callerDetails.lat > 0 && callerDetails.lng > 0) ? Math.round(+(distanceGet(savedLocation.latitude, savedLocation.longitude, callerDetails.lat, callerDetails.lng) || 0)/1000) + 'km' : 'NA',
+                    distance: (callerDetails.lat > 0 && callerDetails.lng > 0) ? Math.round(+(distanceGet(savedLocation.latitude, savedLocation.longitude, callerDetails.lat, callerDetails.lng) || 0) / 1000) + 'km' : 'NA',
                 });
             }
             else {
@@ -395,6 +250,8 @@ const VoiceRecorder = ({ iconContainer, iconText, navigation }: { iconContainer:
 
             socket.emit('leaveCall', {});
 
+            // pcRef.current.close();
+
             // clearTimeout(timerState);
             clearInterval(timerInterval);
             setTimerDigit(0);
@@ -412,7 +269,7 @@ const VoiceRecorder = ({ iconContainer, iconText, navigation }: { iconContainer:
                     </>
                 )
             }
-            {remoteStream && <RTCView streamURL={remoteStream.toURL()} style={{ width: '0%', height: '0%', position: "absolute" }} />}
+            {remoteStream ? <RTCView streamURL={remoteStream.toURL()} style={{ width: '0%', height: '0%', position: "absolute" }} /> : null}
 
             <Loader loading={loader} />
 
