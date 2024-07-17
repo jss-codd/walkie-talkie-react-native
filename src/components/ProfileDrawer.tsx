@@ -304,7 +304,7 @@ const ProfileDrawer = (props: { navigation: any; }) => {
                     </View>
 
                     {/* Setting Div */}
-                    <View style={{ ...styles.container, marginTop: VP(20), justifyContent: "flex-start", alignItems: "center" }}>
+                    {/* <View style={{ ...styles.container, marginTop: VP(20), justifyContent: "flex-start", alignItems: "center" }}>
                         <Image source={require('../assets/icons/setting.png')} style={styles.icon} />
                         <RNText textStyle={{ ...styles.inputs, flexBasis: "80%" }}>
                             Settings
@@ -320,7 +320,7 @@ const ProfileDrawer = (props: { navigation: any; }) => {
                         >
                             <Pencil height={25} width={25} />
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </View>
             </View>
         </>

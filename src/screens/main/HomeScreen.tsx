@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState, useTransition } from 'react';
-import { View, StyleSheet, AppState, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, AppState, Image, TouchableOpacity, Button } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
@@ -20,6 +20,8 @@ import Location from '../../assets/svgs/location.svg';
 import { SettingContext } from '../../context/SettingContext';
 import Modals from '../../components/Modals';
 import RouteBox from '../../components/RouteBox';
+import Unmute from '../../assets/svgs/unmute.svg';
+import ToggleNotification from '../../components/ToggleNotification';
 
 export const LinearGradientComp = ({ children, status, onOffer, style }: { status: boolean, onOffer: boolean, children: any, style?: any }) => {
   return (
@@ -180,8 +182,6 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
       <Modals {...modalProps} />
       {/* Top Div */}
 
-      {/* <RouteBoxOld settings={settings} navigation={navigation} /> */}
-
       <RouteBox route={settings.route} setRoute={settings.setRoute} navigation={navigation} />
 
       {/* Map Div & Bottom Icons */}
@@ -268,18 +268,23 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
             flexDirection: "row", justifyContent: "space-between", width: "100%", margin: "auto", padding: "auto", paddingHorizontal: 16, paddingVertical: 12, alignItems: "center"
           }}>
 
-            <TouchableOpacity style={{ alignItems: "center" }} onPress={() => navigation.navigate(navigationString.LAST_TALK)}>
+            {/* <TouchableOpacity style={{ alignItems: "center" }} onPress={() => navigation.navigate(navigationString.LAST_TALK)}>
               <View style={styles.iconContainer}>
-                <History width={31} height={31} />
+                <Unmute width={31} height={31} />
               </View>
-              <RNText textStyle={styles.iconText}>Recent Audio</RNText>
-            </TouchableOpacity>
+              <RNText textStyle={styles.iconText}>Mute</RNText>
+            </TouchableOpacity> */}
 
-            <VoiceRecorder iconContainer={styles.iconContainer} iconText={styles.iconText} />
+            <ToggleNotification />
+
+            <VoiceRecorder iconContainer={styles.iconContainer} iconText={styles.iconText} navigation={navigation} />
 
             {/* <Button title="Display" onPress={() => onDisplayNotification('title', 'body')} /> */}
 
-            {/* <Button title="Display" onPress={() => navigation.navigate('MyModal')} /> */}
+            {/* <Button title="Display" onPress={() => navigation.navigate('MyModal', {
+                username: 'Amit Maskare',
+                distance: '100KM',
+            })} /> */}
 
             <View style={{ alignItems: "center" }}>
               <LinearGradientComp onOffer={false} status={backgroundListener}>

@@ -2,7 +2,7 @@ import Geolocation, { GeolocationResponse } from '@react-native-community/geoloc
 import { SetStateAction } from 'react';
 
 import { showAlert } from './alert';
-import { loadStorage } from './storage';
+import { loadStorage, saveStorage } from './storage';
 import { saveLocation } from './apiCall';
 import { sendLocation } from './socketEvents';
 
@@ -45,6 +45,8 @@ const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, set
             if (compareDistance) {
                 setLocationRegion(pos);
 
+                saveStorage({ latitude, longitude }, "savedLocation");
+
                 const dataPayload = {
                     latitude: latitude,
                     longitude: longitude,
@@ -53,7 +55,7 @@ const getLocation = async (setLocation: (arg0: GeolocationResponse) => void, set
 
                 console.log(dataPayload, 'dataPayload1');
 
-                saveLocation(dataPayload);
+                // saveLocation(dataPayload);
             }
         },
         (error) => {
@@ -85,6 +87,7 @@ const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setLoca
 
                 if (compareDistance) {
                     setLocationRegion(position);
+                    saveStorage({ latitude, longitude }, "savedLocation");
 
                     const dataPayload = {
                         latitude: latitude,
@@ -94,7 +97,7 @@ const watchPosition = (setLocation: (arg0: GeolocationResponse) => void, setLoca
 
                     console.log(dataPayload, 'dataPayload2');
 
-                    saveLocation(dataPayload);
+                    // saveLocation(dataPayload);
                 }
             },
             (error) => {
@@ -155,4 +158,4 @@ const calculateHeading = (cord1: { latitude: number; longitude: number; }, cord2
     return 0;
 }
 
-export { getLocation, watchPosition, clearWatch, returnLocation, compareLocation };
+export { getLocation, watchPosition, clearWatch, returnLocation, compareLocation, distanceGet };

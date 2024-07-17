@@ -9,10 +9,14 @@ import ProfileScreen from '../screens/main/ProfileScreen';
 import LinearGradient from 'react-native-linear-gradient';
 import { Button, View, Animated, TouchableOpacity } from 'react-native';
 import Microphone from '../assets/svgs/microphone.svg';
-import { HP } from '../utils/Responsive';
+import { HP, VP } from '../utils/Responsive';
 import ProfileDrawer from '../components/ProfileDrawer';
+import { RNText } from '../components/RNText';
+import { TextStyles } from '../utils/TextStyles';
 
-function ModalScreen({ navigation }) {
+function ModalScreen({ route, navigation }: { route: any, navigation: any }) {
+    const { username, distance } = route.params;
+    console.log(route.params, 'route.params')
     return (
         <LinearGradient
             colors={['#2D3436', '#000000']}
@@ -33,6 +37,11 @@ function ModalScreen({ navigation }) {
                 }}>
                     <Microphone width={64} height={64} />
                 </View>
+            </View>
+            <View style={{ marginVertical: VP(30) }}>
+                <RNText textStyle={{ ...TextStyles.SOFIA_SEMI_BOLD, fontSize: HP(22), color: "#FFF", textAlign: "center" }}>Caller: {username}</RNText>
+
+                <RNText textStyle={{ ...TextStyles.SOFIA_SEMI_BOLD, fontSize: HP(22), color: "#FFF", marginVertical: VP(10), textAlign: "center" }}>Distance: {distance}</RNText>
             </View>
             {/* <Button onPress={() => navigation.goBack()} title="Dismiss" /> */}
         </LinearGradient>

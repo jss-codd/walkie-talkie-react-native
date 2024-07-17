@@ -56,7 +56,7 @@ const RouteBox = (props: { route: any; setRoute: any; navigation: any }) => {
                                         onPress={() => setRoute({})}
                                         style={{ top: 6 }}
                                     >
-                                        <Text style={styles.bottomText}>Change Channel Route</Text>
+                                        <Text style={styles.bottomText}>Exit To Channel Route</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={{}}>
@@ -122,7 +122,9 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         color: "#4B4B4B",
         fontSize: HP(14),
-        width: "100%"
+        width: "100%",
+        lineHeight: 10,
+        top: 10
     },
     bottomText: {
         ...TextStyles.SOFIA_SEMI_BOLD,

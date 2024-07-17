@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, Button, Text, Platform, Alert, StyleSheet, TouchableOpacity, ToastAndroid, SafeAreaView } from 'react-native';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import RNFetchBlob from 'rn-fetch-blob'
@@ -8,7 +8,7 @@ import { AlertMessages, apiEndpoints, BACKEND_URL, errorMessage } from '../utils
 import Loader from './Loader';
 import { requestAudioPermissions, requestAudioAndStoragePermissions, askInitialPermission } from '../utils/permissions';
 import { showAlert, showFadeAlert } from '../utils/alert';
-import { returnLocation } from '../utils/location';
+import { distanceGet, returnLocation } from '../utils/location';
 import Microphone from '../assets/svgs/microphone.svg';
 import PhoneOff from '../assets/svgs/phone-off.svg';
 import { LinearGradientComp } from '../screens/main/HomeScreen';
@@ -28,6 +28,9 @@ import {
 import { socket } from '../../socket';
 import LinearGradient from 'react-native-linear-gradient';
 import { HP } from '../utils/Responsive';
+import { navigationString } from '../utils/navigationString';
+import { SettingContext } from '../context/SettingContext';
+import { loadStorage } from '../utils/storage';
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
@@ -52,7 +55,9 @@ const getMimeType = (fileExtension: string) => {
     return mimeType || 'application/octet-stream'; // Default MIME type for unknown file types
 };
 
-const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconText: any }) => {
+const VoiceRecorder = ({ iconContainer, iconText, navigation }: { iconContainer: any, iconText: any, navigation: any }) => {
+    const settings = useContext<any>(SettingContext);
+
     const [recording, setRecording] = useState(false);
     const [recordTime, setRecordTime] = useState('00:00:00');
     const [audioPath, setAudioPath] = useState('');
@@ -213,6 +218,7 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
     const [onOffer, setOnOffer] = useState<any>(false);
     const buttonRef = useRef<any>(null);
     const [leaveCallCount, setLeaveCallCount] = useState<any>(0);
+    const [callerDetails, setCallerDetails] = useState<any>({});
 
     const pcRef = useRef<any>();
 
@@ -220,14 +226,14 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
         pcRef.current = new RTCPeerConnection(configuration);
 
         pcRef.current.onicecandidate = (event: { candidate: any; }) => {
-            console.log('-------------candidate emit')
+            console.log(settings.proflieDetails.mobile, '-------------candidate emit')
             if (event.candidate) {
                 socket.emit('candidate', event.candidate);
             }
         };
 
         pcRef.current.onconnectionstatechange = (event: any) => {
-            console.log(pcRef.current.connectionState, '----------pcRef.current.connectionState')
+            console.log(pcRef.current.connectionState, settings.proflieDetails.mobile, '----------pcRef.current.connectionState')
             switch (pcRef.current.connectionState) {
                 case 'closed':
                     socket.emit('leaveCall', {});
@@ -242,22 +248,25 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
         };
 
         pcRef.current.onaddstream = (event: any) => {
-            console.log('-------------onaddstream')
+            console.log(settings.proflieDetails.mobile, '-------------onaddstream')
             // setRemoteStream(event.stream);
         };
 
         // Handle incoming stream
         pcRef.current.ontrack = (event: { streams: any[]; }) => {
-            console.log('-------------ontrack')
-            const remoteStream = event.streams[0];
+            console.log(settings.proflieDetails.mobile, '-------------ontrack')
+            const remoteStreamGet = event.streams[0];
             // Attach the remote stream to your UI
-            setRemoteStream(remoteStream);
+            setRemoteStream(remoteStreamGet);
         };
 
-        socket.on('offer', async (offer) => {
+        socket.on('offer', async (offer, user, location) => {
             try {
-                console.log('-----------------offer');
+                console.log(settings.proflieDetails.mobile, '-----------------offer');
+                setCallerDetails({ ...user, ...location });
                 setOnOffer(true);
+
+                // setLeaveCallCount((pre: number) => ++pre);
 
                 //here we are going to disabled call button
 
@@ -276,7 +285,7 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
 
         socket.on('leaveCall', async (offer) => {
             try {
-                console.log('-----------------leaveCall');
+                console.log(settings.proflieDetails.mobile, '-----------------leaveCall');
                 setOnOffer(false);
             } catch (error) {
                 console.error('Error leaveCall: ', error);
@@ -284,12 +293,13 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
         });
 
         socket.on('answer', async (answer) => {
-            console.log('-----------------answer')
+            console.log(settings.proflieDetails.mobile, '-----------------answer');
+            // code for mic on
             await pcRef.current.setRemoteDescription(new RTCSessionDescription(answer));
         });
 
         socket.on('candidate', async (candidate) => {
-            console.log('-----------------candidate on')
+            console.log(settings.proflieDetails.mobile, '-----------------candidate on')
             await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate));
         });
 
@@ -307,6 +317,22 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
         if (leaveCallCount > 0)
             leaveCall()
     }, [leaveCallCount]);
+
+    useEffect(() => {
+        (async () => {
+            if (onOffer) {
+                const savedLocation = await loadStorage('savedLocation');
+
+                navigation.navigate('MyModal', {
+                    username: callerDetails?.name || 'Unknown',
+                    distance: (callerDetails.lat > 0 && callerDetails.lng > 0) ? Math.round(+(distanceGet(savedLocation.latitude, savedLocation.longitude, callerDetails.lat, callerDetails.lng) || 0)/1000) + 'km' : 'NA',
+                });
+            }
+            else {
+                navigation.navigate(navigationString.HOME_SCREEN);
+            }
+        })()
+    }, [onOffer, callerDetails]);
 
     const startLocalStream = async () => {
         try {
@@ -344,7 +370,7 @@ const VoiceRecorder = ({ iconContainer, iconText }: { iconContainer: any, iconTe
 
             // const timer = setTimeout(() => {
             //     setLeaveCallCount((pre: number) => ++pre);
-            // }, 10000)
+            // }, 15000)
 
             const timerIntervalGet = setInterval(() => {
                 setTimerDigit((pre: number) => ++pre);
