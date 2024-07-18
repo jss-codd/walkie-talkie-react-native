@@ -119,13 +119,13 @@ const notificationPermission = async () => {
 const askInitialPermission = async () => {
     const grantedNotification = await notificationPermission();
     const grantedLocation = await hasLocationPermission();
-    // const audioPermissions = await requestAudioPermissions();
+    const audioPermissions = await requestAudioPermissions();
 
     if (grantedNotification) {
         getFcmToken();
     }
 
-    return grantedLocation && grantedNotification;
+    return grantedLocation && grantedNotification && audioPermissions;
 };
 
 const requestAudioPermissions = async () => {

@@ -22,6 +22,7 @@ import Modals from '../../components/Modals';
 import RouteBox from '../../components/RouteBox';
 import Unmute from '../../assets/svgs/unmute.svg';
 import ToggleNotification from '../../components/ToggleNotification';
+import CustomSocket from '../../components/CustomSocket';
 
 export const LinearGradientComp = ({ children, status, onOffer, style }: { status: boolean, onOffer: boolean, children: any, style?: any }) => {
   return (
@@ -260,7 +261,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
               ))}
             </MapView>
           ) : null}
-        </View>
+        </View>     
 
         {/* Bottom Bar */}
         <View style={{ bottom: 0, height: VP(123), position: "absolute", backgroundColor: "#ffffff", borderTopLeftRadius: 0, borderTopRightRadius: 0, flex: 1 }}>
@@ -277,7 +278,9 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
 
             <ToggleNotification />
 
-            <VoiceRecorder iconContainer={styles.iconContainer} iconText={styles.iconText} navigation={navigation} />
+            {/* <VoiceRecorder iconContainer={styles.iconContainer} iconText={styles.iconText} navigation={navigation} /> */}
+
+            <CustomSocket iconContainer={styles.iconContainer} iconText={styles.iconText} navigation={navigation} />
 
             {/* <Button title="Display" onPress={() => onDisplayNotification('title', 'body')} /> */}
 
