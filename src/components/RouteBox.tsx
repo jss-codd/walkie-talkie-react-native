@@ -1,17 +1,12 @@
 import { View, StyleSheet, Text, TouchableOpacity, Image, TextInput } from 'react-native';
-import { useState } from 'react';
 
 import Menu from '../assets/svgs/menu.svg';
-import { navigationString } from '../utils/navigationString';
 import { TextStyles } from '../utils/TextStyles';
 import { HP, VP } from '../utils/Responsive';
 import RouteSelect from './RouteSelect';
-import MyModal from './ProfileDrawer';
 
 const RouteBox = (props: { route: any; setRoute: any; navigation: any }) => {
     const { route, setRoute, navigation } = props;
-
-    const [modalVisible, setModalVisible] = useState(false);
 
     return (
         <>

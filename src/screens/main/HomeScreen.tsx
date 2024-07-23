@@ -1,29 +1,23 @@
 import React, { useContext, useEffect, useRef, useState, useTransition } from 'react';
-import { View, StyleSheet, AppState, Image, TouchableOpacity, Button } from 'react-native';
+import { View, StyleSheet, AppState, Image, TouchableOpacity } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
 import MapView, { Marker } from 'react-native-maps';
-import axios from 'axios';
 import LinearGradient from 'react-native-linear-gradient';
 import SystemSetting from 'react-native-system-setting'
 
 import { showAlert } from '../../utils/alert';
-import { AlertMessages, apiEndpoints, BACKEND_URL } from '../../utils/constants';;
-import { askInitialPermission, checkPermissions, hasLocationPermissionBG, requestAudioPermissions } from '../../utils/permissions';
-import { clearWatch, getLocation, returnLocation, watchPosition } from '../../utils/location';
-import VoiceRecorder from '../../components/VoiceRecorder';
+import { AlertMessages } from '../../utils/constants';;
+import { askInitialPermission, checkPermissions, hasLocationPermissionBG } from '../../utils/permissions';
+import { clearWatch, getLocation, watchPosition } from '../../utils/location';
 import { FS, HP, VP } from '../../utils/Responsive';
-import { navigationString } from '../../utils/navigationString';
 import { RNText } from '../../components/RNText';
 import { TextStyles } from '../../utils/TextStyles';
-import History from '../../assets/svgs/history.svg';
 import Location from '../../assets/svgs/location.svg';
 import { SettingContext } from '../../context/SettingContext';
 import Modals from '../../components/Modals';
 import RouteBox from '../../components/RouteBox';
-import Unmute from '../../assets/svgs/unmute.svg';
 import ToggleNotification from '../../components/ToggleNotification';
-import CustomSocket from '../../components/CustomSocket';
-import VoiceRecorder1 from '../../components/VoiceRecorder1';
+import VoiceRecorder from '../../components/VoiceRecorder';
 
 export const LinearGradientComp = ({ children, status, onOffer, style }: { status: boolean, onOffer: boolean, children: any, style?: any }) => {
   return (
@@ -57,24 +51,6 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
   const [locationState, setLocationState] = useState(false);
 
-  const fetchNearDevices = async () => {
-    try {
-      const location = await returnLocation();
-
-      const dataPayload = {
-        location: JSON.stringify(location)
-      };
-
-      const response = await axios.post(BACKEND_URL + apiEndpoints.fetchNearDevices, dataPayload);
-
-      // console.log(response.data.data, 'fetchNearDevices')
-
-      // setMarkers(response.data.data || []);
-    } catch (error: any) {
-      console.warn("Error fetching data fetchNearDevices: ", error);
-    }
-  }
-
   // location update on initial load
   useEffect(() => {
     (async () => {
@@ -88,8 +64,6 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
       }
 
       getLocation(setLocation, setLocationRegion, locationRegion, setModalVisible);
-
-      // fetchNearDevices();
     })();
   }, [locationState]);
 
@@ -262,7 +236,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
               ))}
             </MapView>
           ) : null}
-        </View>     
+        </View>
 
         {/* Bottom Bar */}
         <View style={{ bottom: 0, height: VP(123), position: "absolute", backgroundColor: "#ffffff", borderTopLeftRadius: 0, borderTopRightRadius: 0, flex: 1 }}>
@@ -270,25 +244,9 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
             flexDirection: "row", justifyContent: "space-between", width: "100%", margin: "auto", padding: "auto", paddingHorizontal: 16, paddingVertical: 12, alignItems: "center"
           }}>
 
-            {/* <TouchableOpacity style={{ alignItems: "center" }} onPress={() => navigation.navigate(navigationString.LAST_TALK)}>
-              <View style={styles.iconContainer}>
-                <Unmute width={31} height={31} />
-              </View>
-              <RNText textStyle={styles.iconText}>Mute</RNText>
-            </TouchableOpacity> */}
-
             <ToggleNotification />
 
-            {/* <VoiceRecorder iconContainer={styles.iconContainer} iconText={styles.iconText} navigation={navigation} /> */}
-
-            <VoiceRecorder1 iconContainer={styles.iconContainer} iconText={styles.iconText} navigation={navigation} />
-
-            {/* <Button title="Display" onPress={() => onDisplayNotification('title', 'body')} /> */}
-
-            {/* <Button title="Display" onPress={() => navigation.navigate('MyModal', {
-                username: 'Amit Maskare',
-                distance: '100KM',
-            })} /> */}
+            <VoiceRecorder iconContainer={styles.iconContainer} iconText={styles.iconText} navigation={navigation} />
 
             <View style={{ alignItems: "center" }}>
               <LinearGradientComp onOffer={false} status={backgroundListener}>
