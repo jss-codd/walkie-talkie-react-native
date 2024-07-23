@@ -7,6 +7,10 @@ const roomName = 'room';
 const roomJoin = (roomId: number) => {
     socket.emit("roomJoin", roomId);
     socket.emit('join', roomName);
+
+    // socket.emit("join", roomName, (response) => {
+    //     console.log(response.status); // ok
+    // });
 }
 
 const roomLeave = (roomId: number) => {

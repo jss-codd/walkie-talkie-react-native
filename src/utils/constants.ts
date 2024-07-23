@@ -1,4 +1,4 @@
-export const BACKEND_URL = "https://square-immune-hound.ngrok-free.app";
+export const BACKEND_URL = "https://current-fish-manually.ngrok-free.app";
 
 export const apiEndpoints = { pinLogin: "/api/users/pin-login", recordUpload: "/api/users/upload", deviceToken: "/api/users/device-token", saveLocation: "/api/users/save-location", audioPlayStatus: "/api/users/audio-play-status", notificationStatus: "/api/users/notification-status", fetchNearDevices: "/api/users/fetch-near-devices", mobileVerification: "/api/users/mobile-verification", otpVerification: "/api/users/otp-verification", pinSet: "/api/users/pin-set", profileDetails: "/api/users/profile-details", profileUpload: "/api/users/profile-upload", reportUser: "/api/users/report-user", channelList: "/api/users/channel-list", emailSubmit: "/api/users/email-submit", locationSubmit: "/api/users/location-submit", nameSubmit: "/api/users/name-submit" };
 

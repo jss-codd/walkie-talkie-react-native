@@ -95,28 +95,6 @@ function App(): React.JSX.Element {
 
   const contextData = { ...settings, handler: settingHandler, proflieDetails, setProflieDetails, route, setRoute, markers };
 
-  const fetchSettings = async () => {
-    // setLoader(true);
-    const token: any = await loadStorage();
-
-    const dataPayload = {
-      "token": token?.token || ""
-    };
-
-    axios.post(BACKEND_URL + '/fetch-settings', dataPayload)
-      .then(response => {
-        console.log(response.data, 'response.data');
-        const res = { audioPlayStatus: response.data.play_audio, notificationStatus: response.data.status };
-        saveStorage(res, "settings");
-        setSettings(res);
-      })
-      .catch(error => {
-        // setLoader(false);
-        showAlert('Error to fetch', "");
-        console.error("Error fetch data: ", error);
-      });
-  }
-
   // check internet
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state: any) => {
@@ -183,8 +161,6 @@ function App(): React.JSX.Element {
       } else {
         setProflieDetails((pre) => ({ ...userProfile }));
       }
-
-      // fetchSettings();
     })()
   }, [])
 
@@ -198,7 +174,6 @@ function App(): React.JSX.Element {
     });
 
     socket.on('receiveLocation', (data) => {
-      // console.log(data, 'receiveLocation')
       setMarkers(data);
     });
 

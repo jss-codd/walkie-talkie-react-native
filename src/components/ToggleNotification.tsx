@@ -39,36 +39,39 @@ import Mute from '../assets/svgs/mute.svg';
 const ToggleNotification = (): React.JSX.Element => {
     const settings = useContext<any>(SettingContext);
 
-    const notificationStatus = settings.proflieDetails.status;
+    const notificationStatus = settings.notificationStatus;
 
-    const [loader, setLoader] = useState(false);
+    // const [loader, setLoader] = useState(false);
 
     const toggleNotification = async () => {
-        setLoader(true);
+        // setLoader(true);
 
         const dataPayload = {
             "status": !notificationStatus
         };
 
-        axios.put(BACKEND_URL + apiEndpoints.notificationStatus, dataPayload)
-            .then(response => {
-                // settings.handler('notificationStatus', !notificationStatus);
-                settings.setProflieDetails((pre: any) => ({ ...pre, status: response?.data?.status }))
-                setLoader(false)
-            })
-            .catch(error => {
-                setLoader(false);
-                showAlert('Error to change', "");
-                console.warn("Error sending data: ", error);
+        settings.handler('notificationStatus', !notificationStatus);
 
-                console.warn(error.response.data, 'error.response.data');
-                console.warn(error.response.status, 'error.response.status');
-            });
+        // setLoader(false);
+
+        // axios.put(BACKEND_URL + apiEndpoints.notificationStatus, dataPayload)
+        //     .then(response => {
+        //         settings.setProflieDetails((pre: any) => ({ ...pre, status: response?.data?.status }))
+        //         setLoader(false)
+        //     })
+        //     .catch(error => {
+        //         setLoader(false);
+        //         showAlert('Error to change', "");
+        //         console.warn("Error sending data: ", error);
+
+        //         console.warn(error.response.data, 'error.response.data');
+        //         console.warn(error.response.status, 'error.response.status');
+        //     });
     }
 
     return (
         <>
-            <Loader loading={loader} />
+            {/* <Loader loading={loader} /> */}
             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => toggleNotification()}>
                 <View style={styles.iconContainer}>
                     {notificationStatus ? <Unmute width={31} height={31} /> : (<Mute width={31} height={31} />)}
