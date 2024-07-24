@@ -191,7 +191,7 @@ function ReceiverScreen({ route, navigation }: { route: any, navigation: any }) 
             >
                 <RNText textStyle={{ ...TextStyles.SOFIA_SEMI_BOLD, color: '#fff', textAlign: "center", fontSize: HP(16), marginBottom: VP(16) }}>{callerName}</RNText>
 
-                <BorderAnimation>
+                <BorderAnimation animationStatus={true}>
                 </BorderAnimation>
 
                 <View style={{

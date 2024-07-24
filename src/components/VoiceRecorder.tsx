@@ -8,10 +8,12 @@ import { LinearGradientComp } from '../screens/main/HomeScreen';
 import { socket } from '../../socket';
 import { HP } from '../utils/Responsive';
 import { SettingContext } from '../context/SettingContext';
+import { showFadeAlert } from '../utils/alert';
+import { roomName } from '../navigations/MainTabNavigator';
 
 const VoiceRecorder = ({ iconContainer, navigation }: { iconContainer: any, iconText: any, navigation: any }) => {
     const settings = useContext<any>(SettingContext);
-    
+
     const buttonRef = useRef<any>(null);
 
     useEffect(() => {
@@ -43,8 +45,13 @@ const VoiceRecorder = ({ iconContainer, navigation }: { iconContainer: any, icon
                 return;
             }
 
-            navigation.navigate('CallerScreen', {
-            })
+            socket.emit('checkCall', roomName, (data: boolean) => {
+                if (data) {
+                    navigation.navigate('CallerScreen')
+                } else {
+                    showFadeAlert('Can not connect, Call is already initiated by another user!');
+                }
+            });
         } catch (error) {
             console.error('Error startLocalStream: ', error);
         }

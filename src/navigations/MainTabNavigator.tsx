@@ -13,7 +13,7 @@ import ReceiverScreen from '../screens/calls/ReceiverScreen';
 
 export const roomName = 'room';
 
-export const BorderAnimation = () => {
+export const BorderAnimation = ({ animationStatus = true }: { animationStatus: boolean }) => {
     const [fadeAnim1] = useState(new Animated.Value(1));
 
     React.useEffect(() => {
@@ -33,9 +33,9 @@ export const BorderAnimation = () => {
                 }),
             ]).start(() => runAnimation());
         };
-
-        runAnimation();
-    }, []);
+        if (animationStatus)
+            runAnimation();
+    }, [animationStatus]);
 
     return (
         <Animated.View

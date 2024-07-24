@@ -31,8 +31,11 @@ function CallerScreen({ route, navigation }: { route: any, navigation: any }) {
 
     let remoteRTCMessage = useRef<any>(null);
     const otherUserId = useRef(null);
+    const callConnectedOnce = useRef<any>(null);
 
     useEffect(() => {
+        callConnectedOnce.current = 0;
+
         socket.emit('joinRoom', {
             roomId: roomName,
             userType: 'caller'
@@ -50,16 +53,20 @@ function CallerScreen({ route, navigation }: { route: any, navigation: any }) {
                             new RTCSessionDescription(remoteRTCMessage.current),
                         )
                         .then(() => {
-                            setCallConnected(true);
-                            const timerIntervalGet = setInterval(() => {
-                                setTimerDigit((pre: number) => ++pre);
-                            }, 1000);
-                            setTimerInterval(timerIntervalGet);
+                            if (callConnectedOnce.current === 0) {
+                                setCallConnected(true);
+                                const timerIntervalGet = setInterval(() => {
+                                    setTimerDigit((pre: number) => ++pre);
+                                }, 1000);
+                                setTimerInterval(timerIntervalGet);
 
-                            const timer = setTimeout(() => {
-                                setLeaveCallCount((pre: number) => ++pre);
-                            }, 15000)
-                            setTimerState(timer);
+                                const timer = setTimeout(() => {
+                                    setLeaveCallCount((pre: number) => ++pre);
+                                }, 15000)
+                                setTimerState(timer);
+
+                                callConnectedOnce.current++;
+                            }
                         })
                         .catch((error: any) =>
                             console.error('Failed to set remote description:', error),
@@ -279,7 +286,7 @@ function CallerScreen({ route, navigation }: { route: any, navigation: any }) {
                 end={{ x: 1, y: 1 }}
                 style={{ flex: 1, justifyContent: "center", alignItems: "center", height: "100%", width: "100%", position: "absolute" }}
             >
-                <BorderAnimation>
+                <BorderAnimation animationStatus={callConnected}>
                 </BorderAnimation>
 
                 <TouchableOpacity style={{
