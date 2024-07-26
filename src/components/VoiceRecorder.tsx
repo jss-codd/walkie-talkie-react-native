@@ -10,18 +10,18 @@ import { HP } from '../utils/Responsive';
 import { SettingContext } from '../context/SettingContext';
 import { showFadeAlert } from '../utils/alert';
 import { roomName } from '../navigations/MainTabNavigator';
+import { useSelector } from 'react-redux';
+import { notificationStatus } from '../redux/features/settings';
 
 const VoiceRecorder = ({ iconContainer, navigation }: { iconContainer: any, iconText: any, navigation: any }) => {
-    const settings = useContext<any>(SettingContext);
+    const NotificationStatus = useSelector(notificationStatus);
 
     const buttonRef = useRef<any>(null);
 
     useEffect(() => {
-        if (settings.notificationStatus) {
+        if (NotificationStatus) {
             socket.on('calling', async (name, location) => {
                 try {
-                    console.log(settings.proflieDetails.mobile, '-----------------calling');
-
                     navigation.navigate('ReceiverScreen', {
                         name: name,
                         location: location
@@ -35,7 +35,7 @@ const VoiceRecorder = ({ iconContainer, navigation }: { iconContainer: any, icon
                 socket.off('calling');
             }
         }
-    }, [settings.notificationStatus])
+    }, [NotificationStatus])
 
     const startLocalStream = async () => {
         try {

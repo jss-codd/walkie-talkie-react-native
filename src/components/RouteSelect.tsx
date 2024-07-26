@@ -6,27 +6,30 @@ import { getCameraList, getChannelList, getActionIconList } from '../utils/apiCa
 import Arrow from '../assets/svgs/arrow-narrow-right.svg';
 import { roomJoin } from '../utils/socketEvents';
 import { SettingContext } from '../context/SettingContext';
+import { routeItems, setRoute } from '../redux/features/route';
+import { useDispatch, useSelector } from 'react-redux';
+import { setActionIconMarker, setCameraMarker } from '../redux/features/markers';
 
 const RouteSelect = () => {
-    const settings = useContext<any>(SettingContext);
+    const dispatch = useDispatch();
 
-    const { setRoute, setCameraMarkers, setActionIconMarkers, channelItems }: { setRoute: Dispatch<SetStateAction<any>>, setCameraMarkers: Dispatch<SetStateAction<any[]>>, setActionIconMarkers: Dispatch<SetStateAction<any[]>>, channelItems: any[] } = settings;
+    const channelItems = useSelector(routeItems);
 
     const selectRouteHandler = async (selectedItem: any) => {
-        setRoute(selectedItem);
+        dispatch(setRoute(selectedItem));
 
         roomJoin(selectedItem.value);
 
         const data = await getCameraList(selectedItem.value);
 
         if (data?.list) {
-            setCameraMarkers(data.list);
+            dispatch(setCameraMarker(data.list));
         }
 
         const dataActionIcon = await getActionIconList(selectedItem.value);
 
         if (dataActionIcon?.list) {
-            setActionIconMarkers(dataActionIcon.list);
+            dispatch(setActionIconMarker(dataActionIcon.list));
         }
     }
 

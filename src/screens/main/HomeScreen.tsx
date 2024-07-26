@@ -4,6 +4,7 @@ import BackgroundTimer from 'react-native-background-timer';
 import MapView, { Marker } from 'react-native-maps';
 import LinearGradient from 'react-native-linear-gradient';
 import SystemSetting from 'react-native-system-setting'
+import { useDispatch, useSelector } from 'react-redux';
 
 import { showAlert } from '../../utils/alert';
 import { AlertMessages } from '../../utils/constants';;
@@ -22,6 +23,22 @@ import MapIconsAction from '../../components/MapIconsAction';
 import { useIsFocused } from '@react-navigation/native';
 import { roomJoin } from '../../utils/socketEvents';
 import { TimeAgo } from '../../utils/timeAgo';
+import { loadStorage, saveStorage } from '../../utils/storage';
+import { notificationStatus, setSettings } from '../../redux/features/settings';
+import { proflieDetails, setProflieDetails } from '../../redux/features/profile';
+import { selectedRoute, setRouteItems } from '../../redux/features/route';
+import { actionIconMarkers, appendActionIconMarker, appendCameraMarker, cameraMarkers, setUserMarker, userMarkers } from '../../redux/features/markers';
+import { socket } from '../../../socket';
+import { getChannelList } from '../../utils/apiCall';
+
+const fetchChannels = async () => {
+  const response = await getChannelList();
+
+  if (response?.list) {
+    return response?.list;
+  }
+  return [];
+}
 
 export const LinearGradientComp = ({ children, status, onOffer, style }: { status: boolean, onOffer: boolean, children: any, style?: any }) => {
   return (
@@ -40,11 +57,16 @@ export const LinearGradientComp = ({ children, status, onOffer, style }: { statu
 }
 
 function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
-  const settings = useContext<any>(SettingContext);
-
-  const { markers, proflieDetails, cameraMarkers, route, actionIconMarkers } = settings;
+  const dispatch = useDispatch();
 
   const isFocused = useIsFocused();
+
+  const NotificationStatus = useSelector(notificationStatus);
+  const ProflieDetails = useSelector(proflieDetails);
+  const route = useSelector(selectedRoute);
+  const markers = useSelector(userMarkers);
+  const CameraMarkers = useSelector(cameraMarkers);
+  const ActionIconMarkers = useSelector(actionIconMarkers);
 
   const [isPending, startTransition] = useTransition();
 
@@ -142,6 +164,52 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
     }
   }, [isFocused]);
 
+  // fetch settings & profile details from storage
+  useEffect(() => {
+    (async () => {
+      const settingsData = await loadStorage("settings");
+
+      if (!settingsData || !settingsData.hasOwnProperty("notificationStatus")) {
+        saveStorage({ notificationStatus: NotificationStatus }, "settings");
+      } else {
+        dispatch(setSettings(settingsData));
+      }
+    })()
+  }, [])
+
+  // fetch channel items
+  useEffect(() => {
+    (async () => {
+      const list = await fetchChannels();
+
+      if (list && list.length > 0) {
+        const channelListMap = list.map((d: { starting_loc_address: string; destination_loc_address: string; id: number; }) => { return { starting_loc_address: d.starting_loc_address, destination_loc_address: d.destination_loc_address, value: d.id } });
+
+        dispatch(setRouteItems(channelListMap));
+      }
+    })()
+  }, [])
+
+  // socket events
+  useEffect(() => {
+    socket.on('receiveLocation', (data) => {
+      dispatch(setUserMarker(data));
+    });
+
+    socket.on('receiveActionIconLocation', (data: any) => {
+      if (data?.type === 'camera') {
+        dispatch(appendCameraMarker({ lat: data.lat, lng: data.lng }));
+      } else {
+        dispatch(appendActionIconMarker({ lat: data.lat, lng: data.lng, type: data.type, createdAt: data.createdAt }));
+      }
+    });
+
+    return () => {
+      socket.off('receiveLocation');
+      socket.off('receiveActionIconLocation');
+    };
+  }, [])
+
   const startTask = () => {
     console.log('Watcher started');
     hasLocationPermissionBG().then(function (res) {
@@ -206,7 +274,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
               {/* markers for other route users */}
               {markers && markers?.map((marker: any, index: number) => (
                 <React.Fragment key={index.toString()}>
-                  {proflieDetails.id !== marker.id && (
+                  {ProflieDetails.id !== marker.id && (
                     <Marker
                       rotation={+marker.heading || 0}
                       coordinate={{
@@ -229,10 +297,8 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 </React.Fragment>
               ))}
 
-              {/* {console.log(cameraMarkers, '------------cameraMarkers')} */}
-
               {/* markers for cameras for selected route */}
-              {cameraMarkers && cameraMarkers?.map((marker: any, index: number) => (
+              {CameraMarkers && CameraMarkers?.map((marker: any, index: number) => (
                 <React.Fragment key={(Math.random() + index).toString()}>
                   <Marker
                     coordinate={{
@@ -252,10 +318,10 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 </React.Fragment>
               ))}
 
-              {/* {console.log(actionIconMarkers, '---------actionIconMarkers')} */}
+              {/* {console.log(ActionIconMarkers, '---------actionIconMarkers')} */}
 
               {/* markers for other icon action for selected route */}
-              {actionIconMarkers && actionIconMarkers?.map((marker: any, index: number) => (
+              {ActionIconMarkers && ActionIconMarkers?.map((marker: any, index: number) => (
                 <React.Fragment key={(Math.random() + index).toString()}>
                   <Marker
                     coordinate={{
@@ -265,18 +331,18 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                     zIndex={999}
                   >
                     <View>
-                      <View style={{ bottom: VP(-8) }}>
-                        <View style={{ backgroundColor: "#341049", flexDirection: "row", borderRadius: 50, borderWidth: 1, borderColor: "#341049", alignItems: "center", padding: 2, justifyContent: "space-around" }}>
+                      {marker?.createdAt && (
+                        <View style={{ bottom: VP(-8) }}>
+                          <View style={{ backgroundColor: "#341049", flexDirection: "row", borderRadius: 50, borderWidth: 1, borderColor: "#341049", alignItems: "center", padding: 2, justifyContent: "space-around" }}>
 
-                          {marker?.createdAt && (
                             <RNText textStyle={{ ...TextStyles.SOFIA_SEMI_BOLD, fontSize: FS(10), color: "#fff", paddingHorizontal: 5 }}>
                               {TimeAgo.inWords(new Date(marker.createdAt).getTime())}
                             </RNText>
-                          )}
-                        </View>
+                          </View>
 
-                        <Image resizeMode="contain" source={require("../../assets/icons/down.png")} style={{ width: HP(13), height: VP(8), left: 8, top: -2 }} />
-                      </View>
+                          <Image resizeMode="contain" source={require("../../assets/icons/down.png")} style={{ width: HP(13), height: VP(8), left: 8, top: -2 }} />
+                        </View>
+                      )}
 
                       {marker.type === 'policeman' && (
                         <Image

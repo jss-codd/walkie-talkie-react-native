@@ -16,12 +16,15 @@ import Loader from './Loader';
 import { submitEmailDetails, submitLocationDetails, submitNameDetails, submitProfileDetails } from '../utils/apiCall';
 import { showFadeAlert } from '../utils/alert';
 import Close from '../assets/svgs/close.svg';
+import { proflieDetails } from '../redux/features/profile';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ProfileDrawer = (props: { navigation: any; }) => {
     const { navigation } = props;
-    const nameRef = useRef<any>(null);
+    
+    const dispatch = useDispatch();
 
-    const settings = useContext<any>(SettingContext);
+    const ProflieDetails = useSelector(proflieDetails);
 
     const [profile, setProfile] = useState<any>({});
     const [editMode, setEditMode] = useState<any>({ email: false, location: false, name: false });
@@ -54,7 +57,7 @@ const ProfileDrawer = (props: { navigation: any; }) => {
                 email: profile.email
             };
 
-            const res = await submitEmailDetails(dataPayload, settings);
+            const res = await submitEmailDetails(dataPayload, dispatch);
 
             setLoader(false);
 
@@ -66,7 +69,7 @@ const ProfileDrawer = (props: { navigation: any; }) => {
             setLoader(false);
             setEditMode((pre: any) => ({ ...pre, email: false }));
             showFadeAlert('Failed to update!');
-            setProfile(settings.proflieDetails)
+            setProfile(ProflieDetails)
         }
     }
 
@@ -92,7 +95,7 @@ const ProfileDrawer = (props: { navigation: any; }) => {
                 location: profile.location
             };
 
-            const res = await submitLocationDetails(dataPayload, settings);
+            const res = await submitLocationDetails(dataPayload, dispatch);
 
             setLoader(false);
 
@@ -104,7 +107,7 @@ const ProfileDrawer = (props: { navigation: any; }) => {
             setLoader(false);
             setEditMode((pre: any) => ({ ...pre, location: false }));
             showFadeAlert('Failed to update!');
-            setProfile(settings.proflieDetails)
+            setProfile(ProflieDetails)
         }
     }
 
@@ -130,7 +133,7 @@ const ProfileDrawer = (props: { navigation: any; }) => {
                 name: profile.name
             };
 
-            const res = await submitNameDetails(dataPayload, settings);
+            const res = await submitNameDetails(dataPayload, dispatch);
 
             setLoader(false);
 
@@ -142,13 +145,13 @@ const ProfileDrawer = (props: { navigation: any; }) => {
             setLoader(false);
             setEditMode((pre: any) => ({ ...pre, name: false }));
             showFadeAlert('Failed to update!');
-            setProfile(settings.proflieDetails)
+            setProfile(ProflieDetails)
         }
     }
 
     useEffect(() => {
-        setProfile(settings.proflieDetails)
-    }, [settings.proflieDetails])
+        setProfile(ProflieDetails)
+    }, [ProflieDetails])
 
     return (
         <>

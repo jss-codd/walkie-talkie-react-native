@@ -2,6 +2,8 @@ import axios from "axios";
 
 import { apiEndpoints, BACKEND_URL } from "./constants";
 import { saveStorage } from "./storage";
+import { setProflieDetails } from "../redux/features/profile";
+import { Dispatch, UnknownAction } from "@reduxjs/toolkit";
 
 const saveLocation = async (dataPayload: any) => {
   const { latitude, longitude } = dataPayload;
@@ -27,19 +29,6 @@ const refreshAuthToken = async (dataPayload: any) => {
   });
 }
 
-const getProfileDetails = async (settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
-  try {
-    const res = await axios.get(BACKEND_URL + apiEndpoints.profileDetails);
-    saveStorage(res.data.data, "userProfile");
-    settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
-    console.log(res.data, '---------------getProfileDetails');
-    return res.data;
-  } catch (error: any) {
-    console.error("Error getProfileDetails: ", (error.response.data.error || error));
-    return {};
-  }
-}
-
 const submitProfileDetails = async (dataPayload: any, settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
   try {
     const res = await axios.post(BACKEND_URL + apiEndpoints.profileDetails, dataPayload);
@@ -52,11 +41,11 @@ const submitProfileDetails = async (dataPayload: any, settings: { setProflieDeta
   }
 }
 
-const submitEmailDetails = async (dataPayload: any, settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
+const submitEmailDetails = async (dataPayload: any, dispatch: Dispatch<UnknownAction>) => {
   try {
     const res = await axios.post(BACKEND_URL + apiEndpoints.emailSubmit, dataPayload);
     saveStorage(res.data.data, "userProfile");
-    settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
+    dispatch(setProflieDetails(res.data.data));
     return res.data;
   } catch (error: any) {
     console.error("Error submitEmailDetails: ", error);
@@ -64,11 +53,11 @@ const submitEmailDetails = async (dataPayload: any, settings: { setProflieDetail
   }
 }
 
-const submitLocationDetails = async (dataPayload: any, settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
+const submitLocationDetails = async (dataPayload: any, dispatch: Dispatch<UnknownAction>) => {
   try {
     const res = await axios.post(BACKEND_URL + apiEndpoints.locationSubmit, dataPayload);
     saveStorage(res.data.data, "userProfile");
-    settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
+    dispatch(setProflieDetails(res.data.data));
     return res.data;
   } catch (error: any) {
     console.error("Error submitLocationDetails: ", error);
@@ -76,11 +65,11 @@ const submitLocationDetails = async (dataPayload: any, settings: { setProflieDet
   }
 }
 
-const submitNameDetails = async (dataPayload: any, settings: { setProflieDetails: (arg0: (pre: any) => any) => void; }) => {
+const submitNameDetails = async (dataPayload: any, dispatch: Dispatch<UnknownAction>) => {
   try {
     const res = await axios.post(BACKEND_URL + apiEndpoints.nameSubmit, dataPayload);
     saveStorage(res.data.data, "userProfile");
-    settings.setProflieDetails((pre: any) => ({ ...pre, ...res?.data?.data }))
+    dispatch(setProflieDetails(res.data.data));
     return res.data;
   } catch (error: any) {
     console.error("Error submitNameDetails: ", error);
@@ -141,4 +130,4 @@ const getActionIconList = async (route: number) => {
   }
 }
 
-export { saveLocation, refreshAuthToken, getProfileDetails, submitProfileDetails, reportUserCall, getChannelList, submitEmailDetails, submitLocationDetails, submitNameDetails, iconTapSubmit, getCameraList, getActionIconList };
+export { saveLocation, refreshAuthToken, submitProfileDetails, reportUserCall, getChannelList, submitEmailDetails, submitLocationDetails, submitNameDetails, iconTapSubmit, getCameraList, getActionIconList };

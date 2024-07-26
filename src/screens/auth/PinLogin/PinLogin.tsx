@@ -15,6 +15,8 @@ import OTPInput from '../../../components/OTPInput';
 import { showAlert } from '../../../utils/alert';
 import { maskInput } from '../../../utils/commonHelper';
 import { SettingContext } from '../../../context/SettingContext';
+import { useDispatch } from 'react-redux';
+import { setProflieDetails } from '../../../redux/features/profile';
 
 const pinCheck = /^[0-9]{4}$/;
 const otpRetryCount = 5;
@@ -22,7 +24,7 @@ const otpRetryCount = 5;
 const PinLogin: React.FunctionComponent<any> = ({
     navigation,
 }) => {
-    const settings = useContext<any>(SettingContext);
+    const dispatch = useDispatch();
 
     const [pin, setPin] = useState('1111');
     const [errorPin, setErrorPin] = useState({ status: false, text: "" });
@@ -57,7 +59,7 @@ const PinLogin: React.FunctionComponent<any> = ({
                         saveStorage({ ...userDetails, "mobile": response.data.mobile, "jwt": response.data.jwt }, "userDetails");
 
                         saveStorage(response.data.data, "userProfile");
-                        settings.setProflieDetails((pre: any) => ({ ...pre, ...response?.data?.data }))
+                        dispatch(setProflieDetails(response?.data?.data));
 
                         navigation.reset({
                             index: 0,

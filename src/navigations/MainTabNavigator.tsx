@@ -3,10 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Animated, Easing } from 'react-native';
 
 import HomeScreen from '../screens/main/HomeScreen';
-import SettingsScreen from '../screens/main/SettingsScreen';
 import RecordingListScreen from '../screens/main/RecordingListScreen';
 import { navigationString } from '../utils/navigationString';
-import ProfileScreen from '../screens/main/ProfileScreen';
 import ProfileDrawer from '../components/ProfileDrawer';
 import CallerScreen from '../screens/calls/CallerScreen';
 import ReceiverScreen from '../screens/calls/ReceiverScreen';
@@ -84,14 +82,6 @@ const MainTabNavigator: React.FunctionComponent = () => {
             <Stack.Screen
                 name={navigationString.HOME_SCREEN}
                 component={HomeScreen}
-            />
-            <Stack.Screen
-                name={navigationString.PROFILE_SCREEN}
-                component={ProfileScreen}
-            />
-            <Stack.Screen
-                name={navigationString.SETTING_SCREEN}
-                component={SettingsScreen}
             />
             <Stack.Screen
                 name={navigationString.LAST_TALK}

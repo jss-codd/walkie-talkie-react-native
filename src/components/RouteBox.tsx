@@ -7,19 +7,22 @@ import { RouteSelectMemo } from './RouteSelect';
 import { roomLeave } from '../utils/socketEvents';
 import { Dispatch, memo, SetStateAction, useContext } from 'react';
 import { SettingContext } from '../context/SettingContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectedRoute, setRoute } from '../redux/features/route';
+import { resetActionIconMarker, resetCameraMarker } from '../redux/features/markers';
 
 const RouteBox = (props: { navigation: any; }) => {
     const { navigation } = props;
 
-    const settings = useContext<any>(SettingContext);
+    const dispatch = useDispatch();
 
-    const { route, setRoute, setCameraMarkers, setActionIconMarkers }: { route: any, setRoute: Dispatch<SetStateAction<any>>, setCameraMarkers: Dispatch<SetStateAction<any[]>>, setActionIconMarkers: Dispatch<SetStateAction<any[]>> } = settings;
+    const route = useSelector(selectedRoute);
 
     const resetRoute = () => {
         roomLeave(route.value);
-        setRoute({});
-        setCameraMarkers([]);
-        setActionIconMarkers([]);
+        dispatch(setRoute({}));
+        dispatch(resetCameraMarker());
+        dispatch(resetActionIconMarker());
     }
 
     return (

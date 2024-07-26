@@ -16,6 +16,8 @@ import { loadStorage, saveStorage } from '../../../utils/storage';
 import OTPInput from '../../../components/OTPInput';
 import { showAlert } from '../../../utils/alert';
 import { SettingContext } from '../../../context/SettingContext';
+import { useDispatch } from 'react-redux';
+import { setProflieDetails } from '../../../redux/features/profile';
 
 const pinSteps = { currentStep: 1, pin1: "", pin2: "" }
 
@@ -24,7 +26,7 @@ const pinCheck = /^[0-9]{4}$/;
 const PinSet: React.FunctionComponent<any> = ({
     navigation,
 }) => {
-    const settings = useContext<any>(SettingContext);
+    const dispatch = useDispatch();
     
     const [pin1, setPin1] = useState('');
     const [errorPin1, setErrorPin1] = useState({ status: false, text: "" });
@@ -91,8 +93,7 @@ const PinSet: React.FunctionComponent<any> = ({
                         saveStorage({ ...userDetails, "pin": response.data.pin }, "userDetails");
 
                         saveStorage(response.data.data, "userProfile");
-                        settings.setProflieDetails((pre: any) => ({ ...pre, ...response?.data?.data }))
-
+                        dispatch(setProflieDetails(response?.data?.data));
                         navigation.reset({
                             index: 0,
                             routes: [

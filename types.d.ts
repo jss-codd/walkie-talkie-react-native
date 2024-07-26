@@ -1,7 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
-interface ProfileDetails {
+interface ProfileDetailsInterface {
     name: string;
     email: string;
+    mobile: string;
+    location: string;
+    profile_img: string;
+    id?: number;
 }
 
 interface ModalInterface {

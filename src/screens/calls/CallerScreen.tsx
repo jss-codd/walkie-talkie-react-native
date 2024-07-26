@@ -19,7 +19,7 @@ import { BorderAnimation, roomName } from "../../navigations/MainTabNavigator";
 let peerConnection: any = {};
 let localStreamData: any;
 
-function CallerScreen({ route, navigation }: { route: any, navigation: any }) {
+function CallerScreen({ navigation }: { navigation: any }) {
     const [timerDigit, setTimerDigit] = useState<any>(0);
 
     const [remoteStream, setRemoteStream] = useState<any>([]);
@@ -156,10 +156,10 @@ function CallerScreen({ route, navigation }: { route: any, navigation: any }) {
                         peerConnection[data.sender].ontrack = (event: { streams: any[]; }) => {
                             setRemoteStream(event.streams[0]);
                         };
-                        sendCall({
-                            rtcMessage: sessionDescription,
-                            roomId: data.sender,
-                        });
+                        // sendCall({
+                        //     rtcMessage: sessionDescription,
+                        //     roomId: data.sender,
+                        // });
                     } else if (
                         Object.keys(peerConnection).length > 0 &&
                         peerConnection[data.sender].iceConnectionState === 'failed'
@@ -171,10 +171,10 @@ function CallerScreen({ route, navigation }: { route: any, navigation: any }) {
                             sessionDescription,
                         );
 
-                        sendCall({
-                            rtcMessage: sessionDescription,
-                            roomId: data.sender,
-                        });
+                        // sendCall({
+                        //     rtcMessage: sessionDescription,
+                        //     roomId: data.sender,
+                        // });
                     } else if (
                         Object.keys(peerConnection).length > 0 &&
                         peerConnection[data.sender].iceConnectionState === 'disconnected'
@@ -241,6 +241,8 @@ function CallerScreen({ route, navigation }: { route: any, navigation: any }) {
 
     function sendCall(data: { rtcMessage: any; roomId: any; }) {
         socket.emit('teacherLive', data);
+
+        InCallManager.setSpeakerphoneOn(true);
         InCallManager.setForceSpeakerphoneOn(true);
     }
 

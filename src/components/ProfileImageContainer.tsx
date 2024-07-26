@@ -10,6 +10,8 @@ import Loader from './Loader';
 import { showAlert, showFadeAlert } from '../utils/alert';
 import { SettingContext } from '../context/SettingContext';
 import { saveStorage } from '../utils/storage';
+import { useDispatch } from 'react-redux';
+import { setProflieDetails } from '../redux/features/profile';
 
 const createFormData = (photo: { fileName: any; type: any; uri: string; }, body: any = {}) => {
     const data: any = new FormData();
@@ -28,7 +30,7 @@ const createFormData = (photo: { fileName: any; type: any; uri: string; }, body:
 };
 
 function ProfileImageContainer(props: any) {
-    const settings = useContext<any>(SettingContext);
+    const dispatch = useDispatch();
 
     const { profile } = props;
 
@@ -60,10 +62,10 @@ function ProfileImageContainer(props: any) {
                     'accept': 'application/json',
                 }
             });
+            
             saveStorage(res.data.data, "userProfile");
-            settings.setProflieDetails((pre: any) => ({ ...pre, ...res.data.data }))
+            dispatch(setProflieDetails(res.data.data));
             setLoader(false);
-
             showFadeAlert("Profile image uploaded successfully");
         } catch (error: any) {
             setLoader(false);

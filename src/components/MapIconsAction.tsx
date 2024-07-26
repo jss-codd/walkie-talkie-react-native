@@ -16,11 +16,15 @@ import { showAlert, showFadeAlert } from '../utils/alert';
 import { AlertMessages, errorMessage, mapActionIcons } from '../utils/constants';
 import { socket } from '../../socket';
 import { mapActionIconComponents } from '../../types';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectedRoute } from '../redux/features/route';
+import { appendActionIconMarker, appendCameraMarker, setCameraMarker } from '../redux/features/markers';
 
 const MapIconsAction = (): React.JSX.Element => {
     const settings = useContext<any>(SettingContext);
+    const dispatch = useDispatch();
 
-    const { route, setCameraMarkers, setActionIconMarkers }: { route: any, setCameraMarkers: Dispatch<SetStateAction<any[]>>, setActionIconMarkers: Dispatch<SetStateAction<any[]>> } = settings;
+    const route = useSelector(selectedRoute);
 
     const [loader, setLoader] = useState(false);
 
@@ -45,9 +49,9 @@ const MapIconsAction = (): React.JSX.Element => {
 
             if (res?.latitude && res?.longitude && res?.type) {
                 if (res.type === 'camera') {
-                    setCameraMarkers((pre: any) => ([...pre, { lat: res.latitude, lng: res.longitude }]));
+                    dispatch(appendCameraMarker({ lat: res.latitude, lng: res.longitude }));
                 } else {
-                    setActionIconMarkers((pre: any) => ([...pre, { lat: res.latitude, lng: res.longitude, type: res.type, createdAt: '' }]));
+                    dispatch(appendActionIconMarker({ lat: res.latitude, lng: res.longitude, type: res.type, createdAt: '' }));
                 }
                 socket.emit('sendActionIconLocation', {
                     roomId: route.value,

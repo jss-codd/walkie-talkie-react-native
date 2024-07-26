@@ -10,25 +10,11 @@ import HeadlessTask from './HeadlessTask';
 import { showAlert } from './src/utils/alert';
 import { AlertMessages, BACKEND_URL } from './src/utils/constants';
 import { loadStorage, recordingStorage, saveStorage } from './src/utils/storage';
-import { SettingContext } from './src/context/SettingContext';
 import MainStackNavigator from './src/navigations/MainStackNavigator';
 import { getChannelList, refreshAuthToken } from './src/utils/apiCall';
 import { onDisplayNotification } from './src/utils/notifeeHelper';
 import { socket } from './socket';
 import store from './src/redux/store';
-
-const settingsDefault = {
-  notificationStatus: true,
-  audioPlayStatus: true
-}
-
-const profileDefault = {
-  name: "",
-  email: "",
-  mobile: "",
-  location: "",
-  profile_img: ""
-}
 
 axios.interceptors.request.use(
   async config => {
@@ -83,31 +69,8 @@ axios.interceptors.response.use(
 LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
 
-const fetchChannels = async () => {
-  const response = await getChannelList();
-
-  if (response?.list) {
-    return response?.list;
-  }
-  return [];
-}
-
 function App(): React.JSX.Element {
   const [isConnected, setConnected] = useState(true);
-  const [settings, setSettings] = useState(settingsDefault);
-  const [proflieDetails, setProflieDetails] = useState(profileDefault);
-  const [route, setRoute] = useState({});
-  const [markers, setMarkers] = useState([]);
-  const [cameraMarkers, setCameraMarkers] = useState<any[]>([]);
-  const [actionIconMarkers, setActionIconMarkers] = useState<any[]>([]);
-  const [channelItems, setChannelItems] = useState([]);
-
-  const settingHandler = (key: any, data: any) => {
-    saveStorage({ ...settings, [key]: data }, "settings");
-    setSettings((pre) => ({ ...pre, [key]: data }));
-  }
-
-  const contextData = { ...settings, handler: settingHandler, proflieDetails, setProflieDetails, route, setRoute, markers, cameraMarkers, setCameraMarkers, actionIconMarkers, setActionIconMarkers, channelItems };
 
   // check internet
   useEffect(() => {
@@ -158,26 +121,6 @@ function App(): React.JSX.Element {
     return handleBackgroundNotification;
   }, []);
 
-  // fetch settings
-  useEffect(() => {
-    (async () => {
-      const settingsData = await loadStorage("settings");
-      const userProfile = await loadStorage("userProfile");
-
-      if (!settingsData || !settingsData.hasOwnProperty("notificationStatus")) {
-        saveStorage(settings, "settings");
-      } else {
-        setSettings((pre) => ({ ...settingsData }));
-      }
-
-      if (!userProfile || !userProfile.hasOwnProperty("name")) {
-        saveStorage(proflieDetails, "userProfile");
-      } else {
-        setProflieDetails((pre) => ({ ...userProfile }));
-      }
-    })()
-  }, [])
-
   // handle socket events
   useEffect(() => {
     socket.on('connect', () => {
@@ -188,37 +131,11 @@ function App(): React.JSX.Element {
       console.log('Reconnected to server');
     });
 
-    socket.on('receiveLocation', (data) => {
-      setMarkers(data);
-    });
-
-    socket.on('receiveActionIconLocation', (data: any) => {
-      console.log('------------receiveActionIconLocation');
-      if (data?.type === 'camera') {
-        setCameraMarkers((pre) => ([...pre, { lat: data.lat, lng: data.lng }]));
-      } else {
-        setActionIconMarkers((pre) => ([...pre, { lat: data.lat, lng: data.lng }]));
-      }
-    });
-
     return () => {
       console.log('----------------disconnect');
-      socket.off('receiveLocation');
-      socket.off('receiveCameraLocation');
       socket.disconnect();
     };
   }, []);
-
-  // fetch channel items
-  useEffect(() => {
-    (async () => {
-      const list = await fetchChannels();
-
-      if (list && list.length > 0) {
-        setChannelItems(list.map((d: { starting_loc_address: string; destination_loc_address: string; id: number; }) => { return { starting_loc_address: d.starting_loc_address, destination_loc_address: d.destination_loc_address, value: d.id } }))
-      }
-    })()
-  }, [])
 
   if (isConnected === false) {
     return (
@@ -232,11 +149,9 @@ function App(): React.JSX.Element {
 
   return (
     <Provider store={store}>
-      <SettingContext.Provider value={contextData}>
-        <NavigationContainer>
-          <MainStackNavigator />
-        </NavigationContainer>
-      </SettingContext.Provider>
+      <NavigationContainer>
+        <MainStackNavigator />
+      </NavigationContainer>
     </Provider>
   );
 }

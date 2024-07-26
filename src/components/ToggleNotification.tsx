@@ -1,33 +1,32 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { RNText } from './RNText';
 import { FS, HP, VP } from '../utils/Responsive';
-import { SettingContext } from '../context/SettingContext';
 import Unmute from '../assets/svgs/unmute.svg';
 import { TextStyles } from '../utils/TextStyles';
 import Mute from '../assets/svgs/mute.svg';
+import { useDispatch, useSelector } from 'react-redux';
+import { notificationStatus, setSettings } from '../redux/features/settings';
+import { saveStorage } from '../utils/storage';
 
 const ToggleNotification = (): React.JSX.Element => {
-    const settings = useContext<any>(SettingContext);
+    const dispatch = useDispatch();
 
-    const notificationStatus = settings.notificationStatus;
+    const NotificationStatus = useSelector(notificationStatus);
 
     const toggleNotification = async () => {
-        const dataPayload = {
-            "status": !notificationStatus
-        };
-
-        settings.handler('notificationStatus', !notificationStatus);
+        dispatch(setSettings({ notificationStatus: !NotificationStatus }));
+        saveStorage({ notificationStatus: !NotificationStatus }, "settings");
     }
 
     return (
         <>
             <TouchableOpacity style={{ alignItems: "center" }} onPress={() => toggleNotification()}>
                 <View style={styles.iconContainer}>
-                    {notificationStatus ? <Unmute width={31} height={31} /> : (<Mute width={31} height={31} />)}
+                    {NotificationStatus ? <Unmute width={31} height={31} /> : (<Mute width={31} height={31} />)}
                 </View>
-                <RNText textStyle={styles.iconText}>{notificationStatus ? 'Mute' : 'Unmute'}</RNText>
+                <RNText textStyle={styles.iconText}>{NotificationStatus ? 'Mute' : 'Unmute'}</RNText>
             </TouchableOpacity>
         </>
     );
