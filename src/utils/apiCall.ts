@@ -19,10 +19,9 @@ const refreshAuthToken = async (dataPayload: any) => {
   return new Promise(async (resolve, reject) => {
     try {
       const res = await axios.post(BACKEND_URL + apiEndpoints.pinLogin, dataPayload);
-      // console.log(res.data, '---------res refreshAuthToken');
       resolve(res);
     } catch (error: any) {
-      console.log('API ERROR (refreshAuthToken)', error?.response?.data?.message);
+      console.log('API ERROR (refreshAuthToken)', (error?.response?.data?.message || error?.message));
       reject(error);
     }
   });
@@ -36,7 +35,7 @@ const getProfileDetails = async (settings: { setProflieDetails: (arg0: (pre: any
     console.log(res.data, '---------------getProfileDetails');
     return res.data;
   } catch (error: any) {
-    console.error("Error getProfileDetails: ", error.response.data.error || error);
+    console.error("Error getProfileDetails: ", (error.response.data.error || error));
     return {};
   }
 }
@@ -49,7 +48,7 @@ const submitProfileDetails = async (dataPayload: any, settings: { setProflieDeta
     return res.data;
   } catch (error: any) {
     console.error("Error submitProfileDetails: ", error);
-    throw new Error('Failed to submit, ' + error.response.data.message || error.message);
+    throw new Error('Failed to submit, ' + (error.response.data.message || error.message));
   }
 }
 
@@ -61,7 +60,7 @@ const submitEmailDetails = async (dataPayload: any, settings: { setProflieDetail
     return res.data;
   } catch (error: any) {
     console.error("Error submitEmailDetails: ", error);
-    throw new Error('Failed to submit, ' + error.response.data.message || error.message);
+    throw new Error('Failed to submit, ' + (error.response.data.message || error.message));
   }
 }
 
@@ -73,7 +72,7 @@ const submitLocationDetails = async (dataPayload: any, settings: { setProflieDet
     return res.data;
   } catch (error: any) {
     console.error("Error submitLocationDetails: ", error);
-    throw new Error('Failed to submit, ' + error.response.data.message || error.message);
+    throw new Error('Failed to submit, ' + (error.response.data.message || error.message));
   }
 }
 
@@ -85,7 +84,7 @@ const submitNameDetails = async (dataPayload: any, settings: { setProflieDetails
     return res.data;
   } catch (error: any) {
     console.error("Error submitNameDetails: ", error);
-    throw new Error('Failed to submit, ' + error.response.data.message || error.message);
+    throw new Error('Failed to submit, ' + (error.response.data.message || error.message));
   }
 }
 
@@ -104,13 +103,42 @@ const reportUserCall = async (id: any) => {
 const getChannelList = async () => {
   try {
     const res = await axios.get(BACKEND_URL + apiEndpoints.channelList);
-
-    // console.log(res.data, '---------------getChannelList');
     return res.data;
   } catch (error: any) {
-    console.error("Error getChannelList: ", error.response.data.error || error);
+    console.error("Error getChannelList: ", (error.response.data.error || error));
     return {};
   }
 }
 
-export { saveLocation, refreshAuthToken, getProfileDetails, submitProfileDetails, reportUserCall, getChannelList, submitEmailDetails, submitLocationDetails, submitNameDetails };
+const iconTapSubmit = async (dataPayload: any) => {
+  try {
+    const res = await axios.post(BACKEND_URL + apiEndpoints.iconTapAction, dataPayload);
+
+    return res.data;
+  } catch (error: any) {
+    console.error("Error cameraTapAction: ", error.message);
+    throw new Error('Failed to submit, ' + (error.response.data.message || error.message));
+  }
+}
+
+const getCameraList = async (route: number) => {
+  try {
+    const res = await axios.get(BACKEND_URL + apiEndpoints.cameraList + '/' + route);
+    return res.data;
+  } catch (error: any) {
+    console.error("Error getCameraList: ", (error.response.data.error || error));
+    return [];
+  }
+}
+
+const getActionIconList = async (route: number) => {
+  try {
+    const res = await axios.get(BACKEND_URL + apiEndpoints.actionIconList + '/' + route);
+    return res.data;
+  } catch (error: any) {
+    console.error("Error getCameraList: ", (error.response.data.error || error));
+    return [];
+  }
+}
+
+export { saveLocation, refreshAuthToken, getProfileDetails, submitProfileDetails, reportUserCall, getChannelList, submitEmailDetails, submitLocationDetails, submitNameDetails, iconTapSubmit, getCameraList, getActionIconList };

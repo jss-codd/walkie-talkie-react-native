@@ -123,7 +123,7 @@ const compareLocation = (newLoc: { latitude: number; longitude: number; }, oldLo
         if (oldLoc.hasOwnProperty('latitude') && oldLoc.hasOwnProperty('longitude') && newLoc.hasOwnProperty('latitude') && newLoc.hasOwnProperty('longitude')) {
             const distance = distanceGet(newLoc.latitude, newLoc.longitude, oldLoc.latitude, oldLoc.longitude);
 
-            console.log(distance, 'distance');
+            // console.log(distance, 'distance');
 
             if (distance >= 100) {
                 resolve(true);

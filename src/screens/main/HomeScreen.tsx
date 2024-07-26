@@ -15,9 +15,13 @@ import { TextStyles } from '../../utils/TextStyles';
 import Location from '../../assets/svgs/location.svg';
 import { SettingContext } from '../../context/SettingContext';
 import Modals from '../../components/Modals';
-import RouteBox from '../../components/RouteBox';
+import { RouteBoxMemo } from '../../components/RouteBox';
 import ToggleNotification from '../../components/ToggleNotification';
 import VoiceRecorder from '../../components/VoiceRecorder';
+import MapIconsAction from '../../components/MapIconsAction';
+import { useIsFocused } from '@react-navigation/native';
+import { roomJoin } from '../../utils/socketEvents';
+import { TimeAgo } from '../../utils/timeAgo';
 
 export const LinearGradientComp = ({ children, status, onOffer, style }: { status: boolean, onOffer: boolean, children: any, style?: any }) => {
   return (
@@ -38,7 +42,9 @@ export const LinearGradientComp = ({ children, status, onOffer, style }: { statu
 function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
   const settings = useContext<any>(SettingContext);
 
-  const { markers, proflieDetails } = settings;
+  const { markers, proflieDetails, cameraMarkers, route, actionIconMarkers } = settings;
+
+  const isFocused = useIsFocused();
 
   const [isPending, startTransition] = useTransition();
 
@@ -130,6 +136,12 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
     }
   }, []);
 
+  useEffect(() => {
+    if (route?.value) {
+      roomJoin(route.value);
+    }
+  }, [isFocused]);
+
   const startTask = () => {
     console.log('Watcher started');
     hasLocationPermissionBG().then(function (res) {
@@ -158,7 +170,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
       <Modals {...modalProps} />
       {/* Top Div */}
 
-      <RouteBox route={settings.route} setRoute={settings.setRoute} navigation={navigation} />
+      <RouteBoxMemo navigation={navigation} />
 
       {/* Map Div & Bottom Icons */}
       <View style={{ flex: 1, alignItems: 'center', backgroundColor: "#ffffff" }}>
@@ -183,8 +195,6 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                   latitude: location?.coords?.latitude || 0,
                   longitude: location?.coords?.longitude || 0,
                 }}
-              // zIndex={1}
-              // tracksViewChanges={false}
               >
                 <Image
                   source={require('../../assets/images/truck.png')}
@@ -193,9 +203,7 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 />
               </Marker>
 
-
-              {/* {console.log(markers, 'markers')} */}
-
+              {/* markers for other route users */}
               {markers && markers?.map((marker: any, index: number) => (
                 <React.Fragment key={index.toString()}>
                   {proflieDetails.id !== marker.id && (
@@ -208,22 +216,8 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                       title={`${marker.name || ""}`}
                       zIndex={(index + 1)}
                     // tracksViewChanges={false}
-                    // style={{ transform: [{ rotate: `${+marker.heading || 0}deg` }] }}
                     >
-                      {/* transform: [{ rotate: '-'+(+marker.heading || 0) + 'deg'}] */}
                       <View style={{}}>
-                        {/* <View style={{ bottom: -8 }}>
-                      <View style={{ backgroundColor: "#341049", flexDirection: "row", borderRadius: 50, borderWidth: 1, borderColor: "#341049", alignItems: "center", padding: 2, justifyContent: "space-around" }}>
-
-                        <Image resizeMode="contain" loadingIndicatorSource={require("../../assets/images/profile.png")} source={require("../../assets/images/profile.png")} style={{ width: HP(20), height: VP(20), borderRadius: 20, paddingRight: 5, paddingLeft: 5, flexShrink: 0 }} />
-
-                        <RNText textStyle={{ ...TextStyles.SOFIA_SEMI_BOLD, fontSize: FS(12.06), color: "#fff", paddingRight: 5, paddingLeft: 5, }}>
-                          {`${inputSubStr(marker.name || "Unknown")}`}
-                        </RNText>
-                      </View>
-
-                      <Image resizeMode="contain" source={require("../../assets/icons/down.png")} style={{ width: HP(13), height: VP(8), left: 8, top: -2 }} />
-                    </View> */}
                         <Image
                           source={require('../../assets/images/truck.png')}
                           style={{ width: HP(25), height: VP(61) }}
@@ -234,9 +228,81 @@ function HomeScreen({ navigation }: { navigation: any }): React.JSX.Element {
                   )}
                 </React.Fragment>
               ))}
+
+              {/* {console.log(cameraMarkers, '------------cameraMarkers')} */}
+
+              {/* markers for cameras for selected route */}
+              {cameraMarkers && cameraMarkers?.map((marker: any, index: number) => (
+                <React.Fragment key={(Math.random() + index).toString()}>
+                  <Marker
+                    coordinate={{
+                      latitude: +marker.lat || 0,
+                      longitude: +marker.lng || 0,
+                    }}
+                    zIndex={999}
+                  >
+                    <View>
+                      <Image
+                        source={require('../../assets/icons/camera-marker.png')}
+                        style={{ width: HP(35), height: VP(41) }} // 35, 41 || 30, 35
+                        resizeMode="contain"
+                      />
+                    </View>
+                  </Marker>
+                </React.Fragment>
+              ))}
+
+              {/* {console.log(actionIconMarkers, '---------actionIconMarkers')} */}
+
+              {/* markers for other icon action for selected route */}
+              {actionIconMarkers && actionIconMarkers?.map((marker: any, index: number) => (
+                <React.Fragment key={(Math.random() + index).toString()}>
+                  <Marker
+                    coordinate={{
+                      latitude: +marker.lat || 0,
+                      longitude: +marker.lng || 0,
+                    }}
+                    zIndex={999}
+                  >
+                    <View>
+                      <View style={{ bottom: VP(-8) }}>
+                        <View style={{ backgroundColor: "#341049", flexDirection: "row", borderRadius: 50, borderWidth: 1, borderColor: "#341049", alignItems: "center", padding: 2, justifyContent: "space-around" }}>
+
+                          {marker?.createdAt && (
+                            <RNText textStyle={{ ...TextStyles.SOFIA_SEMI_BOLD, fontSize: FS(10), color: "#fff", paddingHorizontal: 5 }}>
+                              {TimeAgo.inWords(new Date(marker.createdAt).getTime())}
+                            </RNText>
+                          )}
+                        </View>
+
+                        <Image resizeMode="contain" source={require("../../assets/icons/down.png")} style={{ width: HP(13), height: VP(8), left: 8, top: -2 }} />
+                      </View>
+
+                      {marker.type === 'policeman' && (
+                        <Image
+                          source={require('../../assets/icons/policeman.png')}
+                          style={{ width: HP(35), height: VP(41) }}
+                          resizeMode="contain"
+                        />
+                      )}
+                      {marker.type === 'traffic' && (
+                        <Image
+                          source={require('../../assets/icons/traffic.png')}
+                          style={{ width: HP(35), height: VP(41) }}
+                          resizeMode="contain"
+                        />
+                      )}
+                    </View>
+
+                  </Marker>
+                </React.Fragment>
+              ))}
             </MapView>
           ) : null}
         </View>
+
+        {/* Side action icons */}
+        <MapIconsAction />
 
         {/* Bottom Bar */}
         <View style={{ bottom: 0, height: VP(123), position: "absolute", backgroundColor: "#ffffff", borderTopLeftRadius: 0, borderTopRightRadius: 0, flex: 1 }}>

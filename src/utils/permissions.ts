@@ -119,13 +119,13 @@ const notificationPermission = async () => {
 const askInitialPermission = async () => {
     const grantedNotification = await notificationPermission();
     const grantedLocation = await hasLocationPermission();
-    const audioPermissions = await requestAudioPermissions();
+    // const audioPermissions = await requestAudioPermissions();
 
     if (grantedNotification) {
         getFcmToken();
     }
 
-    return grantedLocation && grantedNotification && audioPermissions;
+    return grantedLocation && grantedNotification;
 };
 
 const requestAudioPermissions = async () => {
@@ -173,7 +173,7 @@ const requestAudioAndStoragePermissions = async () => {
 const checkPermissions = async () => {
     if (Platform.OS === 'android') {
         const notification = await Permissions.check('android.permission.POST_NOTIFICATIONS');
-
+        console.log(notification, '-----------notification')
         if (
             notification !== PermissionsAndroid.RESULTS.GRANTED &&
             notification !== PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN

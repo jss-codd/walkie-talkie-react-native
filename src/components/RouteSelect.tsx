@@ -1,40 +1,39 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, memo, SetStateAction, useCallback, useContext, useEffect, useState } from 'react';
 import SelectDropdown from 'react-native-select-dropdown'
 import { View, StyleSheet, Text } from 'react-native';
 
-import { getChannelList } from '../utils/apiCall';
+import { getCameraList, getChannelList, getActionIconList } from '../utils/apiCall';
 import Arrow from '../assets/svgs/arrow-narrow-right.svg';
 import { roomJoin } from '../utils/socketEvents';
+import { SettingContext } from '../context/SettingContext';
 
-const RouteSelect = (props: { route: any; setRoute: any; }) => {
-    const { route, setRoute } = props;
+const RouteSelect = () => {
+    const settings = useContext<any>(SettingContext);
 
-    const [items, setItems] = useState([]);
+    const { setRoute, setCameraMarkers, setActionIconMarkers, channelItems }: { setRoute: Dispatch<SetStateAction<any>>, setCameraMarkers: Dispatch<SetStateAction<any[]>>, setActionIconMarkers: Dispatch<SetStateAction<any[]>>, channelItems: any[] } = settings;
 
-    const fetchChannels = async () => {
-        const response = await getChannelList();
+    const selectRouteHandler = async (selectedItem: any) => {
+        setRoute(selectedItem);
 
-        if (response?.list) {
-            setItems(response?.list?.map((d: { starting_loc_address: string; destination_loc_address: string; id: number; }) => { return { starting_loc_address: d.starting_loc_address, destination_loc_address: d.destination_loc_address, value: d.id } }))
+        roomJoin(selectedItem.value);
+
+        const data = await getCameraList(selectedItem.value);
+
+        if (data?.list) {
+            setCameraMarkers(data.list);
+        }
+
+        const dataActionIcon = await getActionIconList(selectedItem.value);
+
+        if (dataActionIcon?.list) {
+            setActionIconMarkers(dataActionIcon.list);
         }
     }
-
-    const selectRouteHandler = (selectedItem: any) => {
-        setRoute(selectedItem);
-        
-        roomJoin(selectedItem.value);
-    }
-
-    useEffect(() => {
-        (async () => {
-            fetchChannels();
-        })()
-    }, [])
 
     return (
         <>
             <SelectDropdown
-                data={items}
+                data={channelItems}
                 onSelect={(selectedItem, index) => {
                     selectRouteHandler(selectedItem)
                 }}
@@ -109,4 +108,6 @@ const styles = StyleSheet.create({
     },
 });
 
-export default RouteSelect;
+// export default RouteSelect;
+
+export const RouteSelectMemo = memo(RouteSelect);

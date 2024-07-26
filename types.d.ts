@@ -14,3 +14,8 @@ interface modalContent {
     title: string;
     message: string;
 }
+
+interface mapActionIconComponents {
+    policeman: Policeman;
+    traffic: TrafficLight
+}

@@ -3,10 +3,24 @@ import { View, StyleSheet, Text, TouchableOpacity, Image, TextInput } from 'reac
 import Menu from '../assets/svgs/menu.svg';
 import { TextStyles } from '../utils/TextStyles';
 import { HP, VP } from '../utils/Responsive';
-import RouteSelect from './RouteSelect';
+import { RouteSelectMemo } from './RouteSelect';
+import { roomLeave } from '../utils/socketEvents';
+import { Dispatch, memo, SetStateAction, useContext } from 'react';
+import { SettingContext } from '../context/SettingContext';
 
-const RouteBox = (props: { route: any; setRoute: any; navigation: any }) => {
-    const { route, setRoute, navigation } = props;
+const RouteBox = (props: { navigation: any; }) => {
+    const { navigation } = props;
+
+    const settings = useContext<any>(SettingContext);
+
+    const { route, setRoute, setCameraMarkers, setActionIconMarkers }: { route: any, setRoute: Dispatch<SetStateAction<any>>, setCameraMarkers: Dispatch<SetStateAction<any[]>>, setActionIconMarkers: Dispatch<SetStateAction<any[]>> } = settings;
+
+    const resetRoute = () => {
+        roomLeave(route.value);
+        setRoute({});
+        setCameraMarkers([]);
+        setActionIconMarkers([]);
+    }
 
     return (
         <>
@@ -48,17 +62,11 @@ const RouteBox = (props: { route: any; setRoute: any; navigation: any }) => {
                                         readOnly={true}
                                     />
                                     <TouchableOpacity
-                                        onPress={() => setRoute({})}
+                                        onPress={() => resetRoute()}
                                         style={{ top: 6 }}
                                     >
                                         <Text style={styles.bottomText}>Exit To Channel Route</Text>
                                     </TouchableOpacity>
-                                </View>
-                                <View style={{}}>
-
-                                </View>
-                                <View style={{}}>
-
                                 </View>
                             </View>
                         </View>
@@ -76,7 +84,7 @@ const RouteBox = (props: { route: any; setRoute: any; navigation: any }) => {
                             </View>
 
                             <View style={{ flexBasis: "90%", }}>
-                                <RouteSelect route={route} setRoute={setRoute} />
+                                <RouteSelectMemo />
                             </View>
                         </View>
                     </>
@@ -132,4 +140,6 @@ const styles = StyleSheet.create({
     }
 });
 
-export default RouteBox;
+// export default RouteBox;
+
+export const RouteBoxMemo = memo(RouteBox);

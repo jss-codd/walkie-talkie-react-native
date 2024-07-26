@@ -6,7 +6,7 @@ const roomName = 'room';
 
 const roomJoin = (roomId: number) => {
     socket.emit("roomJoin", roomId);
-    socket.emit('join', roomName);
+    // socket.emit('join', roomName);
 
     // socket.emit("join", roomName, (response) => {
     //     console.log(response.status); // ok
@@ -14,7 +14,7 @@ const roomJoin = (roomId: number) => {
 }
 
 const roomLeave = (roomId: number) => {
-    socket.emit('leave', roomName);
+    socket.emit('leave', roomId);
 }
 
 const sendLocation = async (location: any) => {
