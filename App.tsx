@@ -5,6 +5,7 @@ import messaging from '@react-native-firebase/messaging';
 import { NavigationContainer } from '@react-navigation/native';
 import axios from 'axios';
 import { Provider } from 'react-redux'
+import KeepAwake from 'react-native-keep-awake';
 
 import HeadlessTask from './HeadlessTask';
 import { showAlert } from './src/utils/alert';
@@ -68,6 +69,8 @@ axios.interceptors.response.use(
 
 LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
+
+KeepAwake.activate();
 
 function App(): React.JSX.Element {
   const [isConnected, setConnected] = useState(true);
